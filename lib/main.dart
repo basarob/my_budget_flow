@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'features/auth/wrapper.dart';
@@ -25,6 +26,17 @@ class MyBudgetFlow extends StatelessWidget {
       title: 'My Budget Flow',
 
       theme: AppTheme.lightTheme,
+      // Takvimin ve diğer bileşenlerin Türkçe olması için eklendi
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('tr', 'TR'), // Turkish
+        Locale('en', 'US'), // English
+      ],
+      locale: const Locale('tr', 'TR'),
 
       // Wrapper'a yönlendir
       home: const AuthWrapper(),
