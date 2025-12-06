@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"my-budget-flow","appId":"1:1047531027316:android:5de096ffd359de8b288a21","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"my-budget-flow","configurations":{"android":"1:1047531027316:android:5de096ffd359de8b288a21","ios":"1:1047531027316:ios:6571f94fe9e1fb3e288a21"}}}}}}
