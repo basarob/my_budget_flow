@@ -128,7 +128,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       color: AppColors.primaryDark,
                     ),
                   ),
+
                   const SizedBox(height: 8),
+
                   const Text(
                     "Tekrar Hoşgeldiniz",
                     style: TextStyle(
@@ -142,110 +144,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
-                      child: Form(
-                        key: _formKey, // Form anahtarını buraya bağlıyoruz
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // Email Alanı
-                            TextFormField(
-                              controller: _emailController,
-                              autofocus: false,
-                              keyboardType: TextInputType.emailAddress,
-                              decoration: const InputDecoration(
-                                labelText: "E-posta Adresi",
-                                prefixIcon: Icon(
-                                  Icons.email_outlined,
-                                  color: AppColors.primaryLight,
-                                ),
-                              ),
-                              // Validator: Kullanıcı butona basınca burası çalışır. Null dönerse geçerli, yazı dönerse hata mesajıdır.
-                              validator: (value) {
-                                // 1. Kontrol: Boş mu? - Buton durumu ile kontrol edildi.
-                                if (value == null || value.isEmpty) {
-                                  return null; // Buton zaten pasif olacak
-                                }
-                                // 2. Kontrol: Email formatına uygun mu? (Regex)
-                                final bool emailValid = RegExp(
-                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-                                ).hasMatch(value);
-
-                                if (!emailValid) {
-                                  return 'Geçerli bir e-posta adresi giriniz.';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Şifre Alanı
-                            TextFormField(
-                              controller: _passwordController,
-                              autofocus: false,
-                              obscureText:
-                                  _obscurePassword, // Şifreyi gizle/göster durumu
-                              decoration: InputDecoration(
-                                labelText: "Şifre",
-                                prefixIcon: const Icon(
-                                  Icons.lock_outline,
-                                  color: AppColors.primaryLight,
-                                ), // Göz ikonu: Tıklanınca şifreyi gösterir/gizler
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                  ),
-                                  onPressed: () => setState(
-                                    () => _obscurePassword = !_obscurePassword,
-                                  ),
-                                ),
-                              ),
-                              validator: (val) => null,
-                            ),
-
-                            // Şifremi Unuttum Linki
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  FocusScope.of(
-                                    context,
-                                  ).unfocus(); // Odağı kaldır
-                                  _clearForm();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ForgotPasswordScreen(),
-                                    ),
-                                  );
-                                },
-                                child: const Text(
-                                  "Şifremi Unuttum?",
-                                  style: TextStyle(color: AppColors.primary),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            // Giriş Butonu
-                            ElevatedButton(
-                              onPressed: _isButtonEnabled && !_isLoading
-                                  ? _login
-                                  : null,
-                              child: _isLoading
-                                  ? const CircularProgressIndicator(
-                                      color: Colors.white,
-                                    )
-                                  : const Text("Giriş Yap"),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: loginForm(context),
                     ),
                   ),
+
                   const SizedBox(height: 24),
 
                   // --- KAYIT OL YÖNLENDİRMESİ ---
@@ -282,6 +184,100 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Form loginForm(BuildContext context) {
+    return Form(
+      key: _formKey, // Form anahtarını buraya bağlıyoruz
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Email Alanı
+          TextFormField(
+            controller: _emailController,
+            autofocus: false,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              labelText: "E-posta Adresi",
+              prefixIcon: Icon(
+                Icons.email_outlined,
+                color: AppColors.primaryLight,
+              ),
+            ),
+            // Validator: Kullanıcı butona basınca burası çalışır. Null dönerse geçerli, yazı dönerse hata mesajıdır.
+            validator: (value) {
+              // 1. Kontrol: Boş mu? - Buton durumu ile kontrol edildi.
+              if (value == null || value.isEmpty) {
+                return null; // Buton zaten pasif olacak
+              }
+              // 2. Kontrol: Email formatına uygun mu? (Regex)
+              final bool emailValid = RegExp(
+                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+              ).hasMatch(value);
+
+              if (!emailValid) {
+                return 'Geçerli bir e-posta adresi giriniz.';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // Şifre Alanı
+          TextFormField(
+            controller: _passwordController,
+            autofocus: false,
+            obscureText: _obscurePassword, // Şifreyi gizle/göster durumu
+            decoration: InputDecoration(
+              labelText: "Şifre",
+              prefixIcon: const Icon(
+                Icons.lock_outline,
+                color: AppColors.primaryLight,
+              ), // Göz ikonu: Tıklanınca şifreyi gösterir/gizler
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
+              ),
+            ),
+            validator: (val) => null,
+          ),
+
+          // Şifremi Unuttum Linki
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {
+                FocusScope.of(context).unfocus(); // Odağı kaldır
+                _clearForm();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ForgotPasswordScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                "Şifremi Unuttum?",
+                style: TextStyle(color: AppColors.primary),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Giriş Butonu
+          ElevatedButton(
+            onPressed: _isButtonEnabled && !_isLoading ? _login : null,
+            child: _isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text("Giriş Yap"),
+          ),
+        ],
       ),
     );
   }

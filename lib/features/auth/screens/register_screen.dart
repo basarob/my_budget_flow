@@ -88,14 +88,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         .join(' ');
   }
 
-  // Tarih Seçiciyi Açan Fonksiyon
+  // .Tarih Seçiciyi Açan Fonksiyon
   Future<void> _pickDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(2000), // Varsayılan açılış yılı
-      firstDate: DateTime(1900), // En eski tarih
-      lastDate: DateTime.now(), // En yeni tarih (bugün)
-      // Temaya uygun renkler için builder
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      // .Temaya uygun renkler için builder
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -179,7 +179,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       // AppBar: Ekranın en üstündeki başlık çubuğu
-      appBar: AppBar(title: const Text("Hesap Oluştur")),
+      appBar: AppBar(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+        ),
+        title: const Text("Hesap Oluştur"),
+      ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(

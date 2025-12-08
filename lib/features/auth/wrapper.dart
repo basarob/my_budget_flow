@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'services/auth_service.dart';
 
 import 'screens/login_screen.dart';
-import '../budget/screens/budgetDash_screen.dart';
+import '../budget/screens/budget_screen.dart';
 
 class AuthWrapper extends ConsumerWidget {
   const AuthWrapper({super.key});
@@ -28,7 +28,7 @@ class AuthWrapper extends ConsumerWidget {
           return const LoginScreen();
         } else {
           // Kullanıcı var -> Ana Ekrana git
-          return const BudgetdashScreen();
+          return const BudgetScreen();
         }
       },
     );

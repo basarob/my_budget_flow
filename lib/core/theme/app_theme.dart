@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // --- ANA RENKLER (PRIMARY) ---
-  static const Color primary = Color(0xFF1565C0); // Blue 800
-  static const Color primaryLight = Color(0xFF42A5F5); // Blue 400
-  static const Color primaryDark = Color(0xFF0D47A1); // Blue 900
+  static const Color primary = Color(0xFF64B5F6); // Blue 800
+  static const Color primaryLight = Color(0xFF90CAF9); // Blue 400
+  static const Color primaryDark = Color(0xFF1E88E5); // Blue 900
 
   // --- ARKA PLAN (BACKGROUND) ---
   static const Color background = Color(0xFFF4F6F8);
@@ -111,7 +111,7 @@ class AppTheme {
 
     // AppBar Stili
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.primaryDark,
       foregroundColor: Colors.white,
       elevation: 0,
       centerTitle: true,
