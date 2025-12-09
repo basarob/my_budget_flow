@@ -26,14 +26,14 @@ class MyBudgetFlow extends StatelessWidget {
       title: 'My Budget Flow',
 
       theme: AppTheme.lightTheme,
-      // Takvimin ve diğer bileşenlerin Türkçe olması için eklendi
+      // .Takvimin ve diğer bileşenlerin Türkçe olması için eklendi
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('tr', 'TR'), // Turkish
+        Locale('tr', 'TR'), // .Turkish
         Locale('en', 'US'), // English
       ],
       locale: const Locale('tr', 'TR'),

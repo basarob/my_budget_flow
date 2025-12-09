@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // --- ANA RENKLER (PRIMARY) ---
-  static const Color primary = Color(0xFF64B5F6); // Blue 800
-  static const Color primaryLight = Color(0xFF90CAF9); // Blue 400
-  static const Color primaryDark = Color(0xFF1E88E5); // Blue 900
+  static const Color primary = Color(0xFF64B5F6);
+  static const Color primaryLight = Color(0xFF90CAF9);
+  static const Color primaryDark = Color(0xFF1E88E5);
 
   // --- ARKA PLAN (BACKGROUND) ---
   static const Color background = Color(0xFFF4F6F8);
@@ -21,6 +21,7 @@ class AppColors {
   // --- DURUM RENKLERİ ---
   static const Color incomeGreen = Color(0xFF2E7D32); // Gelir (Yeşil)
   static const Color expenseRed = Color(0xFFC62828); // Gider (Kırmızı)
+  static const Color blueRed = Color(0xFFE53935); // Mavi Üzeri Kırmızı
   static const Color warningYellow = Color(0xFFEF6C00); // Uyarı (Turuncu)
 }
 

@@ -4,9 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/services/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
 
-import '../../drawer/aboutapp_screen.dart';
-import '../../drawer/profile_screen.dart';
-import '../../drawer/settings_screen.dart';
+import 'appbar/aboutapp_screen.dart';
+import 'appbar/profile_screen.dart';
+import 'appbar/settings_screen.dart';
+import 'appbar/notifications_screen.dart';
 import 'budCalendar_screen.dart';
 import 'budDashboard_body.dart';
 import 'budGoals_screen.dart';
@@ -40,9 +41,24 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     return Scaffold(
       appBar: budgetAppBar(_selectedIndex),
 
-      endDrawer: Drawer(
-        width: MediaQuery.of(context).size.width * 0.50,
-        child: customDrawer(context),
+      drawerScrimColor: Colors.transparent,
+      endDrawer: Align(
+        alignment: Alignment.topRight,
+        child: Padding(
+          padding: EdgeInsets.only(top: 60.0, right: 3.0),
+          child: SizedBox(
+            height: 200,
+            child: Drawer(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                side: BorderSide(color: Colors.white, width: 2),
+              ),
+              backgroundColor: AppColors.primaryDark,
+              width: 160,
+              child: customDrawer(context),
+            ),
+          ),
+        ),
       ),
 
       body: _widgetOptions.elementAt(_selectedIndex),
@@ -131,7 +147,12 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         IconButton(
           icon: const Icon(Icons.notifications_outlined),
           onPressed: () {
-            // TODO: Bildirimler sayfası veya paneli açılacak.
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const NotificationsScreen(),
+              ),
+            );
           },
           tooltip: "Bildirimler",
         ),
@@ -153,67 +174,92 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   Column customDrawer(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(20, 63, 20, 20),
-          color: AppColors.primaryDark,
-          child: Text(
-            'My Budget Flow',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(color: Colors.white),
+        // ! Ekleme yapmadan önce yüksekliği büyüt.
+        _buildDrawerItem(
+          context,
+          Icons.person_outline,
+          'Profil',
+          const ProfileScreen(),
+        ),
+        _buildDrawerItem(
+          context,
+          Icons.settings_outlined,
+          'Ayarlar',
+          const SettingsScreen(),
+        ),
+        _buildDrawerItem(
+          context,
+          Icons.info_outline,
+          'Hakkında',
+          const AboutAppScreen(),
+        ),
+
+        const Spacer(),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 13.0),
+          child: Divider(color: Colors.white54, height: 10),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.all(11.0),
+          child: Material(
+            color: AppColors.primaryLight,
+            borderRadius: BorderRadius.circular(10),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(authServiceProvider).signOut();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 8,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.logout, color: AppColors.blueRed),
+                    const SizedBox(width: 9),
+                    const Text(
+                      'Çıkış Yap',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.blueRed,
+                        fontSize: 17,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
-        ListTile(
-          leading: const Icon(Icons.person_outline),
-          title: const Text('Profil'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.settings_outlined),
-          title: const Text('Ayarlar'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.info_outline),
-          title: const Text('Hakkında'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AboutAppScreen()),
-            );
-          },
-        ),
-        const Divider(),
-        ListTile(
-          leading: const Icon(Icons.logout, weight: 700),
-          iconColor: AppColors.expenseRed,
-          title: const Text(
-            'Çıkış Yap',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          textColor: AppColors.expenseRed,
-          onTap: () {
-            Navigator.pop(context); // Önce menüyü kapat
-            ref.read(authServiceProvider).signOut();
-          },
         ),
       ],
     );
   }
+}
+
+// !Drawer butonları
+Widget _buildDrawerItem(
+  BuildContext context,
+  IconData icon,
+  String title,
+  Widget page,
+) {
+  return ListTile(
+    dense: true,
+    visualDensity: VisualDensity.compact,
+    leading: Icon(icon, color: Colors.white),
+    title: Text(
+      title,
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+    ),
+    textColor: Colors.white,
+    onTap: () {
+      Navigator.pop(context);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+    },
+  );
 }
 
 // !AppBar Başlıkları
