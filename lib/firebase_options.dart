@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'my-budget-flow.firebasestorage.app',
     iosBundleId: 'com.basarob.myBudgetFlow',
   );
-
 }

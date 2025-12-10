@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
 import '../services/auth_service.dart';
-import '../services/database_service.dart';
+import '../../../services/database_service.dart';
 import '../../../core/theme/app_theme.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {

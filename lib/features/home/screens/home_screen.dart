@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/services/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
 
-import 'appbar/aboutapp_screen.dart';
-import 'appbar/profile_screen.dart';
-import 'appbar/settings_screen.dart';
-import 'appbar/notifications_screen.dart';
-import 'budCalendar_screen.dart';
-import 'budDashboard_body.dart';
-import 'budGoals_screen.dart';
-import 'budTransactions_screen.dart';
+import '../../appbar/screens/about_app_screen.dart';
+import '../../appbar/screens/profile_screen.dart';
+import '../../appbar/screens/settings_screen.dart';
+import '../../appbar/screens/notifications_screen.dart';
+import '../../calendar/screens/calendar_screen.dart';
+import '../../dashboard/screens/dashboard_screen.dart';
+import '../../goals/screens/goals_screen.dart';
+import '../../transactions/screens/transactions_screen.dart';
 
 class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
