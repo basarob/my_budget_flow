@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/auth_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -41,6 +42,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   Future<void> _sendResetLink() async {
     // Önce kontrol: Kullanıcı email yazmış mı?
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() => _isLoading = true);
     try {
@@ -52,10 +54,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       if (mounted) {
         // Kullanıcıya yeşil bir başarı mesajı göster
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Sıfırlama bağlantısı e-mail adresine gönderildi.\nSpam klasörünü kontrol etmeyi unutma!',
-            ),
+          SnackBar(
+            content: Text(l10n.successResetEmailSent),
             backgroundColor: AppColors.incomeGreen,
           ),
         );
@@ -65,9 +65,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Hata: ${e.toString()}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.errorGeneric(e.toString()))),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -76,12 +76,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
         ),
-        title: const Text("Şifre Sıfırla"),
+        title: Text(l10n.resetPasswordTitle),
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -97,10 +98,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   color: AppColors.primary,
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  "E-posta adresini gir, sana şifreni sıfırlaman için bir bağlantı gönderelim.",
+                Text(
+                  l10n.resetPasswordDescription,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 16,
                   ),
@@ -111,9 +112,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: "E-posta Adresi",
-                    prefixIcon: Icon(
+                  decoration: InputDecoration(
+                    labelText: l10n.emailLabel,
+                    prefixIcon: const Icon(
                       Icons.email,
                       color: AppColors.primaryLight,
                     ),
@@ -127,7 +128,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     ).hasMatch(value);
 
                     if (!emailValid) {
-                      return 'Geçerli bir e-posta adresi giriniz';
+                      return l10n.errorInvalidEmail;
                     }
                     return null;
                   },
@@ -141,7 +142,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         : null,
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Sıfırlama Linki Gönder"),
+                        : Text(l10n.sendResetLinkButton),
                   ),
                 ),
               ],

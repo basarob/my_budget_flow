@@ -1,0 +1,72 @@
+{
+    "@@locale": "en",
+
+    "appTitle": "My Budget Flow",
+    "welcomeBack": "Welcome Back",
+    "joinUsTitle": "Join Us Now!",
+    "joinUsSubtitle": "Easily track your income and expenses, set your goals!",
+    "createAccountTitle": "Create Account",
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordDescription": "Enter your email address and we will send you a link to reset your password.",
+
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "passwordConfirmLabel": "Confirm Password",
+    "nameLabel": "Name",
+    "surnameLabel": "Surname",
+    "birthDateLabel": "Birth Date",
+    "dateHint": "DD.MM.YYYY",
+
+    "loginButton": "Login",
+    "registerButton": "Register",
+    "sendResetLinkButton": "Send Reset Link",
+    "logoutButton": "Logout",
+
+    "forgotPasswordQuestion": "Forgot Password?",
+    "noAccountQuestion": "Don't have an account?",
+    "alreadyHaveAccountQuestion": "Already have an account? Login",
+
+    "navHome": "Home",
+    "navTransactions": "Transactions",
+    "navCalendar": "Calendar",
+    "navGoals": "Goals",
+
+    "pageTitleHome": "Dashboard",
+    "pageTitleTransactions": "Transactions",
+    "pageTitleCalendar": "Calendar",
+    "pageTitleGoals": "Goals",
+    "pageTitleProfile": "Profile",
+    "pageTitleSettings": "Settings",
+    "pageTitleNotifications": "Notifications",
+    "pageTitleAbout": "About",
+
+    "errorInvalidEmail": "Please enter a valid email address.",
+    "errorEmptyField": "This field cannot be empty.",
+    "errorPasswordShort": "Must be at least 6 characters.",
+    "errorPasswordMismatch": "Passwords do not match.",
+    "errorOnlyLetters": "Please enter letters only.",
+    "errorLoginGeneral": "An error occurred during login.",
+    "errorLoginWrongCredentials": "Incorrect email or password.",
+    "errorRegisterEmailInUse": "This email address is already in use.",
+    "errorRegisterGeneral": "An error occurred during registration.",
+    "errorLoadingLanguageSettings": "An error occurred while loading the language settings.",
+
+    "successRegister": "Registration successful. Please login.",
+    "successResetEmailSent": "A reset link has been sent to your email address.\nDon't forget to check your spam folder!",
+
+    "settingsLanguage": "App Language",
+    "settingsLanguageTr": "Turkish",
+    "settingsLanguageEn": "English",
+    "settingsTheme": "App Theme",
+    "settingsThemeLight": "Light",
+    "settingsThemeDark": "Dark",
+    
+    "errorGeneric": "An error occurred: {error}",
+    "@errorGeneric": {
+        "description": "A generic error message that includes the error details.",
+        "placeholders": {
+            "error": {
+            }
+        }
+    }
+}

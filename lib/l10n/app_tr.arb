@@ -1,0 +1,71 @@
+{
+    "@@locale": "tr",
+
+    "appTitle": "Bütçe Akışım",
+    "welcomeBack": "Tekrar Hoşgeldiniz",
+    "joinUsTitle": "Hemen Aramıza Katıl!",
+    "joinUsSubtitle": "Gelir ve giderlerini kolayca takip et, hedeflerini koy!",
+    "createAccountTitle": "Hesap Oluştur",
+    "resetPasswordTitle": "Şifre Sıfırla",
+    "resetPasswordDescription": "E-posta adresini gir, sana şifreni sıfırlaman için bir bağlantı gönderelim.",
+
+    "emailLabel": "E-posta Adresi",
+    "passwordLabel": "Şifre",
+    "passwordConfirmLabel": "Şifre Tekrar",
+    "nameLabel": "Ad",
+    "surnameLabel": "Soyad",
+    "birthDateLabel": "Doğum Tarihi",
+    "dateHint": "GG.AA.YYYY",
+
+    "loginButton": "Giriş Yap",
+    "registerButton": "Kayıt Ol",
+    "sendResetLinkButton": "Sıfırlama Linki Gönder",
+    "logoutButton": "Çıkış Yap",
+
+    "forgotPasswordQuestion": "Şifremi Unuttum?",
+    "noAccountQuestion": "Hesabın yok mu?",
+    "alreadyHaveAccountQuestion": "Zaten hesabın var mı? Giriş Yap",
+
+    "navHome": "Ana Menü",
+    "navTransactions": "İşlemler",
+    "navCalendar": "Takvim",
+    "navGoals": "Hedefler",
+
+    "pageTitleHome": "Ana Menü",
+    "pageTitleTransactions": "İşlemler",
+    "pageTitleCalendar": "Takvim",
+    "pageTitleGoals": "Hedefler",
+    "pageTitleProfile": "Profil",
+    "pageTitleSettings": "Ayarlar",
+    "pageTitleNotifications": "Bildirimler",
+    "pageTitleAbout": "Hakkında",
+
+    "errorInvalidEmail": "Geçerli bir e-posta adresi giriniz.",
+    "errorEmptyField": "Bu alan boş bırakılamaz.",
+    "errorPasswordShort": "En az 6 karakter olmalı.",
+    "errorPasswordMismatch": "Şifreler eşleşmiyor.",
+    "errorOnlyLetters": "Sadece harf giriniz.",
+    "errorLoginGeneral": "Giriş sırasında bir hata oluştu.",
+    "errorLoginWrongCredentials": "Hatalı e-posta veya şifre girdiniz.",
+    "errorRegisterEmailInUse": "Bu e-posta adresi zaten kullanılıyor.",
+    "errorRegisterGeneral": "Kayıt sırasında bir hata oluştu.",
+    "errorLoadingLanguageSettings": "Dil ayarları yüklenirken bir hata oluştu.",
+
+    "successRegister": "Kayıt başarıyla oluşturuldu. Lütfen giriş yapın.",
+    "successResetEmailSent": "Sıfırlama bağlantısı e-posta adresine gönderildi.\nSpam klasörünü kontrol etmeyi unutma!",
+
+    "settingsLanguage": "Uygulama Dili",
+    "settingsLanguageTr": "Türkçe",
+    "settingsLanguageEn": "İngilizce",
+    "settingsTheme": "Uygulama Teması",
+    "settingsThemeLight": "Açık",
+    "settingsThemeDark": "Koyu",
+    
+    "errorGeneric": "Bir hata oluştu: {error}",
+    "@errorGeneric": {
+        "description": "Hata detayını içeren genel bir hata mesajı.",
+        "placeholders": {
+            "error": {}
+        }
+    }
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 
 import 'login_screen.dart';
@@ -10,6 +11,7 @@ class AuthWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     // Kullanıcının oturum durumunu dinle (authStateChangesProvider)
     final authState = ref.watch(authStateChangesProvider);
 
@@ -19,7 +21,9 @@ class AuthWrapper extends ConsumerWidget {
           const Scaffold(body: Center(child: CircularProgressIndicator())),
 
       // 2. Durum: Bir hata oluştu
-      error: (err, stack) => Scaffold(body: Center(child: Text('Hata: $err'))),
+      error: (err, stack) => Scaffold(
+        body: Center(child: Text(l10n.errorGeneric(err.toString()))),
+      ),
 
       // 3. Durum: Veri geldi (Kullanıcı var ya da yok)
       data: (user) {

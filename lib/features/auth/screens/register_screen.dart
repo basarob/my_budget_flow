@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../../../services/database_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -123,6 +124,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       // 1. ADIM: Firebase Authentication ile kullanıcıyı oluştur
       final user = await ref
@@ -150,18 +153,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       // 3. ADIM: Başarı mesajı göster ve bir önceki ekrana dön
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kayıt başarıyla oluşturuldu. Lütfen giriş yapın.'),
+          SnackBar(
+            content: Text(l10n.successRegister),
             backgroundColor: AppColors.incomeGreen,
           ),
         );
         Navigator.of(context).pop();
       }
     } on FirebaseAuthException catch (e) {
+      // Hata mesajını yerelleştirme anahtarlarına göre ayarla
       if (mounted) {
-        String errorMessage = 'Kayıt sırasında bir hata oluştu.';
+        String errorMessage = l10n.errorRegisterGeneral;
         if (e.code == 'email-already-in-use') {
-          errorMessage = 'Bu e-posta adresi zaten kullanılıyor.';
+          errorMessage = l10n.errorRegisterEmailInUse;
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -177,13 +181,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       // AppBar: Ekranın en üstündeki başlık çubuğu
       appBar: AppBar(
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
         ),
-        title: const Text("Hesap Oluştur"),
+        title: Text(l10n.createAccountTitle),
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -194,18 +200,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Hemen Aramıza Katıl!",
-                  style: TextStyle(
+                Text(
+                  l10n.joinUsTitle,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryDark,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  "Gelir ve giderlerini kolayca takip et, hedeflerini koy!",
-                  style: TextStyle(color: AppColors.textSecondary),
+                Text(
+                  l10n.joinUsSubtitle,
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 30),
 
@@ -216,8 +222,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       child: TextFormField(
                         controller: _nameController,
                         textCapitalization: TextCapitalization.words,
-                        decoration: const InputDecoration(
-                          labelText: "Ad",
+                        decoration: InputDecoration(
+                          labelText: l10n.nameLabel,
                           prefixIcon: Icon(
                             Icons.person_outline,
                             color: AppColors.primaryLight,
@@ -229,7 +235,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             r'^[a-zA-ZçÇğĞıİöÖşŞÜ\s]+$',
                           );
                           if (!nameRegExp.hasMatch(v)) {
-                            return 'Sadece harf giriniz.';
+                            return l10n.errorOnlyLetters;
                           }
                           return null;
                         },
@@ -240,14 +246,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       child: TextFormField(
                         controller: _surnameController,
                         textCapitalization: TextCapitalization.words,
-                        decoration: const InputDecoration(labelText: "Soyad"),
+                        decoration: InputDecoration(
+                          labelText: l10n.surnameLabel,
+                        ),
                         validator: (v) {
                           if (v == null || v.isEmpty) return null;
                           final nameRegExp = RegExp(
                             r'^[a-zA-ZçÇğĞıİöÖşŞÜ\s]+$',
                           );
                           if (!nameRegExp.hasMatch(v)) {
-                            return 'Sadece harf giriniz.';
+                            return l10n.errorOnlyLetters;
                           }
                           return null;
                         },
@@ -262,10 +270,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _birthDateController,
                   readOnly: true, // Elle yazmayı engelle, sadece tıklanabilsin
                   onTap: _pickDate, // Tıklanınca takvimi aç
-                  decoration: const InputDecoration(
-                    labelText: "Doğum Tarihi",
-                    hintText: "GG.AA.YYYY",
-                    prefixIcon: Icon(
+                  decoration: InputDecoration(
+                    labelText: l10n.birthDateLabel,
+                    hintText: l10n.dateHint,
+                    prefixIcon: const Icon(
                       Icons.calendar_month,
                       color: AppColors.primaryLight,
                     ),
@@ -279,9 +287,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: "E-posta Adresi",
-                    prefixIcon: Icon(
+                  decoration: InputDecoration(
+                    labelText: l10n.emailLabel,
+                    prefixIcon: const Icon(
                       Icons.email_outlined,
                       color: AppColors.primaryLight,
                     ),
@@ -296,7 +304,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ).hasMatch(value);
 
                     if (!emailValid) {
-                      return 'Geçerli bir e-posta adresi giriniz.';
+                      return l10n.errorInvalidEmail;
                     }
                     return null;
                   },
@@ -308,7 +316,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _passwordController,
                   obscureText: _obscurePassword, // Şifreyi yıldızlı göster
                   decoration: InputDecoration(
-                    labelText: "Şifre",
+                    labelText: l10n.passwordLabel,
                     prefixIcon: const Icon(
                       Icons.lock_outline,
                       color: AppColors.primaryLight,
@@ -324,7 +332,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ),
                   validator: (v) => v != null && v.length < 6
-                      ? 'En az 6 karakter olmalı'
+                      ? l10n.errorPasswordShort
                       : null,
                 ),
                 const SizedBox(height: 16),
@@ -334,7 +342,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _confirmPasswordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
-                    labelText: "Şifre Tekrar",
+                    labelText: l10n.passwordConfirmLabel,
                     prefixIcon: const Icon(
                       Icons.lock_clock_outlined,
                       color: AppColors.primaryLight,
@@ -351,7 +359,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (v) {
                     if (v != _passwordController.text) {
-                      return 'Şifreler eşleşmiyor';
+                      return l10n.errorPasswordMismatch;
                     }
                     return null;
                   },
@@ -367,7 +375,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         : null,
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Kayıt Ol"),
+                        : Text(l10n.registerButton),
                   ),
                 ),
 
@@ -377,9 +385,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Center(
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "Zaten hesabın var mı? Giriş Yap",
-                      style: TextStyle(color: AppColors.primary),
+                    child: Text(
+                      l10n.alreadyHaveAccountQuestion,
+                      style: const TextStyle(color: AppColors.primary),
                     ),
                   ),
                 ),

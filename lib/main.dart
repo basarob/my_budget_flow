@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'l10n/app_localizations.dart';
 
-import 'features/auth/screens/wrapper.dart';
 import 'core/theme/app_theme.dart';
+import 'features/auth/screens/wrapper.dart';
+import 'core/providers/language_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,30 +17,36 @@ void main() async {
   runApp(const ProviderScope(child: MyBudgetFlow()));
 }
 
-class MyBudgetFlow extends StatelessWidget {
+class MyBudgetFlow extends ConsumerWidget {
   const MyBudgetFlow({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'My Budget Flow',
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncLocale = ref.watch(languageProvider);
 
-      theme: AppTheme.lightTheme,
-      // .Takvimin ve diğer bileşenlerin Türkçe olması için eklendi
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('tr', 'TR'), // .Turkish
-        Locale('en', 'US'), // English
-      ],
-      locale: const Locale('tr', 'TR'),
-
-      // Wrapper'a yönlendir
-      home: const AuthWrapper(),
+    // Dil yüklenirken veya hata oluşursa bir bekleme ekranı göster
+    return asyncLocale.when(
+      data: (currentLocale) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+          theme: AppTheme.lightTheme,
+          locale: currentLocale,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AuthWrapper(),
+        );
+      },
+      loading: () => const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+      ),
+      error: (err, stack) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          body: Center(child: Text('Uygulama başlatılamadı: $err')),
+        ),
+      ),
     );
   }
 }

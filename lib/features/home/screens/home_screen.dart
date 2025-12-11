@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/services/auth_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 
 import '../../appbar/screens/about_app_screen.dart';
@@ -38,8 +39,10 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: budgetAppBar(_selectedIndex),
+      appBar: budgetAppBar(_selectedIndex, l10n),
 
       drawerScrimColor: Colors.transparent,
       endDrawer: Align(
@@ -55,7 +58,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
               ),
               backgroundColor: AppColors.primaryDark,
               width: 160,
-              child: customDrawer(context),
+              child: customDrawer(context, l10n),
             ),
           ),
         ),
@@ -76,23 +79,23 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
               backgroundColor: AppColors.primaryDark,
               type: BottomNavigationBarType.fixed,
               items: <BottomNavigationBarItem>[
-                _buildNavItem(Icons.home_outlined, Icons.home, 'Ana Menü', 0),
+                _buildNavItem(Icons.home_outlined, Icons.home, l10n.navHome, 0),
                 _buildNavItem(
                   Icons.swap_horiz_outlined,
                   Icons.swap_horiz,
-                  'İşlemler',
+                  l10n.navTransactions,
                   1,
                 ),
                 _buildNavItem(
                   Icons.calendar_today_outlined,
                   Icons.calendar_today,
-                  'Takvim',
+                  l10n.navCalendar,
                   2,
                 ),
                 _buildNavItem(
                   Icons.track_changes_outlined,
                   Icons.track_changes,
-                  'Hedefler',
+                  l10n.navGoals,
                   3,
                 ),
               ],
@@ -131,7 +134,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   }
 
   // !AppBar
-  AppBar budgetAppBar(int page) {
+  AppBar budgetAppBar(int page, AppLocalizations l10n) {
     return AppBar(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
@@ -140,7 +143,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         padding: const EdgeInsets.all(8.0),
         child: Image.asset('assets/icon/app_icon_white1.png'),
       ),
-      title: Text(_getTitleForPage(page)),
+      title: Text(_getTitleForPage(page, l10n)),
       centerTitle: false,
       actions: [
         // Bildirimler butonu
@@ -154,7 +157,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
               ),
             );
           },
-          tooltip: "Bildirimler",
+          tooltip: l10n.pageTitleNotifications,
         ),
         // Menü butonunu eklemesi.
         Builder(
@@ -171,26 +174,26 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   }
 
   // !Drawer
-  Column customDrawer(BuildContext context) {
+  Column customDrawer(BuildContext context, AppLocalizations l10n) {
     return Column(
       children: [
         // ! Ekleme yapmadan önce yüksekliği büyüt.
         _buildDrawerItem(
           context,
           Icons.person_outline,
-          'Profil',
+          l10n.pageTitleProfile,
           const ProfileScreen(),
         ),
         _buildDrawerItem(
           context,
           Icons.settings_outlined,
-          'Ayarlar',
+          l10n.pageTitleSettings,
           const SettingsScreen(),
         ),
         _buildDrawerItem(
           context,
           Icons.info_outline,
-          'Hakkında',
+          l10n.pageTitleAbout,
           const AboutAppScreen(),
         ),
 
@@ -220,8 +223,8 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                   children: [
                     const Icon(Icons.logout, color: AppColors.blueRed),
                     const SizedBox(width: 9),
-                    const Text(
-                      'Çıkış Yap',
+                    Text(
+                      l10n.logoutButton,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.blueRed,
@@ -263,17 +266,17 @@ Widget _buildDrawerItem(
 }
 
 // !AppBar Başlıkları
-String _getTitleForPage(int page) {
+String _getTitleForPage(int page, AppLocalizations l10n) {
   switch (page) {
     case 0:
-      return 'Bütçe Akışım';
+      return l10n.appTitle;
     case 1:
-      return 'İşlemler';
+      return l10n.navTransactions;
     case 2:
-      return 'Takvim';
+      return l10n.navCalendar;
     case 3:
-      return 'Hedefler';
+      return l10n.navGoals;
     default:
-      return 'My Budget Flow';
+      return l10n.appTitle;
   }
 }

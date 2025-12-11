@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../core/providers/language_provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
 import 'forgot_password_screen.dart';
@@ -71,18 +73,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
     } on FirebaseAuthException catch (e) {
       if (mounted) {
-        String errorMessage = 'Giriş sırasında bir hata oluştu.';
+        final l10n = AppLocalizations.of(context)!;
+
+        String errorMessage = l10n.errorLoginGeneral;
         switch (e.code) {
           case 'user-not-found':
           case 'wrong-password':
           case 'invalid-credential':
-            errorMessage = 'Hatalı e-posta veya şifre girdiniz.';
+            errorMessage = l10n.errorLoginWrongCredentials;
             break;
           case 'invalid-email':
-            errorMessage = 'Geçersiz bir e-posta adresi giriniz.';
+            errorMessage = l10n.errorInvalidEmail;
             break;
           default:
-            errorMessage = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+            errorMessage = l10n.errorLoginGeneral;
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -99,89 +103,142 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // --- BAŞLIK VE LOGO ---
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(50), // Köşeleri yuvarla
-                    child: Image.asset(
-                      'assets/icon/app_icon.png',
-                      height: 120,
-                      width: 120,
-                    ),
-                  ),
-                  const SizedBox(height: 16), // Boşluk
-
-                  const Text(
-                    "My Budget Flow",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  const Text(
-                    "Tekrar Hoşgeldiniz",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // --- GİRİŞ FORMU ---
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: loginForm(context),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // --- KAYIT OL YÖNLENDİRMESİ ---
-                  Row(
+          child: Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Hesabın yok mu?",
-                        style: TextStyle(color: AppColors.textSecondary),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          FocusScope.of(context).unfocus(); // Odağı kaldır
-                          _clearForm();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const RegisterScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          "Kayıt Ol",
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      // --- BAŞLIK VE LOGO ---
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          50,
+                        ), // Köşeleri yuvarla
+                        child: Image.asset(
+                          'assets/icon/app_icon.png',
+                          height: 120,
+                          width: 120,
                         ),
+                      ),
+                      const SizedBox(height: 16), // Boşluk
+
+                      Text(
+                        l10n.appTitle,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryDark,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        l10n.welcomeBack,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+
+                      // --- GİRİŞ FORMU ---
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: loginForm(context),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // --- KAYIT OL YÖNLENDİRMESİ ---
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            l10n.noAccountQuestion,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              FocusScope.of(context).unfocus(); // Odağı kaldır
+                              _clearForm();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const RegisterScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              l10n.registerButton,
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
+
+              // Dil Seçimi
+              Positioned(
+                top: 16,
+                right: 16,
+                child: PopupMenuButton<bool>(
+                  icon: const Icon(
+                    Icons.language,
+                    color: AppColors.primary,
+                    size: 30,
+                  ),
+                  offset: const Offset(0, 45),
+                  color: AppColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  onSelected: (isEnglish) {
+                    ref
+                        .read(languageProvider.notifier)
+                        .changeLanguage(isEnglish);
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: false, // isEnglish = false
+                      child: Center(
+                        child: CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          child: Text('🇹🇷', style: TextStyle(fontSize: 28)),
+                        ),
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: true, // isEnglish = true
+                      child: Center(
+                        child: CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          child: Text('🇬🇧', style: TextStyle(fontSize: 28)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -189,6 +246,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Form loginForm(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Form(
       key: _formKey, // Form anahtarını buraya bağlıyoruz
       child: Column(
@@ -199,8 +257,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             controller: _emailController,
             autofocus: false,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: "E-posta Adresi",
+            decoration: InputDecoration(
+              labelText: l10n.emailLabel,
               prefixIcon: Icon(
                 Icons.email_outlined,
                 color: AppColors.primaryLight,
@@ -218,7 +276,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ).hasMatch(value);
 
               if (!emailValid) {
-                return 'Geçerli bir e-posta adresi giriniz.';
+                return l10n.errorInvalidEmail;
               }
               return null;
             },
@@ -231,7 +289,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             autofocus: false,
             obscureText: _obscurePassword, // Şifreyi gizle/göster durumu
             decoration: InputDecoration(
-              labelText: "Şifre",
+              labelText: l10n.passwordLabel,
               prefixIcon: const Icon(
                 Icons.lock_outline,
                 color: AppColors.primaryLight,
@@ -261,9 +319,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 );
               },
-              child: const Text(
-                "Şifremi Unuttum?",
-                style: TextStyle(color: AppColors.primary),
+              child: Text(
+                l10n.forgotPasswordQuestion,
+                style: const TextStyle(color: AppColors.primary),
               ),
             ),
           ),
@@ -275,7 +333,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             onPressed: _isButtonEnabled && !_isLoading ? _login : null,
             child: _isLoading
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text("Giriş Yap"),
+                : Text(l10n.loginButton),
           ),
         ],
       ),

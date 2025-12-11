@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 
 class DashboardBody extends StatelessWidget {
   const DashboardBody({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Dashboard'));
+    final l10n = AppLocalizations.of(context)!;
+
+    return Center(child: Text(l10n.pageTitleHome));
   }
 }
