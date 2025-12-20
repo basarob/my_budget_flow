@@ -168,6 +168,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsThemeDark => 'Koyu';
 
   @override
+  String get tabHistory => 'Geçmiş';
+
+  @override
+  String get tabRecurring => 'Düzenli';
+
+  @override
   String errorGeneric(Object error) {
     return 'Bir hata oluştu: $error';
   }

@@ -404,6 +404,18 @@ abstract class AppLocalizations {
   /// **'Koyu'**
   String get settingsThemeDark;
 
+  /// No description provided for @tabHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş'**
+  String get tabHistory;
+
+  /// No description provided for @tabRecurring.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenli'**
+  String get tabRecurring;
+
   /// Hata detayını içeren genel bir hata mesajı.
   ///
   /// In tr, this message translates to:

@@ -61,6 +61,9 @@
     "settingsThemeLight": "Light",
     "settingsThemeDark": "Dark",
     
+    "tabHistory": "History",
+    "tabRecurring": "Recurring",
+
     "errorGeneric": "An error occurred: {error}",
     "@errorGeneric": {
         "description": "A generic error message that includes the error details.",

@@ -166,6 +166,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsThemeDark => 'Dark';
 
   @override
+  String get tabHistory => 'History';
+
+  @override
+  String get tabRecurring => 'Recurring';
+
+  @override
   String errorGeneric(Object error) {
     return 'An error occurred: $error';
   }
