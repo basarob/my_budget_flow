@@ -172,6 +172,222 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabRecurring => 'Recurring';
 
   @override
+  String get searchHint => 'Search...';
+
+  @override
+  String get filterTitle => 'Filter';
+
+  @override
+  String get clearAllFilters => 'Clear All';
+
+  @override
+  String get foundTransactionsPrefix => 'Found transactions: ';
+
+  @override
+  String get showResultsButton => 'Show Results';
+
+  @override
+  String get transactionTypeHeader => 'TRANSACTION TYPE';
+
+  @override
+  String get allTransactions => 'All';
+
+  @override
+  String get incomeType => 'Income';
+
+  @override
+  String get expenseType => 'Expense';
+
+  @override
+  String get dateHeader => 'DATE';
+
+  @override
+  String get dateToday => 'Today';
+
+  @override
+  String get dateWeek => 'This Week';
+
+  @override
+  String get dateMonth => 'This Month';
+
+  @override
+  String get date3Months => '3 Months';
+
+  @override
+  String get dateCustom => 'Custom Date';
+
+  @override
+  String get categoriesHeader => 'CATEGORIES';
+
+  @override
+  String get errorCategoriesLoad => 'Failed to load categories';
+
+  @override
+  String get addExpenseTitle => 'Add Expense';
+
+  @override
+  String get addIncomeTitle => 'Add Income';
+
+  @override
+  String get editTransactionTitle => 'Edit Transaction';
+
+  @override
+  String get addFromRecurring => 'Add from Recurring';
+
+  @override
+  String get errorEnterAmount => 'Enter amount';
+
+  @override
+  String get errorInvalidAmount => 'Invalid amount';
+
+  @override
+  String get titleHint => 'Title (e.g. Grocery Bill)';
+
+  @override
+  String get errorEnterTitle => 'Enter title';
+
+  @override
+  String get categoryLabel => 'Category';
+
+  @override
+  String get selectLabel => 'Select';
+
+  @override
+  String get categoryOther => 'Other';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get addNoteLabel => 'Add Note';
+
+  @override
+  String get noteHint => 'Write your note here...';
+
+  @override
+  String get categoryFood => 'Food';
+
+  @override
+  String get categoryBills => 'Bills';
+
+  @override
+  String get categoryTransport => 'Transportation';
+
+  @override
+  String get categoryRent => 'Rent';
+
+  @override
+  String get categoryEntertainment => 'Entertainment';
+
+  @override
+  String get categoryShopping => 'Shopping';
+
+  @override
+  String get categorySalary => 'Salary';
+
+  @override
+  String get categoryInvestment => 'Investment';
+
+  @override
+  String get saveButton => 'SAVE';
+
+  @override
+  String get makeRecurringLabel => 'Make Recurring';
+
+  @override
+  String get frequencyLabel => 'Frequency';
+
+  @override
+  String get selectCategoryTitle => 'Select Category';
+
+  @override
+  String get addNewCategoryTooltip => 'Add New Category';
+
+  @override
+  String get defaultCategoriesTitle => 'Default Categories';
+
+  @override
+  String get userCategoriesTitle => 'User Categories';
+
+  @override
+  String get deleteCategoryHint => 'Long press to delete';
+
+  @override
+  String errorMessagePrefix(Object error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get addNewCategoryTitle => 'Add New Category';
+
+  @override
+  String get categoryNameLabel => 'Category Name';
+
+  @override
+  String get selectColorLabel => 'Select Color';
+
+  @override
+  String get selectIconLabel => 'Select Icon';
+
+  @override
+  String get cancelButton => 'Cancel';
+
+  @override
+  String get addButton => 'Add';
+
+  @override
+  String get deleteButton => 'Delete';
+
+  @override
+  String get undoAction => 'Undo';
+
+  @override
+  String get transactionDeleted => 'Transaction deleted';
+
+  @override
+  String get recurringDeleted => 'Recurring transaction deleted';
+
+  @override
+  String get noTransactionsFound => 'No transactions found.';
+
+  @override
+  String get addTransactionHint =>
+      'You can add a new transaction using the \"+\" button.';
+
+  @override
+  String get addRecurringHint => 'You can add transactions like rent, bills.';
+
+  @override
+  String get deleteCategoryTitle => 'Delete Category?';
+
+  @override
+  String deleteCategoryConfirmMessage(Object category) {
+    return 'Are you sure you want to delete \'$category\'?';
+  }
+
+  @override
+  String get frequencyMonthly => 'Monthly';
+
+  @override
+  String get frequencyWeekly => 'Weekly';
+
+  @override
+  String get frequencyYearly => 'Yearly';
+
+  @override
+  String get frequencyDaily => 'Daily';
+
+  @override
+  String get recurringDescription =>
+      'This transaction will be repeated at intervals.';
+
+  @override
+  String get selectRecurringTitle => 'Select Recurring Transaction';
+
+  @override
+  String get noRecurringFound => 'No recurring transactions found.';
+
+  @override
   String errorGeneric(Object error) {
     return 'An error occurred: $error';
   }

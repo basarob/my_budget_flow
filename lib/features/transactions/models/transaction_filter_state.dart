@@ -3,20 +3,28 @@ import 'transaction_model.dart';
 
 class TransactionFilterState {
   final TransactionType? type;
-  final String? categoryName;
+  final List<String>? selectedCategories; // Çoklu kategori seçimi
   final DateTimeRange? dateRange;
+  final String? searchQuery; // Arama sorgusu
 
-  const TransactionFilterState({this.type, this.categoryName, this.dateRange});
+  const TransactionFilterState({
+    this.type,
+    this.selectedCategories,
+    this.dateRange,
+    this.searchQuery,
+  });
 
   TransactionFilterState copyWith({
     TransactionType? type,
-    String? categoryName,
+    List<String>? selectedCategories,
     DateTimeRange? dateRange,
+    String? searchQuery,
   }) {
     return TransactionFilterState(
       type: type ?? this.type,
-      categoryName: categoryName ?? this.categoryName,
+      selectedCategories: selectedCategories ?? this.selectedCategories,
       dateRange: dateRange ?? this.dateRange,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 }

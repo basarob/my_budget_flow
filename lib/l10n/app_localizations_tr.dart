@@ -174,6 +174,223 @@ class AppLocalizationsTr extends AppLocalizations {
   String get tabRecurring => 'Düzenli';
 
   @override
+  String get searchHint => 'Ara...';
+
+  @override
+  String get filterTitle => 'Filtrele';
+
+  @override
+  String get clearAllFilters => 'Hepsini Temizle';
+
+  @override
+  String get foundTransactionsPrefix => 'Bulunan işlemler: ';
+
+  @override
+  String get showResultsButton => 'Sonuçları Göster';
+
+  @override
+  String get transactionTypeHeader => 'İŞLEM TÜRÜ';
+
+  @override
+  String get allTransactions => 'Tümü';
+
+  @override
+  String get incomeType => 'Gelir';
+
+  @override
+  String get expenseType => 'Gider';
+
+  @override
+  String get dateHeader => 'TARİH';
+
+  @override
+  String get dateToday => 'Bugün';
+
+  @override
+  String get dateWeek => 'Bu Hafta';
+
+  @override
+  String get dateMonth => 'Bu Ay';
+
+  @override
+  String get date3Months => '3 Ay';
+
+  @override
+  String get dateCustom => 'Özel Tarih';
+
+  @override
+  String get categoriesHeader => 'KATEGORİLER';
+
+  @override
+  String get errorCategoriesLoad => 'Kategoriler yüklenemedi';
+
+  @override
+  String get addExpenseTitle => 'Gider Ekle';
+
+  @override
+  String get addIncomeTitle => 'Gelir Ekle';
+
+  @override
+  String get editTransactionTitle => 'İşlemi Düzenle';
+
+  @override
+  String get addFromRecurring => 'Düzenliden Ekle';
+
+  @override
+  String get errorEnterAmount => 'Tutar giriniz';
+
+  @override
+  String get errorInvalidAmount => 'Geçersiz tutar';
+
+  @override
+  String get titleHint => 'Başlık (Örn: Market Fişi)';
+
+  @override
+  String get errorEnterTitle => 'Başlık giriniz';
+
+  @override
+  String get categoryLabel => 'Kategori';
+
+  @override
+  String get selectLabel => 'Seçiniz';
+
+  @override
+  String get categoryOther => 'Diğer';
+
+  @override
+  String get dateLabel => 'Tarih';
+
+  @override
+  String get addNoteLabel => 'Not Ekle';
+
+  @override
+  String get noteHint => 'Notunuzu buraya yazın...';
+
+  @override
+  String get categoryFood => 'Gıda';
+
+  @override
+  String get categoryBills => 'Fatura';
+
+  @override
+  String get categoryTransport => 'Ulaşım';
+
+  @override
+  String get categoryRent => 'Kira/Aidat';
+
+  @override
+  String get categoryEntertainment => 'Eğlence';
+
+  @override
+  String get categoryShopping => 'Alışveriş';
+
+  @override
+  String get categorySalary => 'Maaş';
+
+  @override
+  String get categoryInvestment => 'Yatırım';
+
+  @override
+  String get saveButton => 'KAYDET';
+
+  @override
+  String get makeRecurringLabel => 'Düzenli İşlem Yap';
+
+  @override
+  String get frequencyLabel => 'Sıklık';
+
+  @override
+  String get selectCategoryTitle => 'Kategori Seç';
+
+  @override
+  String get addNewCategoryTooltip => 'Yeni Kategori Ekle';
+
+  @override
+  String get defaultCategoriesTitle => 'Varsayılan Kategoriler';
+
+  @override
+  String get userCategoriesTitle => 'Kullanıcı Kategorileri';
+
+  @override
+  String get deleteCategoryHint => 'Basılı tutarak silebilirsiniz';
+
+  @override
+  String errorMessagePrefix(Object error) {
+    return 'Hata: $error';
+  }
+
+  @override
+  String get addNewCategoryTitle => 'Yeni Kategori Ekle';
+
+  @override
+  String get categoryNameLabel => 'Kategori Adı';
+
+  @override
+  String get selectColorLabel => 'Renk Seç';
+
+  @override
+  String get selectIconLabel => 'İkon Seç';
+
+  @override
+  String get cancelButton => 'İptal';
+
+  @override
+  String get addButton => 'Ekle';
+
+  @override
+  String get deleteButton => 'Sil';
+
+  @override
+  String get undoAction => 'Geri Al';
+
+  @override
+  String get transactionDeleted => 'İşlem silindi';
+
+  @override
+  String get recurringDeleted => 'Düzenli işlem silindi';
+
+  @override
+  String get noTransactionsFound => 'İşlem bulunamadı.';
+
+  @override
+  String get addTransactionHint =>
+      '\"+\" butonu ile yeni bir işlem ekleyebilirsiniz.';
+
+  @override
+  String get addRecurringHint =>
+      'Kira, fatura gibi işlemlerinizi ekleyebilirsiniz.';
+
+  @override
+  String get deleteCategoryTitle => 'Kategoriyi Sil?';
+
+  @override
+  String deleteCategoryConfirmMessage(Object category) {
+    return '\'$category\' kategorisini silmek istediğinize emin misiniz?';
+  }
+
+  @override
+  String get frequencyMonthly => 'Aylık';
+
+  @override
+  String get frequencyWeekly => 'Haftalık';
+
+  @override
+  String get frequencyYearly => 'Yıllık';
+
+  @override
+  String get frequencyDaily => 'Günlük';
+
+  @override
+  String get recurringDescription =>
+      'Bu işlem belirli aralıklarla tekrarlansın.';
+
+  @override
+  String get selectRecurringTitle => 'Düzenli İşlem Seç';
+
+  @override
+  String get noRecurringFound => 'Düzenli işlem bulunamadı.';
+
+  @override
   String errorGeneric(Object error) {
     return 'Bir hata oluştu: $error';
   }

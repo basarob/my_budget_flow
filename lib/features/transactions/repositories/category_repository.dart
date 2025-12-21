@@ -49,4 +49,14 @@ class CategoryRepository {
 
     await docRef.set(newCategory.toMap());
   }
+
+  // Kategoriyi Sil
+  Future<void> deleteCustomCategory(String userId, String categoryId) async {
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('categories')
+        .doc(categoryId)
+        .delete();
+  }
 }

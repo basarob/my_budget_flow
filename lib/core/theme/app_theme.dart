@@ -19,10 +19,41 @@ class AppColors {
   static const Color textSecondary = Color(0xFF627D98);
 
   // --- DURUM RENKLERİ ---
-  static const Color incomeGreen = Color(0xFF2E7D32); // Gelir (Yeşil)
-  static const Color expenseRed = Color(0xFFC62828); // Gider (Kırmızı)
+  static const Color incomeGreen = Color(0xFF2E7D32); // Gelir (Yeşil - Updated)
+  static const Color expenseRed = Color(
+    0xFFC62828,
+  ); // Gider (Kırmızı - Updated)
+  static const Color passive = Colors.grey; // Pasif (Gri - New)
   static const Color blueRed = Color(0xFFE53935); // Mavi Üzeri Kırmızı
   static const Color warningYellow = Color(0xFFEF6C00); // Uyarı (Turuncu)
+
+  // --- KATEGORİ RENK PALETİ (Category Palette - New) ---
+  static const List<Color> categoryColors = [
+    Color(0xFFFFB74D), // 0
+    Color(0xFF4DB6AC), // 1
+    Color(0xFFF06292), // 2
+    Color(0xFF9575CD), // 3
+    Color(0xFF4FC3F7), // 4
+    Color(0xFFBA68C8), // 5
+    Color(0xFFE57373), // 6
+    Color(0xFF7986CB), // 7
+    Color(0xFF90A4AE), // 8
+    Color(0xFF81C784), // 9
+    Color(0xFFAED581), // 10
+    Color(0xFF4DD0E1), // 11
+    Color(0xFFFFD54F), // 12
+  ];
+  // --- KULLANICI SEÇİM RENKLERİ (8 Temel Renk) ---
+  static const List<Color> userSelectionColors = [
+    Color(0xFFE57373), // Kırmızı (Soft)
+    Color(0xFF64B5F6), // Mavi
+    Color(0xFF81C784), // Yeşil
+    Color(0xFFFFB74D), // Turuncu
+    Color(0xFF9575CD), // Mor
+    Color(0xFF4DB6AC), // Teal
+    Color(0xFFF06292), // Pembe
+    Color(0xFF90A4AE), // Gri / BlueGrey
+  ];
 }
 
 class AppTheme {
@@ -36,7 +67,7 @@ class AppTheme {
       primary: AppColors.primary,
       secondary: AppColors.primaryLight,
       surface: AppColors.surface,
-      error: AppColors.expenseRed,
+      error: AppColors.expenseRed, // Updated
       onPrimary: Colors.white, // Primary üzerindeki yazı rengi
       onSurface: AppColors.textPrimary, // Kart üzerindeki yazı rengi
     ),

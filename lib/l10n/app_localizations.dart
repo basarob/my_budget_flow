@@ -416,6 +416,426 @@ abstract class AppLocalizations {
   /// **'Düzenli'**
   String get tabRecurring;
 
+  /// No description provided for @searchHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ara...'**
+  String get searchHint;
+
+  /// No description provided for @filterTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Filtrele'**
+  String get filterTitle;
+
+  /// No description provided for @clearAllFilters.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hepsini Temizle'**
+  String get clearAllFilters;
+
+  /// No description provided for @foundTransactionsPrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bulunan işlemler: '**
+  String get foundTransactionsPrefix;
+
+  /// No description provided for @showResultsButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonuçları Göster'**
+  String get showResultsButton;
+
+  /// No description provided for @transactionTypeHeader.
+  ///
+  /// In tr, this message translates to:
+  /// **'İŞLEM TÜRÜ'**
+  String get transactionTypeHeader;
+
+  /// No description provided for @allTransactions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümü'**
+  String get allTransactions;
+
+  /// No description provided for @incomeType.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelir'**
+  String get incomeType;
+
+  /// No description provided for @expenseType.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gider'**
+  String get expenseType;
+
+  /// No description provided for @dateHeader.
+  ///
+  /// In tr, this message translates to:
+  /// **'TARİH'**
+  String get dateHeader;
+
+  /// No description provided for @dateToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün'**
+  String get dateToday;
+
+  /// No description provided for @dateWeek.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Hafta'**
+  String get dateWeek;
+
+  /// No description provided for @dateMonth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Ay'**
+  String get dateMonth;
+
+  /// No description provided for @date3Months.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 Ay'**
+  String get date3Months;
+
+  /// No description provided for @dateCustom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özel Tarih'**
+  String get dateCustom;
+
+  /// No description provided for @categoriesHeader.
+  ///
+  /// In tr, this message translates to:
+  /// **'KATEGORİLER'**
+  String get categoriesHeader;
+
+  /// No description provided for @errorCategoriesLoad.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategoriler yüklenemedi'**
+  String get errorCategoriesLoad;
+
+  /// No description provided for @addExpenseTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gider Ekle'**
+  String get addExpenseTitle;
+
+  /// No description provided for @addIncomeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelir Ekle'**
+  String get addIncomeTitle;
+
+  /// No description provided for @editTransactionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlemi Düzenle'**
+  String get editTransactionTitle;
+
+  /// No description provided for @addFromRecurring.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenliden Ekle'**
+  String get addFromRecurring;
+
+  /// No description provided for @errorEnterAmount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tutar giriniz'**
+  String get errorEnterAmount;
+
+  /// No description provided for @errorInvalidAmount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçersiz tutar'**
+  String get errorInvalidAmount;
+
+  /// No description provided for @titleHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlık (Örn: Market Fişi)'**
+  String get titleHint;
+
+  /// No description provided for @errorEnterTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlık giriniz'**
+  String get errorEnterTitle;
+
+  /// No description provided for @categoryLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori'**
+  String get categoryLabel;
+
+  /// No description provided for @selectLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçiniz'**
+  String get selectLabel;
+
+  /// No description provided for @categoryOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get categoryOther;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarih'**
+  String get dateLabel;
+
+  /// No description provided for @addNoteLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Not Ekle'**
+  String get addNoteLabel;
+
+  /// No description provided for @noteHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Notunuzu buraya yazın...'**
+  String get noteHint;
+
+  /// No description provided for @categoryFood.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gıda'**
+  String get categoryFood;
+
+  /// No description provided for @categoryBills.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fatura'**
+  String get categoryBills;
+
+  /// No description provided for @categoryTransport.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ulaşım'**
+  String get categoryTransport;
+
+  /// No description provided for @categoryRent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kira/Aidat'**
+  String get categoryRent;
+
+  /// No description provided for @categoryEntertainment.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eğlence'**
+  String get categoryEntertainment;
+
+  /// No description provided for @categoryShopping.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alışveriş'**
+  String get categoryShopping;
+
+  /// No description provided for @categorySalary.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maaş'**
+  String get categorySalary;
+
+  /// No description provided for @categoryInvestment.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yatırım'**
+  String get categoryInvestment;
+
+  /// No description provided for @saveButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'KAYDET'**
+  String get saveButton;
+
+  /// No description provided for @makeRecurringLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenli İşlem Yap'**
+  String get makeRecurringLabel;
+
+  /// No description provided for @frequencyLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıklık'**
+  String get frequencyLabel;
+
+  /// No description provided for @selectCategoryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori Seç'**
+  String get selectCategoryTitle;
+
+  /// No description provided for @addNewCategoryTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Kategori Ekle'**
+  String get addNewCategoryTooltip;
+
+  /// No description provided for @defaultCategoriesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Varsayılan Kategoriler'**
+  String get defaultCategoriesTitle;
+
+  /// No description provided for @userCategoriesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcı Kategorileri'**
+  String get userCategoriesTitle;
+
+  /// No description provided for @deleteCategoryHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Basılı tutarak silebilirsiniz'**
+  String get deleteCategoryHint;
+
+  /// No description provided for @errorMessagePrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hata: {error}'**
+  String errorMessagePrefix(Object error);
+
+  /// No description provided for @addNewCategoryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Kategori Ekle'**
+  String get addNewCategoryTitle;
+
+  /// No description provided for @categoryNameLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori Adı'**
+  String get categoryNameLabel;
+
+  /// No description provided for @selectColorLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Renk Seç'**
+  String get selectColorLabel;
+
+  /// No description provided for @selectIconLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İkon Seç'**
+  String get selectIconLabel;
+
+  /// No description provided for @cancelButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get cancelButton;
+
+  /// No description provided for @addButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekle'**
+  String get addButton;
+
+  /// No description provided for @deleteButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get deleteButton;
+
+  /// No description provided for @undoAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri Al'**
+  String get undoAction;
+
+  /// No description provided for @transactionDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem silindi'**
+  String get transactionDeleted;
+
+  /// No description provided for @recurringDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenli işlem silindi'**
+  String get recurringDeleted;
+
+  /// No description provided for @noTransactionsFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem bulunamadı.'**
+  String get noTransactionsFound;
+
+  /// No description provided for @addTransactionHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'\"+\" butonu ile yeni bir işlem ekleyebilirsiniz.'**
+  String get addTransactionHint;
+
+  /// No description provided for @addRecurringHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kira, fatura gibi işlemlerinizi ekleyebilirsiniz.'**
+  String get addRecurringHint;
+
+  /// No description provided for @deleteCategoryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategoriyi Sil?'**
+  String get deleteCategoryTitle;
+
+  /// No description provided for @deleteCategoryConfirmMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'\'{category}\' kategorisini silmek istediğinize emin misiniz?'**
+  String deleteCategoryConfirmMessage(Object category);
+
+  /// No description provided for @frequencyMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık'**
+  String get frequencyMonthly;
+
+  /// No description provided for @frequencyWeekly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık'**
+  String get frequencyWeekly;
+
+  /// No description provided for @frequencyYearly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıllık'**
+  String get frequencyYearly;
+
+  /// No description provided for @frequencyDaily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük'**
+  String get frequencyDaily;
+
+  /// No description provided for @recurringDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu işlem belirli aralıklarla tekrarlansın.'**
+  String get recurringDescription;
+
+  /// No description provided for @selectRecurringTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenli İşlem Seç'**
+  String get selectRecurringTitle;
+
+  /// No description provided for @noRecurringFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenli işlem bulunamadı.'**
+  String get noRecurringFound;
+
   /// Hata detayını içeren genel bir hata mesajı.
   ///
   /// In tr, this message translates to:

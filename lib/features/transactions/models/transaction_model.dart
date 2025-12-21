@@ -13,6 +13,7 @@ class TransactionModel {
   final String categoryName; // Kategori adı (Örn: Market, Fatura, Burs)
   final DateTime date; // İşlem tarihi
   final String? description; // Açıklama (Opsiyonel)
+  final bool isRecurring; // Bu işlem düzenli bir işlemden mi üretildi?
 
   TransactionModel({
     required this.id,
@@ -23,6 +24,7 @@ class TransactionModel {
     required this.categoryName,
     required this.date,
     this.description,
+    this.isRecurring = false,
   });
 
   // Firestore'a veri gönderirken Map'e çevirme işlemi
@@ -36,6 +38,7 @@ class TransactionModel {
       'categoryName': categoryName,
       'date': Timestamp.fromDate(date), // DateTime -> Firestore Timestamp
       'description': description,
+      'isRecurring': isRecurring,
     };
   }
 
@@ -52,10 +55,11 @@ class TransactionModel {
       type: (map['type'] == 'income')
           ? TransactionType.income
           : TransactionType.expense,
-      categoryName: map['categoryName'] ?? 'Diğer',
+      categoryName: map['categoryName'] ?? 'categoryOther',
       date: (map['date'] as Timestamp)
           .toDate(), // Firestore Timestamp -> DateTime
       description: map['description'],
+      isRecurring: map['isRecurring'] ?? false,
     );
   }
 

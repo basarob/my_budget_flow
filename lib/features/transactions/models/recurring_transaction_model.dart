@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RecurringTransactionModel {
   final String id; // Firestore ID
+  final String title; // Kullanıcının girdiği başlık (Örn: Ev Kirası)
   final String userId;
   final double amount;
   final TransactionType type; // Gelir/Gider
@@ -16,9 +17,11 @@ class RecurringTransactionModel {
   final DateTime startDate;
   final String description;
   final bool isActive; // Otomatik ekleme aktif mi?
+  final DateTime? lastProcessedDate; // En son ne zaman işlem oluşturuldu?
 
   RecurringTransactionModel({
     required this.id,
+    required this.title,
     required this.userId,
     required this.amount,
     required this.type,
@@ -27,12 +30,14 @@ class RecurringTransactionModel {
     required this.startDate,
     this.description = '',
     this.isActive = true,
+    this.lastProcessedDate,
   });
 
   // Firestore'a yazmak için Map çevirici
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'title': title,
       'userId': userId,
       'amount': amount,
       'type': type == TransactionType.income ? 'income' : 'expense',
@@ -41,6 +46,9 @@ class RecurringTransactionModel {
       'startDate': Timestamp.fromDate(startDate),
       'description': description,
       'isActive': isActive,
+      'lastProcessedDate': lastProcessedDate != null
+          ? Timestamp.fromDate(lastProcessedDate!)
+          : null,
     };
   }
 
@@ -51,6 +59,10 @@ class RecurringTransactionModel {
   ) {
     return RecurringTransactionModel(
       id: documentId,
+      title:
+          map['title'] ??
+          map['categoryName'] ??
+          'Düzenli İşlem', // Geriye dönük uyumluluk
       userId: map['userId'] ?? '',
       amount: (map['amount'] ?? 0.0).toDouble(),
       type: (map['type'] == 'income')
@@ -61,6 +73,9 @@ class RecurringTransactionModel {
       startDate: (map['startDate'] as Timestamp).toDate(),
       description: map['description'] ?? '',
       isActive: map['isActive'] ?? true,
+      lastProcessedDate: map['lastProcessedDate'] != null
+          ? (map['lastProcessedDate'] as Timestamp).toDate()
+          : null,
     );
   }
 }
