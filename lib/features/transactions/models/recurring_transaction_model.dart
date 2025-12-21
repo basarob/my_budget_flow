@@ -1,23 +1,22 @@
-// Düzenli (Tekrarlayan) İşlem Modeli
-// Örn: Kira, Netflix, Maaş gibi her ay belli bir günde tekrarlanan işlemler.
-
-import 'transaction_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'transaction_model.dart';
 
-// enum TransactionType { income, expense } // transaction_model.dart dosyasindan geliyor
-
+/// Düzenli (Tekrarlayan) İşlem Modeli
+///
+/// Belirli aralıklarla (günlük, haftalık, aylık vb.) otomatik oluşturulacak
+/// işlemlerin şablonunu temsil eder.
 class RecurringTransactionModel {
-  final String id; // Firestore ID
-  final String title; // Kullanıcının girdiği başlık (Örn: Ev Kirası)
+  final String id;
+  final String title;
   final String userId;
   final double amount;
-  final TransactionType type; // Gelir/Gider
+  final TransactionType type; // Gelir veya Gider
   final String categoryName;
-  final String frequency; // Günlük, Haftalık, Aylık, Yıllık
+  final String frequency; // Sıklık (örn: monthly)
   final DateTime startDate;
   final String description;
-  final bool isActive; // Otomatik ekleme aktif mi?
-  final DateTime? lastProcessedDate; // En son ne zaman işlem oluşturuldu?
+  final bool isActive; // Otomatik oluşturma açık mı?
+  final DateTime? lastProcessedDate; // En son işlem ne zaman oluşturuldu?
 
   RecurringTransactionModel({
     required this.id,
@@ -33,7 +32,6 @@ class RecurringTransactionModel {
     this.lastProcessedDate,
   });
 
-  // Firestore'a yazmak için Map çevirici
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -52,24 +50,20 @@ class RecurringTransactionModel {
     };
   }
 
-  // Firestore'dan okumak için Factory kurucu
   factory RecurringTransactionModel.fromMap(
     Map<String, dynamic> map,
     String documentId,
   ) {
     return RecurringTransactionModel(
       id: documentId,
-      title:
-          map['title'] ??
-          map['categoryName'] ??
-          'Düzenli İşlem', // Geriye dönük uyumluluk
+      title: map['title'] ?? map['categoryName'] ?? 'Düzenli İşlem',
       userId: map['userId'] ?? '',
       amount: (map['amount'] ?? 0.0).toDouble(),
       type: (map['type'] == 'income')
           ? TransactionType.income
           : TransactionType.expense,
-      categoryName: map['categoryName'] ?? 'Diğer',
-      frequency: map['frequency'] ?? 'Aylık',
+      categoryName: map['categoryName'] ?? 'categoryOther',
+      frequency: map['frequency'] ?? 'monthly',
       startDate: (map['startDate'] as Timestamp).toDate(),
       description: map['description'] ?? '',
       isActive: map['isActive'] ?? true,

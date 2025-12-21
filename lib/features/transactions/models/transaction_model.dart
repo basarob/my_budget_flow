@@ -1,19 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// İşlem Tipi için Enum (Gelir veya Gider)
-// Veritabanında String olarak saklanacak ('income' veya 'expense')
+/// İşlem Tipi (Gelir / Gider)
 enum TransactionType { income, expense }
 
+/// Tekil İşlem Modeli
+///
+/// Gelir veya gider işleminin tüm detaylarını tutar.
 class TransactionModel {
-  final String id; // Firestore Belge ID'si
-  final String userId; // İşlemi yapan kullanıcının ID'si
-  final String title; // İşlem başlığı (Örn: Market Harcaması, KYK Kredisi)
-  final double amount; // .Tutar
-  final TransactionType type; // Gelir mi Gider mi?
-  final String categoryName; // Kategori adı (Örn: Market, Fatura, Burs)
-  final DateTime date; // İşlem tarihi
-  final String? description; // Açıklama (Opsiyonel)
-  final bool isRecurring; // Bu işlem düzenli bir işlemden mi üretildi?
+  final String id;
+  final String userId;
+  final String title;
+  final double amount;
+  final TransactionType type;
+  final String categoryName;
+  final DateTime date;
+  final String? description;
+  final bool isRecurring; // Düzenli işlemden mi üretildi?
 
   TransactionModel({
     required this.id,
@@ -27,7 +29,6 @@ class TransactionModel {
     this.isRecurring = false,
   });
 
-  // Firestore'a veri gönderirken Map'e çevirme işlemi
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -36,19 +37,18 @@ class TransactionModel {
       'amount': amount,
       'type': type == TransactionType.income ? 'income' : 'expense',
       'categoryName': categoryName,
-      'date': Timestamp.fromDate(date), // DateTime -> Firestore Timestamp
+      'date': Timestamp.fromDate(date),
       'description': description,
       'isRecurring': isRecurring,
     };
   }
 
-  // Firestore'dan gelen veriyi Dart nesnesine çevirme işlemi
   factory TransactionModel.fromMap(
     Map<String, dynamic> map,
     String documentId,
   ) {
     return TransactionModel(
-      id: documentId, // Belge ID'sini buradan alıyoruz
+      id: documentId,
       userId: map['userId'] ?? '',
       title: map['title'] ?? '',
       amount: (map['amount'] ?? 0.0).toDouble(),
@@ -56,14 +56,12 @@ class TransactionModel {
           ? TransactionType.income
           : TransactionType.expense,
       categoryName: map['categoryName'] ?? 'categoryOther',
-      date: (map['date'] as Timestamp)
-          .toDate(), // Firestore Timestamp -> DateTime
+      date: (map['date'] as Timestamp).toDate(),
       description: map['description'],
       isRecurring: map['isRecurring'] ?? false,
     );
   }
 
-  // Debug için yazdırma
   @override
   String toString() {
     return 'TransactionModel(id: $id, title: $title, amount: $amount, type: $type, date: $date)';

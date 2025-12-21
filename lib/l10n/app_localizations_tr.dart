@@ -391,6 +391,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noRecurringFound => 'Düzenli işlem bulunamadı.';
 
   @override
+  String get selectCategoryHint => 'Kategori Seçiniz';
+
+  @override
+  String get recurringSwitchLabel => 'Düzenli İşlem';
+
+  @override
+  String get descriptionLabel => 'Açıklama';
+
+  @override
+  String get updateButton => 'GÜNCELLE';
+
+  @override
   String errorGeneric(Object error) {
     return 'Bir hata oluştu: $error';
   }

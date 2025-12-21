@@ -15,7 +15,7 @@ class TransactionRepository {
 
   // --- İŞLEMLER (TRANSACTIONS) ---
 
-  // İşlem Ekleme
+  /// Yeni işlem ekler
   Future<void> addTransaction(TransactionModel transaction) async {
     final collection = _firestore
         .collection('users')
@@ -29,7 +29,7 @@ class TransactionRepository {
     await docRef.set(data);
   }
 
-  // İşlem Silme
+  /// İşlem siler
   Future<void> deleteTransaction(String userId, String transactionId) async {
     await _firestore
         .collection('users')
@@ -39,7 +39,8 @@ class TransactionRepository {
         .delete();
   }
 
-  // Kategorisi silinen işlemleri güncelle
+  /// Kategorisi silinen işlemlerin kategori adını günceller.
+  /// Örn: "Eğlence" kategorisi silinirse, işlemler "Diğer" kategorisine geçer.
   Future<void> updateCategoryForAllTransactions(
     String userId,
     String oldCategoryName,
@@ -52,6 +53,7 @@ class TransactionRepository {
         .where('categoryName', isEqualTo: oldCategoryName)
         .get();
 
+    // Batch işlemi ile toplu güncelleme (Performans için)
     final batch = _firestore.batch();
     for (var doc in snapshot.docs) {
       batch.update(doc.reference, {'categoryName': newCategoryName});
@@ -59,39 +61,30 @@ class TransactionRepository {
     await batch.commit();
   }
 
-  // --- İŞLEMLER (TRANSACTIONS) ---
-
-  // Gelişmiş İşlem Listeleme (Pagination & Filtering)
+  /// Gelişmiş İşlem Listeleme (Sayfalama ve Filtreleme)
+  ///
+  /// Firestore'un sorgu yeteneklerini ve yerel (client-side) filtrelemeyi
+  /// birleştirerek optimum sonuç sağlar.
   Future<PaginatedTransactionResult> getTransactions({
     required String userId,
     DocumentSnapshot? lastDocument,
     int limit = 20,
     TransactionType? filterType,
-    List<String>? filterCategories, // Çoklu Kategori
-    DateTimeRange? filterDateRange, // Tarih Aralığı
-    String? searchQuery, // Arama Sorgusu
+    List<String>? filterCategories,
+    DateTimeRange? filterDateRange,
+    String? searchQuery,
   }) async {
-    // Firestore İndeks Sorununu Aşmak İçin Tam Optimizasyon
-    // Eğer hem Tip hem Tarih filtresi varsa composite index gerekir.
-    // Kullanıcıya indeks oluşturma yükü bindirmemek için:
-    // 1. Sorguyu her zaman TARİH veya DEFAULT (tarih sıralı) yapıyoruz.
-    // 2. Tip filtresini tamamen CLIENT-SIDE (bellek içi) yapıyoruz.
-
-    // NOT: Client-side filtreleme varsa, sayfalama bozulabilir.
-    // Çünkü 20 veri çekip 18'ini elersek kullanıcıya 2 veri gider.
-    // Bu durumda "limit" kavramı "işlenen döküman sayısı" olur.
-    // Eğer filtreler çok katıysa sonsuz döngüye girmemek için "limit"i artırıyoruz.
+    // Strateji: Firestore Composite Index yükünden kaçınmak için
+    // Temel sorguyu her zaman TARİH sıralı yaparız.
+    // Tip, Kategori gibi filtreleri bellek içinde (client-side) uygularız.
 
     Query query = _firestore
         .collection('users')
         .doc(userId)
         .collection('transactions')
-        .orderBy(
-          'date',
-          descending: true,
-        ); // Her zaman tarihe göre sıralı çekelim
+        .orderBy('date', descending: true);
 
-    // Tarih filtresi varsa ekle (Date range + orderBy date sorun çıkarmaz)
+    // Tarih Aralığı Filtresi (Firestore'da uygulanabilir)
     if (filterDateRange != null) {
       query = query
           .where(
@@ -104,15 +97,14 @@ class TransactionRepository {
           );
     }
 
-    // Eğer client-side filtreleme yapılacaksa, veritabanından daha fazla veri çekmeliyiz
-    // ki filtre sonrası elde anlamlı sayıda veri kalsın.
+    // Client-side filtreleme yapılacaksa, veritabanından daha fazla veri çekmeliyiz
+    // ki filtreledikten sonra elimizde yeterli veri kalsın.
     bool hasClientSideFilter =
         (searchQuery != null && searchQuery.isNotEmpty) ||
         (filterCategories != null && filterCategories.isNotEmpty) ||
         (filterType != null);
 
-    // Client-side filtre varsa limiti artır (Verimlilik için 100 diyelim, 500 fazla olabilir)
-    // Ama kullanıcı "en verimli" dedi, 500 iyidir, az read yapar.
+    // Filtre varsa limiti artırıyoruz (Okuma maliyetini göze alarak)
     int fetchLimit = hasClientSideFilter ? 500 : limit;
 
     if (lastDocument != null) {
@@ -126,6 +118,7 @@ class TransactionRepository {
       return PaginatedTransactionResult([], null);
     }
 
+    // Map ve Dönüşüm
     var transactions = snapshot.docs.map((doc) {
       return TransactionModel.fromMap(
         doc.data() as Map<String, dynamic>,
@@ -133,16 +126,21 @@ class TransactionRepository {
       );
     }).toList();
 
-    // Client-Side Filtreleme (Memory)
+    // --- Client-Side Filtreleme ---
+
+    // 1. İşlem Tipi
     if (filterType != null) {
       transactions = transactions.where((t) => t.type == filterType).toList();
     }
+
+    // 2. Kategori (Çoklu Seçim)
     if (filterCategories != null && filterCategories.isNotEmpty) {
       transactions = transactions
           .where((t) => filterCategories.contains(t.categoryName))
           .toList();
     }
 
+    // 3. Arama Sorgusu (Başlık veya Açıklama içinde)
     if (searchQuery != null && searchQuery.isNotEmpty) {
       final queryLower = searchQuery.toLowerCase();
       transactions = transactions.where((t) {
@@ -151,17 +149,14 @@ class TransactionRepository {
       }).toList();
     }
 
-    // Eğer client-side filtreleme sonucu elimizde istenen limit'ten (örn 20) fazla veri varsa
-    // fazlasını kesebiliriz ama sonsuz kaydırmada kullanıcıya hepsini göstermek daha iyi.
-    // Ancak, sonraki sayfa için "lastDocument" belirlememiz lazım.
-    // Sorun: Filtreleme sonucu son döküman, çektiğimiz snapshot'ın son dökümanı olmayabilir.
-    // Ama pagination sorgusu veritabanındaki sıraya göre çalışır.
-    // Bu yüzden pagination için snapshot.docs.last kullanılmalıdır, filtrelenmiş listenin sonuncusu DEĞİL.
+    // Pagination not: Client-side filtreleme sebebiyle, dönen liste
+    // istenen limitten (20) az olabilir. Bu normaldir.
+    // Sayfalama için veritabanındaki son dökümanı referans almalıyız.
 
     return PaginatedTransactionResult(transactions, snapshot.docs.last);
   }
 
-  // Basit Stream (Takvim ve Dashboard için)
+  /// Son İşlemler Akışı (Dashboard için)
   Stream<List<TransactionModel>> getRecentTransactionsStream(
     String userId, {
     int limit = 5,
@@ -180,39 +175,24 @@ class TransactionRepository {
         });
   }
 
-  Stream<List<TransactionModel>> getAllTransactionsStream(String userId) {
-    return _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('transactions')
-        .orderBy('date', descending: true)
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            return TransactionModel.fromMap(doc.data(), doc.id);
-          }).toList();
-        });
-  }
+  // --- DÜZENLİ İŞLEMLER (RECURRING) ---
 
-  // --- RECURRING TRANSACTIONS (DÜZENLİ ÖDEMELER) MANUELLER ---
-
+  /// Yeni düzenli işlem tanımı ekler
   Future<void> addRecurringItem(RecurringTransactionModel item) async {
     final batch = _firestore.batch();
 
-    // 1. Düzenli İşlemi Oluştur
+    // 1. Düzenli İşlem Dosyasını Oluştur
     final recurringRef = _firestore
         .collection('users')
         .doc(item.userId)
         .collection('recurring_transactions')
-        .doc(); // Auto-ID
+        .doc();
 
     final newItemId = recurringRef.id;
-
-    // 2. Bugün (veya geçmiş) ise hemen ilk işlemi de ekle
     final now = DateTime.now();
     DateTime? processedDate;
 
-    // Sadece saat/dakika farkını yoksaymak için gün bazlı karşılaştırma
+    // 2. Başlangıç tarihi bugün veya geçmişse, ilk işlemi hemen oluştur
     final isTodayOrPast =
         item.startDate.isBefore(now) ||
         (item.startDate.year == now.year &&
@@ -233,16 +213,16 @@ class TransactionRepository {
         amount: item.amount,
         type: item.type,
         categoryName: item.categoryName,
-        date: item.startDate, // Başlangıç tarihi işlemin tarihi olur
+        date: item.startDate,
         description: '${item.description} (Otomatik: ${item.frequency})',
         isRecurring: true,
       );
 
       batch.set(txRef, newTransaction.toMap());
-      processedDate = item.startDate; // Bu tarihi işledik
+      processedDate = item.startDate; // İşlendi olarak işaretle
     }
 
-    // 3. Düzenli işlem verisini hazırla
+    // 3. Düzenli İşlem Kaydını Hazırla
     final newItem = RecurringTransactionModel(
       id: newItemId,
       title: item.title,
@@ -254,12 +234,10 @@ class TransactionRepository {
       startDate: item.startDate,
       description: item.description,
       isActive: item.isActive,
-      lastProcessedDate:
-          processedDate, // Eğer işlem oluşturduysak buraya tarihi yaz
+      lastProcessedDate: processedDate,
     );
 
     batch.set(recurringRef, newItem.toMap());
-
     await batch.commit();
   }
 
@@ -281,7 +259,6 @@ class TransactionRepository {
         .delete();
   }
 
-  // Kategorisi silinen düzenli işlemleri güncelle
   Future<void> updateCategoryForAllRecurringTransactions(
     String userId,
     String oldCategoryName,
@@ -314,7 +291,9 @@ class TransactionRepository {
         });
   }
 
-  // --- AUTOMATIC PROCESSING MAGIC ---
+  // --- OTOMATİK İŞLEM OLUŞTURMA MOTORU ---
+
+  /// Zamanı gelen düzenli işlemleri kontrol eder ve oluşturur.
   Future<void> checkAndProcessRecurringTransactions(String userId) async {
     final now = DateTime.now();
 
@@ -331,38 +310,28 @@ class TransactionRepository {
     for (var doc in snapshot.docs) {
       final item = RecurringTransactionModel.fromMap(doc.data(), doc.id);
 
-      // En son ne zaman işlem yapıldı? (Yoksa başlangıç tarihinden hemen öncesi kabul et ki ilkini yapsın)
-      // Ancak "lastProcessedDate" null ise ve "startDate" gelecekteyse işlem yapma.
-      // Eğer "lastProcessedDate" null ve "startDate" geçmişte veya bugünse, işlem yapmalıyız.
-
+      // En son işlem tarihini al (Yoksa başlangıcın bir gün öncesini al)
       DateTime lastRun =
           item.lastProcessedDate ??
           item.startDate.subtract(const Duration(days: 1));
 
-      // Başlangıç tarihi bugünden büyükse (gelecekse) henüz başlama.
+      // Henüz başlangıç tarihi gelmediyse atla
       if (item.startDate.isAfter(now)) continue;
 
       // Sıklığa göre bir sonraki tarihi hesapla
       DateTime nextDue = _calculateNextDueDate(lastRun, item.frequency);
 
-      // Eğer nextDue bugün veya daha önce ise, işlemi oluştur.
-      // Döngü ile birden fazla kaçırılmış işlem varsa hepsini ekle (Opsiyonel: Sadece sonuncuyu ekle)
-      // Burada sadece "bugün gelmiş veya geçmiş ama işlenmemiş" olan TEK bir işlemi ekleyelim.
-      // Ya da lastProcessedDate'i sürekli ileri atarak kaçanları da ekleyebiliriz.
-      // Kullanıcı deneyimi için: Çok eski tarihliyse (örn 1 yıl) hepsini eklemek spam olabilir.
-      // Şimdilik: while döngüsü ile kaçanları ekleyelim ama bir limit koyalım.
-
-      // Güvenlik limiti: Sonsuz döngüden kaçın (örn. 12 işlemden fazla ekleme)
+      // Güvenlik Sayacı (Sonsuz döngüyü önlemek için)
       int safetyCounter = 0;
+
+      // Eğer bir sonraki işlem tarihi bugün veya geçmişte ise, işlemi oluştur
       while (nextDue.isBefore(now) || isSameDay(nextDue, now)) {
         if (safetyCounter++ > 12) {
-          debugPrint(
-            "Recurring transaction safety break hit for item: ${item.id}",
-          );
+          debugPrint("Güvenlik sınırı aşıldı: ID ${item.id}");
           break;
         }
 
-        // İşlemi Oluştur (Normal işlemler zaten user subcollection altında)
+        // Yeni İşlemi Oluştur
         final newTxRef = _firestore
             .collection('users')
             .doc(userId)
@@ -382,8 +351,7 @@ class TransactionRepository {
         );
         batch.set(newTxRef, newTransaction.toMap());
 
-        // Düzenli İşlemi Güncelle: lastProcessedDate = nextDue
-        // nextDue artık islendi.
+        // Düzenli işlem kaydını güncelle
         final itemRef = _firestore
             .collection('users')
             .doc(userId)
@@ -394,12 +362,12 @@ class TransactionRepository {
           'lastProcessedDate': Timestamp.fromDate(nextDue),
         });
 
-        lastRun = nextDue; // Döngü için güncelle
+        // Döngü için güncelle
+        lastRun = nextDue;
         nextDue = _calculateNextDueDate(lastRun, item.frequency);
         batchHasChanges = true;
 
-        // Güvenlik limiti: Sonsuz döngüden kaçın (örn. 10 işlemden fazla ekleme)
-        // ya da nextDue geleceğe geçene kadar devam et.
+        // Eğer sonraki tarih geleceğe geçtiyse döngüden çık
         if (nextDue.isAfter(now) && !isSameDay(nextDue, now)) break;
       }
     }
@@ -409,6 +377,7 @@ class TransactionRepository {
     }
   }
 
+  /// Bir sonraki işlem tarihini hesaplar
   DateTime _calculateNextDueDate(DateTime lastRun, String frequency) {
     switch (frequency) {
       case 'daily':
@@ -422,25 +391,16 @@ class TransactionRepository {
       case 'monthly':
       case 'Aylık':
       case 'Monthly':
-        // Doğru ay ekleme mantığı:
-        // 31 Ocak + 1 Ay -> 28/29 Şubat (veya Mart'a kaymadan o ayın son günü)
-        // DateTime(year, month + 1, day) yaparsak Dart otomatik taşır (31 Ocak -> 3 Mart).
-        // Bunu engellemek için:
-        // 1. Hedef ayı bul (month + 1)
-        // 2. Hedef ayın kaç gün çektiğini bul
-        // 3. Eğer mevcut gün (day), hedef ayın gün sayısından büyükse, hedef ayın son gününü al.
-
+        // Aylık artış mantığı (31 Ocak -> 28 Şubat gibi durumları yönetir)
         final desiredMonth = lastRun.month + 1;
         final desiredYear = lastRun.year + (desiredMonth > 12 ? 1 : 0);
         final normalizedMonth = desiredMonth > 12 ? 1 : desiredMonth;
 
-        // Hedef ayın son gününü bulmak için: (normalizedMonth + 1, gün 0)
         final lastDayOfDesiredMonth = DateTime(
           desiredYear,
           normalizedMonth + 1,
           0,
         ).day;
-
         final desiredDay = lastRun.day > lastDayOfDesiredMonth
             ? lastDayOfDesiredMonth
             : lastRun.day;
@@ -456,12 +416,8 @@ class TransactionRepository {
       case 'yearly':
       case 'Yıllık':
       case 'Yearly':
-        // Şubatm 29 sorunu (Artık yıl -> Normal Yıl): 29 Şubat 2024 -> 28 Şubat 2025
-        // Dart DateTime(year+1, 2, 29) yaparsa 1 Mart 2025 verir.
-        // Genelde 28 Şubat olması istenir veya 1 Mart. Dart 1 Mart yapar.
-        // Özel bir kontrol ekleyelim:
+        // Yıllık artış (Artık yıl kontrolü)
         if (lastRun.month == 2 && lastRun.day == 29) {
-          // Gelecek yıl artık yıl değilse 28 Şubat olsun
           final isLeapNext =
               (lastRun.year + 1) % 4 == 0 &&
               ((lastRun.year + 1) % 100 != 0 || (lastRun.year + 1) % 400 == 0);
@@ -483,8 +439,7 @@ class TransactionRepository {
           lastRun.minute,
         );
       default:
-        // Fallback for unknown frequency: default to 30 days
-        debugPrint('Unknown frequency: $frequency, defaulting to 30 days.');
+        debugPrint('Bilinmeyen sıklık: $frequency, 30 gün varsayılıyor.');
         return lastRun.add(const Duration(days: 30));
     }
   }

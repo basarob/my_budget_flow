@@ -136,6 +136,10 @@
     "recurringDescription": "Bu işlem belirli aralıklarla tekrarlansın.",
     "selectRecurringTitle": "Düzenli İşlem Seç",
     "noRecurringFound": "Düzenli işlem bulunamadı.",
+    "selectCategoryHint": "Kategori Seçiniz",
+    "recurringSwitchLabel": "Düzenli İşlem",
+    "descriptionLabel": "Açıklama",
+    "updateButton": "GÜNCELLE",
 
     "errorGeneric": "Bir hata oluştu: {error}",
     "@errorGeneric": {

@@ -136,6 +136,10 @@
     "recurringDescription": "This transaction will be repeated at intervals.",
     "selectRecurringTitle": "Select Recurring Transaction",
     "noRecurringFound": "No recurring transactions found.",
+    "selectCategoryHint": "Select a category",
+    "recurringSwitchLabel": "Recurring Transaction",
+    "descriptionLabel": "Description",
+    "updateButton": "UPDATE",
 
     "errorGeneric": "An error occurred: {error}",
     "@errorGeneric": {

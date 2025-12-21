@@ -3,35 +3,41 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../models/recurring_transaction_model.dart';
-import '../models/transaction_model.dart'; // For TransactionType
-import '../models/category_model.dart'; // Import CategoryModel
+import '../models/transaction_model.dart';
+import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
-import '../providers/category_provider.dart'; // Import CategoryProvider
+import '../providers/category_provider.dart';
 import '../../../l10n/app_localizations.dart';
 
+/// Düzenli İşlemler Listesi
+///
+/// Otomatik tekrarlanan işlemlerin yönetildiği liste.
+/// Aktif/Pasif yapma, silme ve arama özelliklerini destekler.
 class RecurringTransactionList extends ConsumerWidget {
   const RecurringTransactionList({super.key});
 
+  /// Sıklık metnini yerelleştirir
   String _getLocalizedFrequency(BuildContext context, String frequency) {
     final l10n = AppLocalizations.of(context)!;
     switch (frequency) {
       case 'daily':
-      case 'Günlük':
-      case 'Daily':
         return l10n.frequencyDaily;
       case 'weekly':
-      case 'Haftalık':
-      case 'Weekly':
         return l10n.frequencyWeekly;
       case 'monthly':
-      case 'Aylık':
-      case 'Monthly':
         return l10n.frequencyMonthly;
       case 'yearly':
-      case 'Yıllık':
-      case 'Yearly':
         return l10n.frequencyYearly;
       default:
+        // Bilinmeyen veya zaten çevrilmiş metinler için (Geriye uyumluluk)
+        if (frequency == 'Günlük' || frequency == 'Daily')
+          return l10n.frequencyDaily;
+        if (frequency == 'Haftalık' || frequency == 'Weekly')
+          return l10n.frequencyWeekly;
+        if (frequency == 'Aylık' || frequency == 'Monthly')
+          return l10n.frequencyMonthly;
+        if (frequency == 'Yıllık' || frequency == 'Yearly')
+          return l10n.frequencyYearly;
         return frequency;
     }
   }
@@ -48,7 +54,7 @@ class RecurringTransactionList extends ConsumerWidget {
 
     return recurringListAsync.when(
       data: (allItems) {
-        // User Feedback #2: Düzenli İşlemler Ekranında Arama (Search Query)
+        // Arama (Search Query) ile filtreleme
         final searchQuery =
             ref.watch(transactionFilterProvider).searchQuery ?? '';
         final items = allItems.where((item) {
@@ -92,23 +98,11 @@ class RecurringTransactionList extends ConsumerWidget {
             final isExpense = item.type == TransactionType.expense;
             final color = isExpense ? Colors.red : Colors.green;
 
-            // Helper to find category
+            // Kategori Bulma
             CategoryModel findCategory(String name) {
-              // Legacy support for Turkish names (Same logic as TransactionList)
-              String searchName = name;
-              if (name == 'Gıda') searchName = 'categoryFood';
-              if (name == 'Fatura') searchName = 'categoryBills';
-              if (name == 'Ulaşım') searchName = 'categoryTransport';
-              if (name == 'Kira/Aidat') searchName = 'categoryRent';
-              if (name == 'Eğlence') searchName = 'categoryEntertainment';
-              if (name == 'Alışveriş') searchName = 'categoryShopping';
-              if (name == 'Maaş') searchName = 'categorySalary';
-              if (name == 'Yatırım') searchName = 'categoryInvestment';
-              if (name == 'Diğer') searchName = 'categoryOther';
-
               return categoryListAsync.maybeWhen(
                 data: (cats) => cats.firstWhere(
-                  (c) => c.name == searchName,
+                  (c) => c.name == name,
                   orElse: () => CategoryModel(
                     id: '',
                     name: name,
@@ -191,7 +185,6 @@ class RecurringTransactionList extends ConsumerWidget {
                         color: Color(category.colorValue).withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
-                      // User Feedback #6: Oklar yerine kategori simgesi
                       child: Icon(
                         IconData(
                           category.iconCode,
@@ -203,7 +196,7 @@ class RecurringTransactionList extends ConsumerWidget {
                     title: Text(
                       item.title.isNotEmpty
                           ? item.title
-                          : localizedCategoryName, // Localized name
+                          : localizedCategoryName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.bold),

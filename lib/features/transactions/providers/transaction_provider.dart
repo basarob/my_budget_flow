@@ -1,18 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../../auth/services/auth_service.dart';
 import '../models/transaction_model.dart';
 import '../models/recurring_transaction_model.dart';
 import '../repositories/transaction_repository.dart';
 import '../models/transaction_filter_state.dart';
-import 'package:flutter/material.dart';
 
-// Repository Provider
+/// İşlem Repository Sağlayıcısı
 final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
   return TransactionRepository();
 });
 
-// Filtreleme State Notifier'ı
+/// İşlem Listesi Filtreleme Yöneticisi
 class TransactionFilterNotifier extends Notifier<TransactionFilterState> {
   @override
   TransactionFilterState build() {
@@ -24,14 +24,13 @@ class TransactionFilterNotifier extends Notifier<TransactionFilterState> {
   }
 
   void setSearchQuery(String query) {
-    // String is non-nullable in method signature, so it's safe to update
     state = state.copyWith(searchQuery: query);
   }
 
   void setFilterType(TransactionType? type) {
-    // Manual copy to allow setting null
+    // Null değer atanabilsin diye yeni nesne oluşturuyoruz
     state = TransactionFilterState(
-      type: type, // Can be null, and we want to set it to null if passed
+      type: type,
       selectedCategories: state.selectedCategories,
       dateRange: state.dateRange,
       searchQuery: state.searchQuery,
@@ -39,20 +38,18 @@ class TransactionFilterNotifier extends Notifier<TransactionFilterState> {
   }
 
   void setFilterDateRange(DateTimeRange? range) {
-    // Manual copy to allow setting null
     state = TransactionFilterState(
       type: state.type,
       selectedCategories: state.selectedCategories,
-      dateRange: range, // Can be null
+      dateRange: range,
       searchQuery: state.searchQuery,
     );
   }
 
   void setFilterCategories(List<String>? categories) {
-    // Manual copy to allow setting null
     state = TransactionFilterState(
       type: state.type,
-      selectedCategories: categories, // Can be null
+      selectedCategories: categories,
       dateRange: state.dateRange,
       searchQuery: state.searchQuery,
     );
@@ -63,13 +60,13 @@ class TransactionFilterNotifier extends Notifier<TransactionFilterState> {
   }
 }
 
-// Filtreleme Provider
+/// Filtreleme Durumu Sağlayıcısı
 final transactionFilterProvider =
     NotifierProvider<TransactionFilterNotifier, TransactionFilterState>(
       TransactionFilterNotifier.new,
     );
 
-// Recent Transactions
+/// Son İşlemler (Dashboard vb. için kısa liste - Stream)
 final recentTransactionsProvider = StreamProvider<List<TransactionModel>>((
   ref,
 ) {
@@ -80,18 +77,17 @@ final recentTransactionsProvider = StreamProvider<List<TransactionModel>>((
   return repository.getRecentTransactionsStream(user.uid);
 });
 
-// --- TRANSACTION CONTROLLER (CRUD) ---
-
+/// İşlem Yönetimi (CRUD) Kontrolcüsü
 class TransactionController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {
-    // Controller başlatıldığında otomatik işlemleri kontrol et
+    // Başlangıçta düzenli (otomatik) işlemleri kontrol et
     final user = ref.watch(authStateChangesProvider).value;
     if (user != null) {
       final repository = ref.read(transactionRepositoryProvider);
-      // Arka planda çalışsın, UI'ı bloklamasın, await etmeye gerek yok ama hata yakalamak iyi olur
+      // Hata olsa bile UI'ı bölmemesi için catchError kullanıyoruz
       repository.checkAndProcessRecurringTransactions(user.uid).catchError((e) {
-        debugPrint('Auto-process error: $e');
+        debugPrint('Otomatik işlem hatası: $e');
       });
     }
   }
@@ -126,9 +122,8 @@ class TransactionController extends AsyncNotifier<void> {
     try {
       final repository = ref.read(transactionRepositoryProvider);
       await repository.addRecurringItem(item);
-      // Eklendiği anda (eğer bugünse) hemen bir kopya transaction oluşturulması gerekebilir
-      // Ancak repository içindeki 'checkAndProcess' metodu bunu zaten halleder.
-      // Sadece tetiklemek lazım:
+
+      // Yeni eklenen düzenli işlemin günü bugünse hemen işlenmesi için tetikle
       final user = ref.read(authStateChangesProvider).value;
       if (user != null) {
         await repository.checkAndProcessRecurringTransactions(user.uid);
@@ -159,14 +154,13 @@ class TransactionController extends AsyncNotifier<void> {
       final repository = ref.read(transactionRepositoryProvider);
       await repository.updateRecurringItem(item);
 
-      // Eğer pasiften aktife çekildiyse kontrol et
+      // Pasiften aktife geçtiyse kontrol et
       if (item.isActive) {
         final user = ref.read(authStateChangesProvider).value;
         if (user != null) {
           await repository.checkAndProcessRecurringTransactions(user.uid);
         }
       }
-
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -174,12 +168,13 @@ class TransactionController extends AsyncNotifier<void> {
   }
 }
 
+/// CRUD Kontrolcüsü Sağlayıcısı
 final transactionControllerProvider =
-    AsyncNotifierProvider<TransactionController, void>(() {
-      return TransactionController();
-    });
+    AsyncNotifierProvider<TransactionController, void>(
+      TransactionController.new,
+    );
 
-// Recurring List Stream
+/// Düzenli İşlemler Listesi (Stream)
 final recurringListProvider = StreamProvider<List<RecurringTransactionModel>>((
   ref,
 ) {
@@ -189,8 +184,7 @@ final recurringListProvider = StreamProvider<List<RecurringTransactionModel>>((
   return repository.getRecurringStream(user.uid);
 });
 
-// --- PAGINATED LIST NOTIFIER (Infinite Scroll) ---
-
+/// Sayfalı (Pagination) İşlem Listesi Yöneticisi
 class TransactionPaginationNotifier
     extends AsyncNotifier<List<TransactionModel>> {
   DocumentSnapshot? _lastDocument;
@@ -202,7 +196,7 @@ class TransactionPaginationNotifier
     final user = ref.watch(authStateChangesProvider).value;
     final filter = ref.watch(transactionFilterProvider);
 
-    // Reset pagination state when dependencies change (filter/user)
+    // Filtre veya kullanıcı değiştiğinde sayfalamayı sıfırla
     _lastDocument = null;
     _hasMore = true;
     _isLoadingMore = false;
@@ -229,18 +223,16 @@ class TransactionPaginationNotifier
     return result.items;
   }
 
+  /// Daha fazla veri yükle (Infinite Scroll)
   Future<void> loadMore() async {
     if (_isLoadingMore || !_hasMore) return;
-
-    // Ensure we have current data and user
     if (!state.hasValue) return;
-    final currentList = state.value!;
 
+    final currentList = state.value!;
     final user = ref.read(authStateChangesProvider).value;
     if (user == null) return;
 
     final filter = ref.read(transactionFilterProvider);
-
     _isLoadingMore = true;
 
     try {
@@ -262,13 +254,14 @@ class TransactionPaginationNotifier
         state = AsyncValue.data([...currentList, ...result.items]);
       }
     } catch (e) {
-      debugPrint('LoadMore Error: $e');
-      // We don't change state to error to avoid clearing the list on load more failure
+      debugPrint('Daha fazla yükleme hatası: $e');
+      // Hata durumunda mevcut listeyi koru
     } finally {
       _isLoadingMore = false;
     }
   }
 
+  /// Listeden eleman sil (Optimistik güncelleme için)
   void removeItem(String transactionId) {
     if (!state.hasValue) return;
     final currentList = state.value!;
@@ -279,6 +272,7 @@ class TransactionPaginationNotifier
   }
 }
 
+/// Sayfalı Liste Sağlayıcısı
 final paginatedTransactionProvider =
     AsyncNotifierProvider<
       TransactionPaginationNotifier,

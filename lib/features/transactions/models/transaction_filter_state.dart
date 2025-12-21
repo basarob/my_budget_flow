@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'transaction_model.dart';
 
+/// İşlem Listesi Filtreleme Durumu
+///
+/// Listeleme ekranındaki filtrelerin (tarih, kategori, tip, arama) durumunu tutar.
 class TransactionFilterState {
-  final TransactionType? type;
+  final TransactionType? type; // Gelir/Gider fitresi
   final List<String>? selectedCategories; // Çoklu kategori seçimi
-  final DateTimeRange? dateRange;
-  final String? searchQuery; // Arama sorgusu
+  final DateTimeRange? dateRange; // Tarih aralığı
+  final String? searchQuery; // Metin arama
 
   const TransactionFilterState({
     this.type,

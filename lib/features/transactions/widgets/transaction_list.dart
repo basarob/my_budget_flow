@@ -3,23 +3,26 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../models/transaction_model.dart';
-import '../models/category_model.dart'; // Import CategoryModel
+import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
-import '../providers/category_provider.dart'; // Import CategoryProvider
+import '../providers/category_provider.dart';
 import '../screens/add_transaction_screen.dart';
 import '../../../l10n/app_localizations.dart';
 
+/// Geçmiş İşlemler Listesi
+///
+/// Pagination (Sayfalama) ve Infinite Scroll destekler.
+/// İşlem silme (kaydırarak) ve düzenleme özelliklerine sahiptir.
 class TransactionList extends ConsumerWidget {
   const TransactionList({super.key});
-
-  // Eski Helper fonksiyonları kaldırıldı (_getIconForCategory, _getCategoryColor)
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    // 1. Pagination Provider'ı dinle
+
+    // Pagination Provider'ı dinle
     final transactionListAsync = ref.watch(paginatedTransactionProvider);
-    // 2. Kategori Listesini dinle (Dinamik ikonlar için)
+    // Kategori Listesini dinle (İkon ve renkler için)
     final categoryListAsync = ref.watch(categoryListProvider);
 
     final currencyFormatter = NumberFormat.currency(
@@ -29,7 +32,7 @@ class TransactionList extends ConsumerWidget {
 
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification scrollInfo) {
-        // Scroll en aşağıya yaklaştıysa (200px kala) yeni veri yükle
+        // Listenin sonuna yaklaşıldığında (200px kala) yeni veri yükle
         if (!scrollInfo.metrics.outOfRange &&
             scrollInfo.metrics.pixels >=
                 scrollInfo.metrics.maxScrollExtent - 200) {
@@ -40,9 +43,6 @@ class TransactionList extends ConsumerWidget {
       child: transactionListAsync.when(
         data: (transactions) {
           if (transactions.isEmpty) {
-            // Filtre durumu?
-            // Eğer filtre varsa "sonuç bulunamadı" denebilir.
-            // Şimdilik genel boş durumu:
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -72,44 +72,25 @@ class TransactionList extends ConsumerWidget {
           }
 
           return ListView.builder(
-            // +1 for loading indicator at bottom if needed
+            // +1: Listenin en altında biraz boşluk bırakmak için
             itemCount: transactions.length + 1,
             itemBuilder: (context, index) {
-              // Loading Indicator at the bottom
               if (index == transactions.length) {
-                // Sadece veri varsa ve yükleniyorsa göster diyeceğim ama
-                // Provider "loading" durumuna sadece ilk açılışta geçiyor (AsyncValue.loading).
-                // "loadMore" sırasında state .data olarak kalıyor, biz ekleme yapıyoruz.
-                // İstenirse buraya küçük bir loader konabilir.
                 return const SizedBox(height: 50); // Spacer
               }
 
               final transaction = transactions[index];
 
-              // Helper to find category
+              // Kategori Bulma Helper
               CategoryModel findCategory(String name) {
-                // Legacy support for Turkish names
-                String searchName = name;
-                if (name == 'Gıda') searchName = 'categoryFood';
-                if (name == 'Fatura') searchName = 'categoryBills';
-                if (name == 'Ulaşım') searchName = 'categoryTransport';
-                if (name == 'Kira/Aidat') searchName = 'categoryRent';
-                if (name == 'Eğlence') searchName = 'categoryEntertainment';
-                if (name == 'Alışveriş') searchName = 'categoryShopping';
-                if (name == 'Maaş') searchName = 'categorySalary';
-                if (name == 'Yatırım') searchName = 'categoryInvestment';
-                if (name == 'Diğer') searchName = 'categoryOther';
-
-                // Legacy for English (if any)
-                if (name == 'Food') searchName = 'categoryFood';
-                // ... add others if needed, mostly Turkish was used.
-
                 return categoryListAsync.maybeWhen(
                   data: (cats) => cats.firstWhere(
-                    (c) => c.name == searchName,
+                    (c) => c.name == name,
+                    // Eğer kategori bulunamazsa (veya özel karakterse)
+                    // mevcut isme göre dummy bir model oluştur veya "Diğer" dön.
                     orElse: () => CategoryModel(
                       id: '',
-                      name: name, // Custom or unknown: use original name
+                      name: name,
                       iconCode: Icons.category.codePoint,
                       colorValue: Colors.grey.value,
                     ),
@@ -125,11 +106,9 @@ class TransactionList extends ConsumerWidget {
 
               final category = findCategory(transaction.categoryName);
               final localizedCategoryName = category.getLocalizedName(context);
+
               final isExpense = transaction.type == TransactionType.expense;
-              final amountColor = isExpense
-                  ? Colors.red
-                  : Colors
-                        .green; // Transaction amount color (remains standard red/green or can be themed)
+              final amountColor = isExpense ? Colors.red : Colors.green;
 
               return Dismissible(
                 key: Key(transaction.id),
@@ -141,9 +120,9 @@ class TransactionList extends ConsumerWidget {
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
                 onDismissed: (_) {
-                  HapticFeedback.lightImpact(); // Haptic Feedback
+                  HapticFeedback.lightImpact();
 
-                  // 1. SnackBar'ı temizle (önceki varsa)
+                  // 1. Önceki SnackBar'ları temizle
                   ScaffoldMessenger.of(context).clearSnackBars();
 
                   // 2. Optimistic Update (Listeden anında sil)
@@ -151,37 +130,31 @@ class TransactionList extends ConsumerWidget {
                       .read(paginatedTransactionProvider.notifier)
                       .removeItem(transaction.id);
 
-                  // 3. Backend Silme İşlemi (Arka planda)
+                  // 3. Backend Silme İşlemi
                   ref
                       .read(transactionControllerProvider.notifier)
                       .deleteTransaction(transaction.id);
 
-                  // 4. SnackBar Göster
+                  // 4. Geri Alma Seçenekli SnackBar
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(l10n.transactionDeleted),
                       duration: const Duration(seconds: 3),
                       behavior: SnackBarBehavior.floating,
-                      margin: const EdgeInsets.fromLTRB(
-                        16,
-                        16,
-                        16,
-                        20,
-                      ), // Alttan boşluk azaltıldı
+                      margin: const EdgeInsets.fromLTRB(16, 16, 16, 20),
                       action: SnackBarAction(
                         label: l10n.undoAction,
                         onPressed: () {
                           ref
                               .read(transactionControllerProvider.notifier)
                               .addTransaction(transaction);
-                          // Geri alma durumunda listeyi tekrar çekmek mantıklı
                           ref.invalidate(paginatedTransactionProvider);
                         },
                       ),
                     ),
                   );
 
-                  // 5. Zorla Kapatma (Timer) - Windows hover sorununu aşmak için
+                  // 5. Kaybolmayan SnackBar sorununu çözmek için Timer
                   Future.delayed(const Duration(seconds: 3), () {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).clearSnackBars();
@@ -189,7 +162,6 @@ class TransactionList extends ConsumerWidget {
                   });
                 },
                 child: Card(
-                  // User Feedback #4: Daha kompakt boşluk
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 4,
@@ -203,7 +175,7 @@ class TransactionList extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     onTap: () async {
                       HapticFeedback.selectionClick();
-                      // Düzenleme Modu
+                      // Düzenleme Ekranına Git
                       final refresh = await Navigator.push(
                         context,
                         MaterialPageRoute(

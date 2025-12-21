@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 
+/// Kategori Modeli
+///
+/// İşlemlerin ve düzenli işlemlerin sınıflandırılması için kullanılır.
+/// Hem varsayılan (sabit) kategorileri hem de kullanıcı tarafından eklenen (özel) kategorileri temsil eder.
 class CategoryModel {
   final String id;
-  final String name;
-  final int iconCode; // IconData.codePoint (Material Icons)
-  final int colorValue; // Color(0xFF...).value
-  final bool isCustom; // Kullanıcı mı ekledi?
+  final String name; // Yerelleştirme anahtarı veya özel kategori adı
+  final int iconCode; // IconData.codePoint
+  final int colorValue; // Color.value
+  final bool isCustom; // true ise kullanıcı tarafından eklenmiştir
 
   CategoryModel({
     required this.id,
@@ -17,8 +21,8 @@ class CategoryModel {
     this.isCustom = false,
   });
 
-  // Varsayılan Kategoriler Listesi
-  // Sıralama: "Gıda", "Fatura", "Ulaşım", "Kira/Aidat", "Eğlence", "Alışveriş", "Maaş", "Yatırım", "Diğer"
+  /// Varsayılan sistem kategorilerini döndürür.
+  /// Renkler [AppTheme] içerisinden alınır.
   static List<CategoryModel> defaultCategories = [
     CategoryModel(
       id: 'cat_food',
@@ -76,9 +80,10 @@ class CategoryModel {
     ),
   ];
 
+  /// Kategori adını yerelleştirilmiş (Türkçe/İngilizce) olarak döndürür.
   String getLocalizedName(BuildContext context) {
     if (isCustom) return name;
-    // Check if it's one of the known keys
+
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return name;
 
@@ -102,13 +107,11 @@ class CategoryModel {
       case 'categoryOther':
         return l10n.categoryOther;
       default:
-        // Fallback for legacy data "Gıda", "Food" etc. if they exist in DB
-        // Optionally try to map legacy strings to keys here if desired,
-        // but typically we just return the string.
         return name;
     }
   }
 
+  /// Firestore veya yerel depolama için Map dönüşümü
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -119,6 +122,7 @@ class CategoryModel {
     };
   }
 
+  /// Map verisinden nesne oluşturma
   factory CategoryModel.fromMap(Map<String, dynamic> map) {
     return CategoryModel(
       id: map['id'] ?? '',

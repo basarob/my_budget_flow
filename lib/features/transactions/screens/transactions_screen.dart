@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart'; // For DatePicker
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -9,9 +8,13 @@ import '../models/transaction_model.dart';
 import '../widgets/transaction_list.dart';
 import '../widgets/recurring_transaction_list.dart';
 import '../providers/category_provider.dart';
-import '../models/category_model.dart'; // Import Added
+import '../models/category_model.dart';
 import 'add_transaction_screen.dart';
 
+/// İşlemler Listeleme ve Yönetim Ekranı
+///
+/// Geçmiş ve düzenli işlemler için sekmeli yapı sunar.
+/// Arama, filtreleme ve yeni işlem ekleme özelliklerini barındırır.
 class TransactionsScreen extends ConsumerStatefulWidget {
   const TransactionsScreen({super.key});
 
@@ -29,13 +32,11 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      // User Feedback #2: Düzenli sekmesinde filtre butonu gizlensin
+      // Düzenli işlemler sekmesinde filtre butonunu gizle
       setState(() {
         _isFilterButtonVisible = _tabController.index == 0;
       });
     });
-    // User Feedback #2: Search TextField logic connection
-    // Kullanıcı arama yapınca provider'ı güncelleyeceğiz.
   }
 
   @override
@@ -46,12 +47,8 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
 
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-
-    // User Feedback #1: "İşlemler" yazmasına gerek yok.
-    // AppBar title'ı kaldırıp, TabBar'ı daha temiz hale getireceğiz.
 
     return Scaffold(
       appBar: AppBar(
@@ -71,8 +68,8 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey.shade600,
             dividerColor: Colors.transparent,
-            splashFactory: NoSplash.splashFactory, // Click efekti temiz olsun
-            overlayColor: MaterialStateProperty.all(Colors.transparent),
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
             tabs: [
               Tab(text: l10n.tabHistory),
               Tab(text: l10n.tabRecurring),
@@ -80,8 +77,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
           ),
         ),
         centerTitle: true,
-        backgroundColor:
-            theme.scaffoldBackgroundColor, // AppBar arkaplanı sayfa ile aynı
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
       ),
       body: Column(
@@ -103,7 +99,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
                       ref.invalidate(paginatedTransactionProvider);
                     },
                     decoration: InputDecoration(
-                      hintText: l10n.searchHint, // Localized
+                      hintText: l10n.searchHint,
                       prefixIcon: const Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -117,6 +113,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
                 ),
                 if (_isFilterButtonVisible) ...[
                   const SizedBox(width: 12),
+                  // "Temizle" butonu için görsel geri bildirim eklendi (InkWell)
                   InkWell(
                     onTap: () {
                       HapticFeedback.selectionClick();
@@ -140,7 +137,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
             ),
           ),
 
-          // Found Transactions Count (Show only if active filters exist)
+          // Bulunan İşlem Sayısı (Aktif filtre varsa gösterilir)
           Consumer(
             builder: (context, ref, child) {
               final filter = ref.watch(transactionFilterProvider);
@@ -206,13 +203,10 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           HapticFeedback.mediumImpact();
-          // User Feedback #6: Her iki tab için de standart ekleme ekranı açılsın
+          // Her iki tab için de standart ekleme ekranı açılır
           final startRefresh = await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) =>
-                  const AddTransactionScreen(), // Default isRecurring = false
-            ),
+            MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
           );
 
           if (startRefresh == true) {
@@ -225,11 +219,11 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
     );
   }
 
-  // User Feedback #3: Advanced Filter Modal
+  /// Gelişmiş Filtreleme Modalı
   void _showFilterModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Tam ekran veya dinamik yükseklik için
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -249,7 +243,6 @@ class _FilterModalContent extends ConsumerStatefulWidget {
 }
 
 class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
-  // _selectedType: null = Tümü (Gelir + Gider), income = Sadece Gelir, expense = Sadece Gider
   TransactionType? _selectedType;
   DateTimeRange? _selectedDateRange;
   List<String> _selectedCategories = [];
@@ -275,7 +268,7 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
   void _setDateRange(String preset) {
     HapticFeedback.selectionClick();
 
-    // Toggle Logic: Eğer zaten seçili olana tıklandıysa kaldır.
+    // Toggle: Eğer zaten seçili olana tıklandıysa kaldır.
     if (_isRangePreset(preset)) {
       setState(() {
         _selectedDateRange = null;
@@ -303,7 +296,6 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
   Future<void> _pickCustomRange() async {
     HapticFeedback.selectionClick();
 
-    // Toggle check for custom
     if (_isCustomSelected()) {
       setState(() {
         _selectedDateRange = null;
@@ -355,7 +347,8 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
     notifier.setFilterType(_selectedType);
     notifier.setFilterDateRange(_selectedDateRange);
     notifier.setFilterCategories(_selectedCategories);
-    // Filtreler değişince listeyi başa sar ve yeniden yükle
+
+    // Filtreler değişince listeyi yenile
     ref.invalidate(paginatedTransactionProvider);
     Navigator.pop(context);
   }
@@ -363,7 +356,7 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
   void _clearFilters() {
     HapticFeedback.lightImpact();
     setState(() {
-      _selectedType = null; // Tümü
+      _selectedType = null;
       _selectedDateRange = null;
       _selectedCategories = [];
     });
@@ -374,7 +367,6 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Hardcoded list removed
     final categoryListAsync = ref.watch(categoryListProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -386,7 +378,7 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
       child: SafeArea(
         top: false,
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Kompakt
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Handle
             const SizedBox(height: 12),
@@ -455,7 +447,7 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
                   vertical: 20,
                 ),
                 children: [
-                  // 1. Transaction Type Section (PREMIUM SEGMENTED CONTROL)
+                  // 1. İşlem Tipi Filtresi
                   _buildSectionHeader(l10n.transactionTypeHeader),
                   const SizedBox(height: 12),
                   Container(
@@ -486,7 +478,7 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
 
                   const SizedBox(height: 24),
 
-                  // 2. Date Range Section
+                  // 2. Tarih Aralığı Filtresi
                   _buildSectionHeader(l10n.dateHeader),
                   const SizedBox(height: 12),
                   Wrap(
@@ -515,7 +507,7 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
 
                   const SizedBox(height: 24),
 
-                  // 3. Categories Section
+                  // 3. Kategori Filtresi
                   _buildSectionHeader(l10n.categoriesHeader),
                   const SizedBox(height: 12),
                   categoryListAsync.when(
@@ -536,7 +528,7 @@ class _FilterModalContentState extends ConsumerState<_FilterModalContent> {
               ),
             ),
 
-            // Filter Button
+            // Filtre Uygula Butonu
             Padding(
               padding: const EdgeInsets.all(20),
               child: SizedBox(

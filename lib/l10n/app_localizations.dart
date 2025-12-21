@@ -836,6 +836,30 @@ abstract class AppLocalizations {
   /// **'Düzenli işlem bulunamadı.'**
   String get noRecurringFound;
 
+  /// No description provided for @selectCategoryHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori Seçiniz'**
+  String get selectCategoryHint;
+
+  /// No description provided for @recurringSwitchLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenli İşlem'**
+  String get recurringSwitchLabel;
+
+  /// No description provided for @descriptionLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açıklama'**
+  String get descriptionLabel;
+
+  /// No description provided for @updateButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'GÜNCELLE'**
+  String get updateButton;
+
   /// Hata detayını içeren genel bir hata mesajı.
   ///
   /// In tr, this message translates to:

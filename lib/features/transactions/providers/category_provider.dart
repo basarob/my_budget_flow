@@ -1,21 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/category_model.dart';
 import '../repositories/category_repository.dart';
-import '../providers/transaction_provider.dart'; // TransactionRepository erişimi için
+import '../providers/transaction_provider.dart';
 import '../../auth/services/auth_service.dart';
 
-// Repository Provider
+/// Kategori Repository Sağlayıcısı
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
   return CategoryRepository();
 });
 
-// Kategorileri Listeleme Provider'ı (FutureProvider)
-// Varsayılan + Özel kategorileri getirir.
+/// Kategori Listesi Sağlayıcısı
+///
+/// Varsayılan kategoriler ile kullanıcının eklediği özel kategorileri birleştirerek sunar.
 final categoryListProvider = FutureProvider.autoDispose<List<CategoryModel>>((
   ref,
 ) async {
   final user = ref.watch(authStateChangesProvider).value;
-  // Eğer kullanıcı giriş yapmamışsa sadece varsayılanları dön
+  // Kullanıcı giriş yapmamışsa sadece varsayılanları göster
   if (user == null) {
     return CategoryModel.defaultCategories;
   }
@@ -24,13 +25,14 @@ final categoryListProvider = FutureProvider.autoDispose<List<CategoryModel>>((
   return repository.getCategories(user.uid);
 });
 
-// Kategori Ekleme Controller'ı
+/// Kategori İşlemleri (Ekleme/Silme/Güncelleme) Yöneticisi
 class CategoryController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {
-    // Initial state is void
+    // Başlangıç durumu
   }
 
+  /// Yeni özel kategori ekler
   Future<void> addCategory(String name, int colorValue, int iconCode) async {
     state = const AsyncValue.loading();
     try {
@@ -39,7 +41,7 @@ class CategoryController extends AsyncNotifier<void> {
         final repository = ref.read(categoryRepositoryProvider);
 
         final newCategory = CategoryModel(
-          id: '', // Repository halledecek
+          id: '', // Repository tarafından atanacak
           name: name,
           iconCode: iconCode,
           colorValue: colorValue,
@@ -48,7 +50,7 @@ class CategoryController extends AsyncNotifier<void> {
 
         await repository.addCustomCategory(user.uid, newCategory);
 
-        // Listeyi yenile ki UI güncellensin
+        // Listeyi yenile
         ref.invalidate(categoryListProvider);
 
         state = const AsyncValue.data(null);
@@ -58,12 +60,15 @@ class CategoryController extends AsyncNotifier<void> {
     }
   }
 
+  /// Özel kategoriyi siler
+  ///
+  /// Silinen kategoriye ait işlemler otomatik olarak "Diğer" kategorisine taşınır.
   Future<void> deleteCategory(String categoryId, String categoryName) async {
     state = const AsyncValue.loading();
     try {
       final user = ref.read(authStateChangesProvider).value;
       if (user != null) {
-        // 1. İşlemleri güncelle (categoryOther'a taşı)
+        // 1. İlgili işlemleri "Diğer" kategorisine taşı
         final transactionRepo = ref.read(transactionRepositoryProvider);
         await transactionRepo.updateCategoryForAllTransactions(
           user.uid,
@@ -76,13 +81,12 @@ class CategoryController extends AsyncNotifier<void> {
           'categoryOther',
         );
 
-        // 2. Kategoriyi sil
+        // 2. Kategoriyi veritabanından sil
         final repository = ref.read(categoryRepositoryProvider);
         await repository.deleteCustomCategory(user.uid, categoryId);
 
-        // 3. Listeleri yenile
+        // 3. İlgili listeleri yenile
         ref.invalidate(categoryListProvider);
-        // İşlemlerin de yenilenmesi lazım çünkü kategori değişti
         ref.invalidate(paginatedTransactionProvider);
         ref.invalidate(recurringListProvider);
 
@@ -94,5 +98,6 @@ class CategoryController extends AsyncNotifier<void> {
   }
 }
 
+/// Kategori Controller Sağlayıcısı
 final categoryControllerProvider =
     AsyncNotifierProvider<CategoryController, void>(CategoryController.new);

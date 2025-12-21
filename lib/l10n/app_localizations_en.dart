@@ -388,6 +388,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRecurringFound => 'No recurring transactions found.';
 
   @override
+  String get selectCategoryHint => 'Select a category';
+
+  @override
+  String get recurringSwitchLabel => 'Recurring Transaction';
+
+  @override
+  String get descriptionLabel => 'Description';
+
+  @override
+  String get updateButton => 'UPDATE';
+
+  @override
   String errorGeneric(Object error) {
     return 'An error occurred: $error';
   }
