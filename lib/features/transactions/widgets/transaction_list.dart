@@ -9,11 +9,17 @@ import '../providers/category_provider.dart';
 import '../screens/add_transaction_screen.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/snackbar_utils.dart';
 
 /// Geçmiş İşlemler Listesi
 ///
-/// Pagination (Sayfalama) ve Infinite Scroll destekler.
-/// İşlem silme (kaydırarak) ve düzenleme özelliklerine sahiptir.
+/// Kullanıcının eklediği gelir ve gider işlemlerini kronolojik olarak listeler.
+///
+/// Özellikler:
+/// - Infinite Scroll: Listeyi aşağı kaydırdıkça eski veriler (Pagination) yüklenir.
+/// - Silme: Sağa veya sola kaydırarak işlem silinebilir. Silme işlemi için geri alma (Undo) sunulur.
+/// - Düzenleme: Karta tıklandığında işlem düzenleme ekranı açılır.
+/// - Kategori Eşleştirme: İşlem modelindeki kategori ismine göre ilgili ikon ve rengi bulur.
 class TransactionList extends ConsumerWidget {
   const TransactionList({super.key});
 
@@ -88,7 +94,7 @@ class TransactionList extends ConsumerWidget {
                   data: (cats) => cats.firstWhere(
                     (c) => c.name == name,
                     // Eğer kategori bulunamazsa (veya özel karakterse)
-                    // mevcut isme göre dummy bir model oluştur veya "Diğer" dön.
+                    // mevcut isme göre geçici (dummy) bir model oluştur veya "Diğer" dön.
                     orElse: () => CategoryModel(
                       id: '',
                       name: name,
@@ -125,9 +131,6 @@ class TransactionList extends ConsumerWidget {
                 onDismissed: (_) {
                   HapticFeedback.lightImpact();
 
-                  final messenger = ScaffoldMessenger.of(context);
-                  messenger.clearSnackBars();
-
                   // 2. Optimistic Update (Listeden anında sil)
                   ref
                       .read(paginatedTransactionProvider.notifier)
@@ -139,27 +142,23 @@ class TransactionList extends ConsumerWidget {
                       .deleteTransaction(transaction.id);
 
                   // 4. Geri Alma Seçenekli SnackBar
-                  messenger.showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.transactionDeleted),
-                      duration: const Duration(seconds: 3),
-                      behavior: SnackBarBehavior.floating,
-                      margin: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-                      action: SnackBarAction(
-                        label: l10n.undoAction,
-                        onPressed: () {
-                          ref
-                              .read(transactionControllerProvider.notifier)
-                              .addTransaction(transaction);
-                          ref.invalidate(paginatedTransactionProvider);
-                        },
-                      ),
-                    ),
+                  SnackbarUtils.showStandard(
+                    context,
+                    message: l10n.transactionDeleted,
+                    undoLabel: l10n.undoAction,
+                    onUndo: () {
+                      ref
+                          .read(transactionControllerProvider.notifier)
+                          .addTransaction(transaction);
+                      ref.invalidate(paginatedTransactionProvider);
+                    },
                   );
 
-                  // 5. Kesin kapanma garantisi için Timer
+                  // 5. Kesin kapanma garantisi
                   Future.delayed(const Duration(seconds: 3), () {
-                    messenger.hideCurrentSnackBar();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    }
                   });
                 },
                 child: Card(

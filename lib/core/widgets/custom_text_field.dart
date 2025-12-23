@@ -13,6 +13,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputType keyboardType; // Klavye tipi (örn: email, number)
   final String? Function(String?)? validator; // Hata kontrol fonksiyonu
   final bool autofocus; // Otomatik odaklanma
+  final TextCapitalization textCapitalization; // Büyük harf kuralı
 
   const CustomTextField({
     super.key,
@@ -23,6 +24,7 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.autofocus = false,
+    this.textCapitalization = TextCapitalization.none,
   });
 
   @override
@@ -39,6 +41,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       autofocus: widget.autofocus,
       obscureText: widget.isPassword ? _obscureText : false,
       keyboardType: widget.keyboardType,
+      textCapitalization: widget.textCapitalization,
       validator: widget.validator,
       style: const TextStyle(fontWeight: FontWeight.w500),
       decoration: InputDecoration(
@@ -58,11 +61,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 },
               )
             : null,
-        // Fill
+        // Dolgu Rengi
         filled: true,
         fillColor: AppColors.surface,
 
-        // Borders
+        // Kenarlıklar
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.passive, width: 1),
@@ -84,7 +87,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           borderSide: const BorderSide(color: AppColors.expenseRed, width: 1.5),
         ),
 
-        // Spacing
+        // İç Boşluklar
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,

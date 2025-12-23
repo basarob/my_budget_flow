@@ -72,4 +72,80 @@ class RecurringTransactionModel {
           : null,
     );
   }
+
+  /// Bir sonraki işlem tarihini hesaplar (Helper)
+  static DateTime calculateNextDueDate(DateTime lastRun, String frequency) {
+    switch (frequency) {
+      case 'daily':
+      case 'Günlük':
+      case 'Daily':
+        return lastRun.add(const Duration(days: 1));
+      case 'weekly':
+      case 'Haftalık':
+      case 'Weekly':
+        return lastRun.add(const Duration(days: 7));
+      case 'monthly':
+      case 'Aylık':
+      case 'Monthly':
+        // Aylık artış mantığı
+        final desiredMonth = lastRun.month + 1;
+        final desiredYear = lastRun.year + (desiredMonth > 12 ? 1 : 0);
+        final normalizedMonth = desiredMonth > 12 ? 1 : desiredMonth;
+
+        final lastDayOfDesiredMonth = DateTime(
+          desiredYear,
+          normalizedMonth + 1,
+          0,
+        ).day;
+        final desiredDay = lastRun.day > lastDayOfDesiredMonth
+            ? lastDayOfDesiredMonth
+            : lastRun.day;
+
+        return DateTime(
+          desiredYear,
+          normalizedMonth,
+          desiredDay,
+          lastRun.hour,
+          lastRun.minute,
+        );
+
+      case 'yearly':
+      case 'Yıllık':
+      case 'Yearly':
+        // Yıllık artış (Artık yıl kontrolü)
+        if (lastRun.month == 2 && lastRun.day == 29) {
+          final isLeapNext =
+              (lastRun.year + 1) % 4 == 0 &&
+              ((lastRun.year + 1) % 100 != 0 || (lastRun.year + 1) % 400 == 0);
+          if (!isLeapNext) {
+            return DateTime(
+              lastRun.year + 1,
+              2,
+              28,
+              lastRun.hour,
+              lastRun.minute,
+            );
+          }
+        }
+        return DateTime(
+          lastRun.year + 1,
+          lastRun.month,
+          lastRun.day,
+          lastRun.hour,
+          lastRun.minute,
+        );
+      default:
+        return lastRun.add(const Duration(days: 30));
+    }
+  }
+
+  /// Görüntülenmesi gereken sıradaki tarihi döner
+  DateTime get nextDueDate {
+    // Eğer hiç işlenmemişse, başlangıç tarihi gösterilir.
+    if (lastProcessedDate == null) {
+      return startDate;
+    }
+    // İşlenmişse, son işlenme tarihinden bir sonraki periyodu hesaplar.
+    return calculateNextDueDate(lastProcessedDate!, frequency);
+  }
 }

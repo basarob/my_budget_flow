@@ -3,9 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../models/transaction_model.dart';
+import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
+import '../providers/category_provider.dart';
 
 /// Düzenli İşlemlerden Seçim Listesi (Modal İçeriği)
+///
+/// Yeni bir işlem eklerken, kullanıcının daha önce tanımladığı
+/// düzenli işlemlerden (şablonlardan) hızlıca seçim yapmasını sağlar.
+///
+/// Seçilen şablonun bilgileri (Başlık, Tutar, Kategori vb.)
+/// işlem ekleme ekranına otomatik olarak doldurulur.
 class RecurringSelectionModal extends ConsumerWidget {
   const RecurringSelectionModal({super.key});
 
@@ -13,6 +21,7 @@ class RecurringSelectionModal extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final recurringListAsync = ref.watch(recurringListProvider);
+    final categoryListAsync = ref.watch(categoryListProvider);
 
     return Container(
       decoration: const BoxDecoration(
@@ -72,6 +81,30 @@ class RecurringSelectionModal extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     final item = items[index];
                     final isExpense = item.type == TransactionType.expense;
+
+                    // Kategori Bulma
+                    CategoryModel? category;
+                    categoryListAsync.whenData((cats) {
+                      category = cats.firstWhere(
+                        (c) => c.name == item.categoryName,
+                        orElse: () => CategoryModel(
+                          id: '',
+                          name: item.categoryName,
+                          iconCode: Icons.category.codePoint,
+                          colorValue: AppColors.passive.value,
+                        ),
+                      );
+                    });
+                    // Fallback
+                    category ??= CategoryModel(
+                      id: '',
+                      name: item.categoryName,
+                      iconCode: Icons.category.codePoint,
+                      colorValue: AppColors.passive.value,
+                    );
+
+                    final itemColor = Color(category!.colorValue);
+
                     return InkWell(
                       onTap: () {
                         Navigator.pop(context, item);
@@ -98,21 +131,16 @@ class RecurringSelectionModal extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color:
-                                    (isExpense
-                                            ? AppColors.expenseRed
-                                            : AppColors.incomeGreen)
-                                        .withOpacity(0.1),
+                                color: itemColor.withOpacity(0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                isExpense
-                                    ? Icons.arrow_downward
-                                    : Icons.arrow_upward,
-                                color: isExpense
-                                    ? AppColors.expenseRed
-                                    : AppColors.incomeGreen,
-                                size: 20,
+                                IconData(
+                                  category!.iconCode,
+                                  fontFamily: 'MaterialIcons',
+                                ),
+                                color: itemColor,
+                                size: 24,
                               ),
                             ),
                             const SizedBox(width: 16),

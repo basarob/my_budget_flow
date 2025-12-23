@@ -9,11 +9,18 @@ import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/snackbar_utils.dart';
+import '../screens/add_transaction_screen.dart';
 
 /// Düzenli İşlemler Listesi
 ///
-/// Otomatik tekrarlanan işlemlerin yönetildiği liste.
-/// Aktif/Pasif yapma, silme ve arama özelliklerini destekler.
+/// Otomatik tekrarlanan işlemlerin (örneğin kira, abonelikler) listelendiği widget.
+///
+/// Ana Özellikler:
+/// - İşlemleri Listeleme: Kayıtlı düzenli işlemleri kart yapısında gösterir.
+/// - Aktif/Pasif Yapma: Switch butonu ile işlem geçici olarak durdurulabilir.
+/// - Silme: Kaydırarak (Dismissible) işlem silinebilir, geri alma (Undo) imkanı vardır.
+/// - Arama: [TransactionFilterProvider] üzerinden gelen arama metnine göre filtreleme yapar.
 class RecurringTransactionList extends ConsumerWidget {
   const RecurringTransactionList({super.key});
 
@@ -152,28 +159,23 @@ class RecurringTransactionList extends ConsumerWidget {
                     .read(transactionControllerProvider.notifier)
                     .deleteRecurringItem(item.id);
 
-                final messenger = ScaffoldMessenger.of(context);
-                messenger.clearSnackBars();
-                messenger.showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.recurringDeleted),
-                    duration: const Duration(seconds: 3),
-                    behavior: SnackBarBehavior.floating,
-                    margin: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-                    action: SnackBarAction(
-                      label: l10n.undoAction,
-                      onPressed: () {
-                        ref
-                            .read(transactionControllerProvider.notifier)
-                            .addRecurringItem(item);
-                      },
-                    ),
-                  ),
+                // 4. Geri Alma Seçenekli SnackBar
+                SnackbarUtils.showStandard(
+                  context,
+                  message: l10n.recurringDeleted,
+                  undoLabel: l10n.undoAction,
+                  onUndo: () {
+                    ref
+                        .read(transactionControllerProvider.notifier)
+                        .addRecurringItem(item);
+                  },
                 );
 
-                // 5. Kesin kapanma garantisi için Timer
+                // 5. Kesin kapanma garantisi
                 Future.delayed(const Duration(seconds: 3), () {
-                  messenger.hideCurrentSnackBar();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  }
                 });
               },
               child: Opacity(
@@ -189,6 +191,19 @@ class RecurringTransactionList extends ConsumerWidget {
                     side: BorderSide(color: AppColors.passive.withOpacity(0.3)),
                   ),
                   child: ListTile(
+                    onTap: () async {
+                      HapticFeedback.lightImpact();
+                      // Düzenleme ekranına git
+
+                      await showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        useSafeArea: true,
+                        builder: (context) => AddTransactionScreen(
+                          recurringTransactionToEdit: item,
+                        ),
+                      );
+                    },
                     leading: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -215,7 +230,7 @@ class RecurringTransactionList extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '$localizedFrequency - ${DateFormat('dd MMMM', Localizations.localeOf(context).toString()).format(item.startDate)}',
+                          '$localizedFrequency - ${DateFormat('dd MMMM', Localizations.localeOf(context).toString()).format(item.nextDueDate)}',
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textSecondary,

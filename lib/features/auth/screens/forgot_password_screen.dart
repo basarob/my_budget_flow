@@ -7,6 +7,7 @@ import '../../../core/widgets/gradient_app_bar.dart';
 import '../services/auth_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/snackbar_utils.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -59,25 +60,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         FocusScope.of(context).unfocus();
 
         // Kullanıcıya başarı mesajı göster
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.successResetEmailSent),
-            backgroundColor: AppColors.incomeGreen,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-          ),
-        );
+        SnackbarUtils.showSuccess(context, message: l10n.successResetEmailSent);
         Navigator.pop(
           context,
         ); // İşlem bitince kullanıcıyı Login ekranına geri at.
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.errorGeneric(e.toString()))),
+        SnackbarUtils.showError(
+          context,
+          message: l10n.errorGeneric(e.toString()),
         );
       }
     } finally {

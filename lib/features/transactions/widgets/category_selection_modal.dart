@@ -7,8 +7,20 @@ import '../models/category_model.dart';
 import '../providers/category_provider.dart';
 import 'add_category_modal.dart';
 
+/// Kategori Seçim Modalı
+///
+/// İşlem ekleme veya filtreleme sırasında kullanılacak kategorinin seçilmesini sağlar.
+///
+/// Özellikler:
+/// - Varsayılan ve kullanıcı tanımlı kategorileri ayrı gruplarda listeleme
+/// - Yeni kategori ekleme seçeneği (+ butonu)
+/// - Kullanıcı tanımlı kategorileri uzun basarak silme imkanı
+/// - Seçili kategoriyi vurgulama
 class CategorySelectionModal extends ConsumerWidget {
+  /// Şu an seçili olan kategorinin adı (Vurgulama için kullanılır)
   final String? currentCategoryName;
+
+  /// Kategori seçildiğinde tetiklenecek callback fonksiyonu
   final ValueChanged<CategoryModel> onCategorySelected;
 
   const CategorySelectionModal({
@@ -117,10 +129,11 @@ class CategorySelectionModal extends ConsumerWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 4,
-                                    mainAxisSpacing: 20,
-                                    crossAxisSpacing: 16,
-                                    childAspectRatio: 0.8,
+                                    crossAxisCount: 5,
+                                    mainAxisSpacing: 16,
+                                    crossAxisSpacing: 8,
+                                    childAspectRatio:
+                                        0.75, // Daha fazla dikey alan
                                   ),
                               itemCount: defaultCategories.length,
                               itemBuilder: (context, index) {
@@ -134,7 +147,7 @@ class CategorySelectionModal extends ConsumerWidget {
 
                             // Özel Kategoriler
                             if (customCategories.isNotEmpty) ...[
-                              const SizedBox(height: 32),
+                              const SizedBox(height: 24),
                               Text(
                                 l10n.userCategoriesTitle.toUpperCase(),
                                 style: const TextStyle(
@@ -144,16 +157,16 @@ class CategorySelectionModal extends ConsumerWidget {
                                   letterSpacing: 1.0,
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               GridView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 4,
-                                      mainAxisSpacing: 20,
-                                      crossAxisSpacing: 16,
-                                      childAspectRatio: 0.8,
+                                      crossAxisCount: 5,
+                                      mainAxisSpacing: 16,
+                                      crossAxisSpacing: 8,
+                                      childAspectRatio: 0.75,
                                     ),
                                 itemCount: customCategories.length,
                                 itemBuilder: (context, index) {
@@ -210,23 +223,21 @@ class CategorySelectionModal extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              color: isSelected
-                  ? itemColor.withOpacity(0.15)
-                  : AppColors.background,
+              color: AppColors.surface,
               shape: BoxShape.circle,
               border: Border.all(
                 color: isSelected
                     ? itemColor
-                    : AppColors.passive.withOpacity(0.3),
-                width: isSelected ? 2.5 : 1,
+                    : AppColors.passive.withOpacity(0.1),
+                width: isSelected ? 3 : 1,
               ),
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: itemColor.withOpacity(0.3),
+                        color: itemColor.withOpacity(0.25),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -235,21 +246,26 @@ class CategorySelectionModal extends ConsumerWidget {
             ),
             child: Icon(
               IconData(cat.iconCode, fontFamily: 'MaterialIcons'),
-              color: isSelected ? itemColor : AppColors.passive,
-              size: 26,
+              color: itemColor,
+              size: 24,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            cat.getLocalizedName(context),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? itemColor : AppColors.textSecondary,
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                cat.getLocalizedName(context),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: AppColors.textSecondary,
+                ),
+                maxLines: 1,
+              ),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

@@ -13,6 +13,17 @@ import '../providers/category_provider.dart';
 import '../providers/transaction_provider.dart';
 import 'modern_date_picker.dart';
 
+/// İşlem Filtreleme Modalı
+///
+/// Kullanıcının işlem listesini belirli kriterlere göre daraltmasını sağlar.
+///
+/// Filtreleme Seçenekleri:
+/// - İşlem Tipi: Gelir, Gider veya Hepsi
+/// - Tarih Aralığı: Bugün, Bu Hafta, Bu Ay, Son 3 Ay veya Özel Aralık
+/// - Kategoriler: Birden fazla kategori seçilebilir
+///
+/// Seçilen filtreler [TransactionFilterProvider] üzerinden yönetilir ve
+/// uygulandığında liste otomatik olarak yenilenir.
 class FilterModal extends ConsumerStatefulWidget {
   const FilterModal({super.key});
 

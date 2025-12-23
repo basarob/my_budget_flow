@@ -11,6 +11,7 @@ import '../services/auth_service.dart';
 import '../../../services/database_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/gradient_app_bar.dart';
+import '../../../core/utils/snackbar_utils.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -190,12 +191,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
       // 3. ADIM: Başarı mesajı göster ve bir önceki ekrana dön
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.successRegister),
-            backgroundColor: AppColors.incomeGreen,
-          ),
-        );
+        SnackbarUtils.showSuccess(context, message: l10n.successRegister);
         Navigator.of(context).pop();
       }
     } on FirebaseAuthException catch (e) {
@@ -205,12 +201,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         if (e.code == 'email-already-in-use') {
           errorMessage = l10n.errorRegisterEmailInUse;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: AppColors.expenseRed,
-          ),
-        );
+        SnackbarUtils.showError(context, message: errorMessage);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -256,6 +247,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               controller: _nameController,
                               labelText: l10n.nameLabel,
                               prefixIcon: Icons.person_outline,
+                              keyboardType: TextInputType.name,
+                              textCapitalization: TextCapitalization.words,
                               validator: (v) {
                                 if (v == null || v.isEmpty)
                                   return l10n.errorEmptyField;
@@ -269,6 +262,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               controller: _surnameController,
                               labelText: l10n.surnameLabel,
                               prefixIcon: Icons.person_outline,
+                              keyboardType: TextInputType.name,
+                              textCapitalization: TextCapitalization.words,
                               validator: (v) {
                                 if (v == null || v.isEmpty)
                                   return l10n.errorEmptyField;

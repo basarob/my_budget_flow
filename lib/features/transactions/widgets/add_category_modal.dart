@@ -4,6 +4,16 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../providers/category_provider.dart';
 
+/// Yeni Kategori Ekleme Modalı
+///
+/// Kullanıcının kendi özel kategorilerini oluşturmasını sağlayan modal penceresi.
+/// Kulanıcı kategori ismini, rengini ve ikonunu bu ekrandan belirleyebilir.
+///
+/// Özellikler:
+/// - Kategori ismi girişi
+/// - Renk paletinden renk seçimi
+/// - Geniş ikon setinden ikon seçimi
+/// - Seçilen özelliklerin canlı önizlemesi
 class AddCategoryModal extends ConsumerStatefulWidget {
   const AddCategoryModal({super.key});
 
@@ -28,10 +38,17 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
     Icons.school,
     Icons.pets,
     Icons.flight,
-    Icons.redeem,
+    Icons.attach_money,
     Icons.child_care,
     Icons.gamepad,
-    Icons.more_horiz,
+    Icons.two_wheeler,
+    Icons.savings,
+    Icons.local_cafe,
+    Icons.work,
+    Icons.family_restroom,
+    Icons.medical_services,
+    Icons.beach_access,
+    Icons.electric_bolt,
   ];
 
   @override
@@ -66,7 +83,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.85,
+      initialChildSize: 0.74,
       minChildSize: 0.5,
       maxChildSize: 0.95,
       builder: (_, scrollController) {

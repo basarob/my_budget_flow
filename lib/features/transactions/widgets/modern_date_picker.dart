@@ -7,8 +7,13 @@ import '../../../l10n/app_localizations.dart';
 
 /// Modern Tarih Seçici Widget'ı
 ///
-/// Kullanıcının başlangıç ve bitiş tarihlerini seçmesini sağlayan
-/// özelleştirilmiş, bottom-sheet olarak açılan takvim arayüzü.
+/// Kullanıcının başlangıç ve bitiş tarihlerini seçmesini sağlayan,
+/// özelleştirilmiş, bottom-sheet içerisinde çalışan takvim arayüzü.
+///
+/// Kullanım:
+/// - Tek tarih seçimi için başlangıç ve bitiş aynı gün olabilir.
+/// - Aralık seçimi için iki farklı güne tıklanır.
+/// - Seçilen aralık `onSaved` callback'i ile geri döndürülür.
 class ModernDatePicker extends StatefulWidget {
   final DateTime? initialStartDate;
   final DateTime? initialEndDate;

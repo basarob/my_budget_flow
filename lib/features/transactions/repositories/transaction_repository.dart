@@ -153,7 +153,7 @@ class TransactionRepository {
       }).toList();
     }
 
-    // Pagination not: Client-side filtreleme sebebiyle, dönen liste
+    // Sayfalama Notu: İstemci tarafı (client-side) filtreleme sebebiyle, dönen liste
     // istenen limitten (20) az olabilir. Bu normaldir.
     // Sayfalama için veritabanındaki son dökümanı referans almalıyız.
 
@@ -328,7 +328,10 @@ class TransactionRepository {
       if (item.startDate.isAfter(now)) continue;
 
       // Sıklığa göre bir sonraki tarihi hesapla
-      DateTime nextDue = _calculateNextDueDate(lastRun, item.frequency);
+      DateTime nextDue = RecurringTransactionModel.calculateNextDueDate(
+        lastRun,
+        item.frequency,
+      );
 
       // Güvenlik Sayacı (Sonsuz döngüyü önlemek için)
       int safetyCounter = 0;
@@ -373,7 +376,10 @@ class TransactionRepository {
 
         // Döngü için güncelle
         lastRun = nextDue;
-        nextDue = _calculateNextDueDate(lastRun, item.frequency);
+        nextDue = RecurringTransactionModel.calculateNextDueDate(
+          lastRun,
+          item.frequency,
+        );
         batchHasChanges = true;
 
         // Eğer sonraki tarih geleceğe geçtiyse döngüden çık
@@ -383,73 +389,6 @@ class TransactionRepository {
 
     if (batchHasChanges) {
       await batch.commit();
-    }
-  }
-
-  /// Bir sonraki işlem tarihini hesaplar
-  DateTime _calculateNextDueDate(DateTime lastRun, String frequency) {
-    switch (frequency) {
-      case 'daily':
-      case 'Günlük':
-      case 'Daily':
-        return lastRun.add(const Duration(days: 1));
-      case 'weekly':
-      case 'Haftalık':
-      case 'Weekly':
-        return lastRun.add(const Duration(days: 7));
-      case 'monthly':
-      case 'Aylık':
-      case 'Monthly':
-        // Aylık artış mantığı (31 Ocak -> 28 Şubat gibi durumları yönetir)
-        final desiredMonth = lastRun.month + 1;
-        final desiredYear = lastRun.year + (desiredMonth > 12 ? 1 : 0);
-        final normalizedMonth = desiredMonth > 12 ? 1 : desiredMonth;
-
-        final lastDayOfDesiredMonth = DateTime(
-          desiredYear,
-          normalizedMonth + 1,
-          0,
-        ).day;
-        final desiredDay = lastRun.day > lastDayOfDesiredMonth
-            ? lastDayOfDesiredMonth
-            : lastRun.day;
-
-        return DateTime(
-          desiredYear,
-          normalizedMonth,
-          desiredDay,
-          lastRun.hour,
-          lastRun.minute,
-        );
-
-      case 'yearly':
-      case 'Yıllık':
-      case 'Yearly':
-        // Yıllık artış (Artık yıl kontrolü)
-        if (lastRun.month == 2 && lastRun.day == 29) {
-          final isLeapNext =
-              (lastRun.year + 1) % 4 == 0 &&
-              ((lastRun.year + 1) % 100 != 0 || (lastRun.year + 1) % 400 == 0);
-          if (!isLeapNext) {
-            return DateTime(
-              lastRun.year + 1,
-              2,
-              28,
-              lastRun.hour,
-              lastRun.minute,
-            );
-          }
-        }
-        return DateTime(
-          lastRun.year + 1,
-          lastRun.month,
-          lastRun.day,
-          lastRun.hour,
-          lastRun.minute,
-        );
-      default:
-        debugPrint('Bilinmeyen sıklık: $frequency, 30 gün varsayılıyor.');
-        return lastRun.add(const Duration(days: 30));
     }
   }
 

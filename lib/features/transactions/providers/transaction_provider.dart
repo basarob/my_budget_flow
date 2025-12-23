@@ -181,7 +181,12 @@ final recurringListProvider = StreamProvider<List<RecurringTransactionModel>>((
   final user = ref.watch(authStateChangesProvider).value;
   if (user == null) return const Stream.empty();
   final repository = ref.watch(transactionRepositoryProvider);
-  return repository.getRecurringStream(user.uid);
+  return repository.getRecurringStream(user.uid).map((items) {
+    // Tarihi en yakın olan (nextDueDate) en üstte görünsün
+    final sortedItems = List<RecurringTransactionModel>.from(items);
+    sortedItems.sort((a, b) => a.nextDueDate.compareTo(b.nextDueDate));
+    return sortedItems;
+  });
 });
 
 /// Sayfalı (Pagination) İşlem Listesi Yöneticisi

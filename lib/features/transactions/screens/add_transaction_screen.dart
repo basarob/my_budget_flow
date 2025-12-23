@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/snackbar_utils.dart';
 import '../../../core/widgets/gradient_app_bar.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/custom_text_field.dart';
@@ -21,13 +22,28 @@ import '../../auth/services/auth_service.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// Yeni İşlem Ekleme veya Mevcut İşlemi Düzenleme Ekranı
+///
+/// Kullanıcının gelir veya gider kaydı oluşturduğu form ekranıdır.
+/// Hem yeni kayıt ekleme hem de var olan kaydı güncelleme amacıyla kullanılır.
+///
+/// Özellikler:
+/// - **Dinamik Form**: Tutar, Başlık, Kategori, Tarih ve Açıklama alanları.
+/// - **Düzenli İşlem Desteği**: İşlemi tekrar eden bir talimata dönüştürme seçeneği.
+/// - **Animasyonlar**: Tarih değişimi ve form geçişlerinde akıcı animasyonlar (animate_do).
+/// - **Hızlı Seçim**: Önceki düzenli işlemlerden kopyalayarak hızlı giriş yapabilme.
+///
+/// Parametreler:
+/// - [transactionToEdit]: Eğer düzenleme modunda ise dolu gelir, yoksa null'dur.
+/// - [initialIsRecurring]: Ekranın doğrudan "Düzenli İşlem Ekle" modunda açılmasını sağlar.
 class AddTransactionScreen extends ConsumerStatefulWidget {
   final TransactionModel? transactionToEdit;
+  final RecurringTransactionModel? recurringTransactionToEdit;
   final bool initialIsRecurring;
 
   const AddTransactionScreen({
     super.key,
     this.transactionToEdit,
+    this.recurringTransactionToEdit,
     this.initialIsRecurring = false,
   });
 
@@ -79,6 +95,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
       _description = t.description ?? '';
       _isNoteVisible = _description.isNotEmpty; // Açıklama varsa alanı aç
       _isRecurring = false;
+    } else if (widget.recurringTransactionToEdit != null) {
+      final t = widget.recurringTransactionToEdit!;
+      _isExpense = t.type == TransactionType.expense;
+      _amountController.text = t.amount.toString();
+      _titleController.text = t.title;
+      _categoryName = t.categoryName;
+      // Düzenli işlemde başlangıç tarihi önemlidir
+      _selectedDate = t.startDate;
+      _description = t.description;
+      _isNoteVisible = _description.isNotEmpty;
+      _isRecurring = true;
+      _recurringFrequency = t.frequency;
     } else {
       _isExpense = true;
       _selectedDate = DateTime.now();
@@ -96,6 +124,17 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
   }
 
   /// İşlemi Kaydet (Ekle veya Güncelle)
+  ///
+  /// Form validasyonunu kontrol eder ve verileri veritabanına yazar.
+  ///
+  /// İşleyiş:
+  /// 1. Formu doğrula (Tutar ve Başlık zorunlu).
+  /// 2. Kullanıcı oturumunu kontrol et.
+  /// 3. [TransactionController] üzerinden Firestore'a yazma işlemini başlat.
+  ///    - Eğer [isRecurring] seçiliyse `RecurringTransaction` koleksiyonuna ekler.
+  ///    - Aksi takdirde normal `Transaction` koleksiyonuna ekler.
+  /// 4. Düzenleme modundaysa, eski kaydı silip yenisini ekler (Update mantığı).
+  /// 5. Başarılı ise ekranı kapatır ve listeyi yenilemesi için sinyal (true) döner.
   void _saveTransaction() async {
     if (!_formKey.currentState!.validate()) return;
     final l10n = AppLocalizations.of(context)!;
@@ -114,9 +153,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
 
     try {
       if (_isRecurring) {
-        // Düzenli İşlem Ekle
+        // Düzenli İşlem Ekle veya Güncelle
         final recurringItem = RecurringTransactionModel(
-          id: '',
+          id: widget.recurringTransactionToEdit?.id ?? '', // Varsa ID koru
           title: title,
           userId: user.uid,
           amount: amount,
@@ -125,11 +164,21 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
           frequency: _recurringFrequency,
           startDate: _selectedDate,
           description: description,
+          // Güncelleme yapıyorsak eski verileri koru
+          lastProcessedDate:
+              widget.recurringTransactionToEdit?.lastProcessedDate,
+          isActive: widget.recurringTransactionToEdit?.isActive ?? true,
         );
 
-        await ref
-            .read(transactionControllerProvider.notifier)
-            .addRecurringItem(recurringItem);
+        if (widget.recurringTransactionToEdit != null) {
+          await ref
+              .read(transactionControllerProvider.notifier)
+              .updateRecurringItem(recurringItem);
+        } else {
+          await ref
+              .read(transactionControllerProvider.notifier)
+              .addRecurringItem(recurringItem);
+        }
       } else {
         // Tek Seferlik İşlem Ekle/Guncelle
         final transaction = TransactionModel(
@@ -161,8 +210,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.errorMessagePrefix(e.toString()))),
+        SnackbarUtils.showError(
+          context,
+          message: l10n.errorMessagePrefix(e.toString()),
         );
       }
     }
@@ -280,7 +330,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
     return Scaffold(
       appBar: GradientAppBar(
         title: Text(
-          widget.transactionToEdit != null
+          (widget.transactionToEdit != null ||
+                  widget.recurringTransactionToEdit != null)
               ? l10n.editTransactionTitle
               : (_isExpense ? l10n.addExpenseTitle : l10n.addIncomeTitle),
           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -416,6 +467,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
               controller: _titleController,
               labelText: l10n.titleHint,
               prefixIcon: Icons.edit_note_rounded,
+              textCapitalization: TextCapitalization.words,
+              keyboardType: TextInputType.text,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return l10n.errorEnterTitle;
@@ -638,7 +691,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
             // 6. Kaydet Butonu
             GradientButton(
               onPressed: _saveTransaction,
-              text: widget.transactionToEdit != null
+              text:
+                  (widget.transactionToEdit != null ||
+                      widget.recurringTransactionToEdit != null)
                   ? l10n.saveButton
                   : l10n.addButton,
               icon: Icons.check_circle_outline,

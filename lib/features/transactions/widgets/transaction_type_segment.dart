@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 
+/// İşlem Tipi Seçim Segmenti (Gelir / Gider)
+///
+/// Kullanıcının işlem eklerken veya filtrelerken "Gelir" veya "Gider"
+/// seçenekleri arasında geçiş yapmasını sağlayan özel toggle butonu.
+///
+/// Görünüm:
+/// - Seçili olmayan taraf şeffaf, seçili taraf kendi rengiyle (Yeşil/Kırmızı) dolgulu görünür.
 class TransactionTypeSegment extends StatelessWidget {
   final bool isExpense;
   final ValueChanged<bool> onTypeChanged;

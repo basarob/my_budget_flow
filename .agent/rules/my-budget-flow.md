@@ -2,6 +2,12 @@
 trigger: always_on
 ---
 
+# İletişim Dili
+
+- Bana her zaman **Türkçe** cevap ver.
+- Beni bilgilendirmek için hazırladığın implementation_plan.md, task.md gibi dosyalar her zaman **Türkçe** olsun.
+- Kod blokları dışındaki açıklamalarda teknik terimleri (Widget, Provider, State vb.) İngilizce haliyle kullan.
+
 # Teknoloji Yığını ve Mimari
 
 - **Framework**: Flutter
@@ -49,6 +55,8 @@ trigger: always_on
       - Inputlar için: `CustomTextField`
       - AppBar için: `GradientAppBar`
       - Tıklama animasyonları için: `ScaleButton`
+    - Özel utils'ları tercih et:
+      - SnackBarlar için: `snackbar_utils`
     - Yazı tipleri için `GoogleFonts.inter` kullan.
     - Animasyonlar için `animate_do` paketini kullan. Performans için sadece gerekli görülen yerlerde animasyon kullan.
 
@@ -59,6 +67,7 @@ trigger: always_on
     - Yeni metinleri `lib/l10n/app_en.arb` ve `app_tr.arb` dosyalarına ekle.
 
 3.  **Yorum Satırları**:
+    - Her bir dosyanın başına **Türkçe** olarak o dosyanın amacını ve özelliklerini, projede ne işe yaradığını açıklayacak yorum satırları ekle.
     - Projeye dışardan bakan birisinin yapıyı kolay anlayabilmesi için sınıf ve kritik fonksiyonların başına **Türkçe** açıklama satırları (`///`) ekle.
     - Kod içerisinde **Ingilizce** yorum satırları ekleme.
     - Yeni eklediğin kodların veya eklemelerin yanına bunu belirten yorum satırları ekleme. Bu gereksiz yorum satırı oluyor.

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/widgets/custom_text_field.dart';
 import '../../../core/widgets/gradient_button.dart';
-import '../../../main.dart'; // For routeObserver
+import '../../../main.dart'; // RouteObserver için
 
 import '../../../core/providers/language_provider.dart';
 import '../../../l10n/app_localizations.dart';
@@ -12,6 +12,7 @@ import '../services/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
+import '../../../core/utils/snackbar_utils.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -106,17 +107,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
           default:
             errorMessage = l10n.errorLoginGeneral;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: AppColors.expenseRed,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-          ),
-        );
+        SnackbarUtils.showError(context, message: errorMessage);
       }
     } finally {
       // 5. Adım: İşlem bitince (başarılı veya hatalı) yükleniyor animasyonunu durdur.
@@ -145,7 +136,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                       ElasticIn(
                         duration: const Duration(
                           milliseconds: 1000,
-                        ), // Slightly longer for elastic effect
+                        ), // Elastik efekt için biraz daha uzun süre
                         child: Hero(
                           tag: 'app_icon',
                           child: ClipOval(

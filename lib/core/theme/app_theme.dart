@@ -59,7 +59,6 @@ class AppColors {
     Color(0xFF81C784), // Yeşil
     Color(0xFFFFB74D), // Turuncu
     Color(0xFF9575CD), // Mor
-    Color(0xFF4DB6AC), // Teal
     Color(0xFFF06292), // Pembe
     Color(0xFF90A4AE), // Gri / BlueGrey
   ];

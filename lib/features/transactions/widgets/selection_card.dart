@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
+/// Genel Amaçlı Seçim Kartı Kartı
+///
+/// Kullanıcının bir listeden veya modalden seçim yapması gereken alanlarda kullanılır.
+/// (Örn: Kategori seçimi, Tarih seçimi).
+///
+/// Görünüm:
+/// - Sol tarafta renkli ikon
+/// - Ortada başlık ve seçilen değer (veya placeholder)
+/// - Sağ tarafta ok ikonu
 class SelectionCard extends StatelessWidget {
   final String title;
   final String? selectedValue;

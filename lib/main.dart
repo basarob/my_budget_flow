@@ -8,7 +8,7 @@ import 'features/auth/screens/wrapper.dart';
 import 'core/providers/language_provider.dart';
 import 'core/widgets/connection_wrapper.dart';
 
-/// Global RouteObserver for detecting route changes (used by RouteAware widgets)
+/// Rota değişikliklerini algılamak için kullanılan global gözlemci (RouteAware widget'lar için).
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
 
@@ -38,7 +38,9 @@ class MyBudgetFlow extends ConsumerWidget {
           locale: currentLocale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          navigatorObservers: [routeObserver], // For RouteAware widgets
+          navigatorObservers: [
+            routeObserver,
+          ], // RouteAware widget'ları izlemek için
           home: const ConnectionWrapper(child: AuthWrapper()),
         );
       },
