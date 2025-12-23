@@ -3,10 +3,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'l10n/app_localizations.dart';
-
 import 'core/theme/app_theme.dart';
 import 'features/auth/screens/wrapper.dart';
 import 'core/providers/language_provider.dart';
+import 'core/widgets/connection_wrapper.dart';
+
+/// Global RouteObserver for detecting route changes (used by RouteAware widgets)
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +38,8 @@ class MyBudgetFlow extends ConsumerWidget {
           locale: currentLocale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const AuthWrapper(),
+          navigatorObservers: [routeObserver], // For RouteAware widgets
+          home: const ConnectionWrapper(child: AuthWrapper()),
         );
       },
       loading: () => const MaterialApp(

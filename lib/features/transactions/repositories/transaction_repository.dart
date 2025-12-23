@@ -10,6 +10,10 @@ class PaginatedTransactionResult {
   PaginatedTransactionResult(this.items, this.lastDocument);
 }
 
+/// Firestore üzerinde finansal işlemleri (gelir/gider) yöneten sınıf.
+///
+/// CRUD işlemleri, filtreleme, gerçek zamanlı dinleme ve düzenli işlemlerin
+/// (recurring transactions) otomatik işlenmesini sağlar.
 class TransactionRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -192,34 +196,39 @@ class TransactionRepository {
     final now = DateTime.now();
     DateTime? processedDate;
 
-    // 2. Başlangıç tarihi bugün veya geçmişse, ilk işlemi hemen oluştur
-    final isTodayOrPast =
-        item.startDate.isBefore(now) ||
-        (item.startDate.year == now.year &&
-            item.startDate.month == now.month &&
-            item.startDate.day == now.day);
+    // 2. Eğer lastProcessedDate zaten varsa (Undo işlemi), onu kullan ve işlem oluşturma.
+    // Yoksa (Yeni işlem), başlangıç tarihi kontrolü yap.
+    if (item.lastProcessedDate != null) {
+      processedDate = item.lastProcessedDate;
+    } else {
+      final isTodayOrPast =
+          item.startDate.isBefore(now) ||
+          (item.startDate.year == now.year &&
+              item.startDate.month == now.month &&
+              item.startDate.day == now.day);
 
-    if (isTodayOrPast && item.isActive) {
-      final txRef = _firestore
-          .collection('users')
-          .doc(item.userId)
-          .collection('transactions')
-          .doc();
+      if (isTodayOrPast && item.isActive) {
+        final txRef = _firestore
+            .collection('users')
+            .doc(item.userId)
+            .collection('transactions')
+            .doc();
 
-      final newTransaction = TransactionModel(
-        id: txRef.id,
-        userId: item.userId,
-        title: item.title,
-        amount: item.amount,
-        type: item.type,
-        categoryName: item.categoryName,
-        date: item.startDate,
-        description: '${item.description} (Otomatik: ${item.frequency})',
-        isRecurring: true,
-      );
+        final newTransaction = TransactionModel(
+          id: txRef.id,
+          userId: item.userId,
+          title: item.title,
+          amount: item.amount,
+          type: item.type,
+          categoryName: item.categoryName,
+          date: item.startDate,
+          description: '${item.description} (Otomatik: ${item.frequency})',
+          isRecurring: true,
+        );
 
-      batch.set(txRef, newTransaction.toMap());
-      processedDate = item.startDate; // İşlendi olarak işaretle
+        batch.set(txRef, newTransaction.toMap());
+        processedDate = item.startDate; // İşlendi olarak işaretle
+      }
     }
 
     // 3. Düzenli İşlem Kaydını Hazırla

@@ -1,6 +1,10 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/widgets/gradient_button.dart';
+import '../../../main.dart'; // For routeObserver
 
 import '../../../core/providers/language_provider.dart';
 import '../../../l10n/app_localizations.dart';
@@ -16,7 +20,7 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
   final _formKey = GlobalKey<FormState>(); // Form anahtarı
 
   // Controller'lar
@@ -25,7 +29,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   bool _isLoading = false;
   bool _isButtonEnabled = false;
-  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -35,12 +38,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Subscribe to RouteObserver
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _emailController.removeListener(_updateButtonState);
     _passwordController.removeListener(_updateButtonState);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  /// Bu rota, üstündeki bir rota kapandığında (pop) tetiklenir.
+  @override
+  void didPopNext() {
+    // Bu ekrana geri dönüldüğünde klavyeyi ve focus'u kapat
+    FocusScope.of(context).unfocus();
   }
 
   void _clearForm() {
@@ -92,6 +110,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SnackBar(
             content: Text(errorMessage),
             backgroundColor: AppColors.expenseRed,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.all(16),
           ),
         );
       }
@@ -111,6 +134,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: SafeArea(
           child: Stack(
             children: [
+              // Arkaplan Deseni (Opsiyonel: Hafif Gradient)
               Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24.0),
@@ -118,78 +142,100 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // --- BAŞLIK VE LOGO ---
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          50,
-                        ), // Köşeleri yuvarla
-                        child: Image.asset(
-                          'assets/icon/app_icon.png',
-                          height: 120,
-                          width: 120,
+                      ElasticIn(
+                        duration: const Duration(
+                          milliseconds: 1000,
+                        ), // Slightly longer for elastic effect
+                        child: Hero(
+                          tag: 'app_icon',
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/icon/app_icon.png',
+                              height: 130,
+                              width: 130,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 16), // Boşluk
-
-                      Text(
-                        l10n.appTitle,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryDark,
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        l10n.welcomeBack,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-
-                      // --- GİRİŞ FORMU ---
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: loginForm(context),
-                        ),
-                      ),
-
                       const SizedBox(height: 24),
 
-                      // --- KAYIT OL YÖNLENDİRMESİ ---
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            l10n.noAccountQuestion,
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              FocusScope.of(context).unfocus(); // Odağı kaldır
-                              _clearForm();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const RegisterScreen(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              l10n.registerButton,
+                      FadeInDown(
+                        delay: const Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 800),
+                        child: Column(
+                          children: [
+                            Text(
+                              l10n.appTitle,
                               style: const TextStyle(
-                                color: AppColors.primary,
+                                fontSize: 32,
                                 fontWeight: FontWeight.bold,
+                                color: AppColors.primaryDark,
+                                letterSpacing: 1.2,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.welcomeBack,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 48),
+
+                      // --- GİRİŞ FORMU ---
+                      FadeInUp(
+                        delay: const Duration(milliseconds: 400),
+                        duration: const Duration(milliseconds: 800),
+                        child: loginForm(context),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // --- KAYIT OL YÖNLENDİRMESİ ---
+                      FadeInUp(
+                        delay: const Duration(milliseconds: 600),
+                        duration: const Duration(milliseconds: 800),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              l10n.noAccountQuestion,
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                FocusScope.of(context).unfocus();
+                                await Future.delayed(
+                                  const Duration(milliseconds: 200),
+                                );
+                                if (!context.mounted) return;
+                                _clearForm();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const RegisterScreen(),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                l10n.registerButton,
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -201,10 +247,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 top: 16,
                 right: 16,
                 child: PopupMenuButton<bool>(
-                  icon: const Icon(
-                    Icons.language,
-                    color: AppColors.primary,
-                    size: 30,
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.language,
+                      color: AppColors.primary,
+                      size: 24,
+                    ),
                   ),
                   offset: const Offset(0, 45),
                   color: AppColors.surface,
@@ -220,18 +279,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const PopupMenuItem(
                       value: false, // isEnglish = false
                       child: Center(
-                        child: CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          child: Text('🇹🇷', style: TextStyle(fontSize: 28)),
+                        child: Text(
+                          '🇹🇷 Türkçe',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     const PopupMenuItem(
                       value: true, // isEnglish = true
                       child: Center(
-                        child: CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          child: Text('🇬🇧', style: TextStyle(fontSize: 28)),
+                        child: Text(
+                          '🇬🇧 English',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -248,60 +307,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Form loginForm(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Form(
-      key: _formKey, // Form anahtarını buraya bağlıyoruz
+      key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Email Alanı
-          TextFormField(
+          CustomTextField(
             controller: _emailController,
-            autofocus: false,
+            labelText: l10n.emailLabel,
+            prefixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              labelText: l10n.emailLabel,
-              prefixIcon: Icon(
-                Icons.email_outlined,
-                color: AppColors.primaryLight,
-              ),
-            ),
-            // Validator: Kullanıcı butona basınca burası çalışır. Null dönerse geçerli, yazı dönerse hata mesajıdır.
             validator: (value) {
-              // 1. Kontrol: Boş mu? - Buton durumu ile kontrol edildi.
-              if (value == null || value.isEmpty) {
-                return null; // Buton zaten pasif olacak
-              }
-              // 2. Kontrol: Email formatına uygun mu? (Regex)
+              if (value == null || value.isEmpty) return null;
               final bool emailValid = RegExp(
                 r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
               ).hasMatch(value);
-
-              if (!emailValid) {
-                return l10n.errorInvalidEmail;
-              }
+              if (!emailValid) return l10n.errorInvalidEmail;
               return null;
             },
           ),
           const SizedBox(height: 16),
 
           // Şifre Alanı
-          TextFormField(
+          CustomTextField(
             controller: _passwordController,
-            autofocus: false,
-            obscureText: _obscurePassword, // Şifreyi gizle/göster durumu
-            decoration: InputDecoration(
-              labelText: l10n.passwordLabel,
-              prefixIcon: const Icon(
-                Icons.lock_outline,
-                color: AppColors.primaryLight,
-              ), // Göz ikonu: Tıklanınca şifreyi gösterir/gizler
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                ),
-                onPressed: () =>
-                    setState(() => _obscurePassword = !_obscurePassword),
-              ),
-            ),
+            labelText: l10n.passwordLabel,
+            prefixIcon: Icons.lock_outline,
+            isPassword: true,
             validator: (val) => null,
           ),
 
@@ -309,8 +341,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () {
-                FocusScope.of(context).unfocus(); // Odağı kaldır
+              onPressed: () async {
+                FocusScope.of(context).unfocus();
+                await Future.delayed(const Duration(milliseconds: 200));
+                if (!context.mounted) return;
                 _clearForm();
                 Navigator.push(
                   context,
@@ -321,19 +355,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               },
               child: Text(
                 l10n.forgotPasswordQuestion,
-                style: const TextStyle(color: AppColors.primary),
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
 
           // Giriş Butonu
-          ElevatedButton(
-            onPressed: _isButtonEnabled && !_isLoading ? _login : null,
-            child: _isLoading
-                ? const CircularProgressIndicator(color: Colors.white)
-                : Text(l10n.loginButton),
+          GradientButton(
+            onPressed: _isButtonEnabled ? _login : null,
+            text: l10n.loginButton,
+            isLoading: _isLoading,
           ),
         ],
       ),

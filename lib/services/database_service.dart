@@ -36,4 +36,15 @@ class DatabaseService {
       rethrow; // Hatayı ekrana göndermek için fırlat
     }
   }
+
+  // Kullanıcı Verisini Getirme
+  Future<Map<String, dynamic>?> getUserData(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      return doc.data();
+    } catch (e) {
+      _logger.e("Veri Çekme Hatası: $uid", error: e);
+      return null;
+    }
+  }
 }

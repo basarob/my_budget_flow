@@ -8,6 +8,7 @@ import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_theme.dart';
 
 /// Düzenli İşlemler Listesi
 ///
@@ -30,14 +31,18 @@ class RecurringTransactionList extends ConsumerWidget {
         return l10n.frequencyYearly;
       default:
         // Bilinmeyen veya zaten çevrilmiş metinler için (Geriye uyumluluk)
-        if (frequency == 'Günlük' || frequency == 'Daily')
+        if (frequency == 'Günlük' || frequency == 'Daily') {
           return l10n.frequencyDaily;
-        if (frequency == 'Haftalık' || frequency == 'Weekly')
+        }
+        if (frequency == 'Haftalık' || frequency == 'Weekly') {
           return l10n.frequencyWeekly;
-        if (frequency == 'Aylık' || frequency == 'Monthly')
+        }
+        if (frequency == 'Aylık' || frequency == 'Monthly') {
           return l10n.frequencyMonthly;
-        if (frequency == 'Yıllık' || frequency == 'Yearly')
+        }
+        if (frequency == 'Yıllık' || frequency == 'Yearly') {
           return l10n.frequencyYearly;
+        }
         return frequency;
     }
   }
@@ -70,20 +75,24 @@ class RecurringTransactionList extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.event_repeat, size: 64, color: Colors.grey.shade300),
+                Icon(
+                  Icons.event_repeat,
+                  size: 64,
+                  color: AppColors.passive.withOpacity(0.5),
+                ),
                 const SizedBox(height: 16),
                 Text(
                   l10n.noRecurringFound,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.copyWith(color: Colors.grey.shade600),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   l10n.addRecurringHint,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade500),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary.withOpacity(0.7),
+                  ),
                 ),
               ],
             ),
@@ -96,7 +105,9 @@ class RecurringTransactionList extends ConsumerWidget {
             final item = items[index];
             final isActive = item.isActive;
             final isExpense = item.type == TransactionType.expense;
-            final color = isExpense ? Colors.red : Colors.green;
+            final color = isExpense
+                ? AppColors.expenseRed
+                : AppColors.incomeGreen;
 
             // Kategori Bulma
             CategoryModel findCategory(String name) {
@@ -107,14 +118,14 @@ class RecurringTransactionList extends ConsumerWidget {
                     id: '',
                     name: name,
                     iconCode: Icons.category.codePoint,
-                    colorValue: Colors.grey.value,
+                    colorValue: AppColors.passive.value,
                   ),
                 ),
                 orElse: () => CategoryModel(
                   id: '',
                   name: name,
                   iconCode: Icons.category.codePoint,
-                  colorValue: Colors.grey.value,
+                  colorValue: AppColors.passive.value,
                 ),
               );
             }
@@ -130,10 +141,10 @@ class RecurringTransactionList extends ConsumerWidget {
               key: Key(item.id),
               direction: DismissDirection.endToStart,
               background: Container(
-                color: Colors.red,
+                color: AppColors.expenseRed,
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 20),
-                child: const Icon(Icons.delete, color: Colors.white),
+                child: const Icon(Icons.delete, color: AppColors.surface),
               ),
               onDismissed: (_) {
                 HapticFeedback.lightImpact();
@@ -141,8 +152,9 @@ class RecurringTransactionList extends ConsumerWidget {
                     .read(transactionControllerProvider.notifier)
                     .deleteRecurringItem(item.id);
 
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
+                final messenger = ScaffoldMessenger.of(context);
+                messenger.clearSnackBars();
+                messenger.showSnackBar(
                   SnackBar(
                     content: Text(l10n.recurringDeleted),
                     duration: const Duration(seconds: 3),
@@ -159,11 +171,9 @@ class RecurringTransactionList extends ConsumerWidget {
                   ),
                 );
 
-                // Zorla Kapatma (Timer)
+                // 5. Kesin kapanma garantisi için Timer
                 Future.delayed(const Duration(seconds: 3), () {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).clearSnackBars();
-                  }
+                  messenger.hideCurrentSnackBar();
                 });
               },
               child: Opacity(
@@ -176,7 +186,7 @@ class RecurringTransactionList extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.grey.shade200),
+                    side: BorderSide(color: AppColors.passive.withOpacity(0.3)),
                   ),
                   child: ListTile(
                     leading: Container(
@@ -206,9 +216,9 @@ class RecurringTransactionList extends ConsumerWidget {
                       children: [
                         Text(
                           '$localizedFrequency - ${DateFormat('dd MMMM', Localizations.localeOf(context).toString()).format(item.startDate)}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade600,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         if (item.description.isNotEmpty)
@@ -218,7 +228,7 @@ class RecurringTransactionList extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade500,
+                              color: AppColors.textSecondary.withOpacity(0.7),
                             ),
                           ),
                       ],
@@ -279,7 +289,8 @@ class RecurringTransactionList extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('Hata: $err')),
+      error: (err, stack) =>
+          Center(child: Text(l10n.errorGeneric(err.toString()))),
     );
   }
 }

@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../auth/services/auth_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
-
-import '../../appbar/screens/about_app_screen.dart';
-import '../../appbar/screens/profile_screen.dart';
-import '../../appbar/screens/settings_screen.dart';
+import '../../../core/widgets/gradient_app_bar.dart';
 import '../../appbar/screens/notifications_screen.dart';
 import '../../calendar/screens/calendar_screen.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
 import '../../goals/screens/goals_screen.dart';
 import '../../transactions/screens/transactions_screen.dart';
+import '../widgets/custom_drawer.dart';
 
+/// Ana Ekran (Home Screen)
+///
+/// Uygulamanın temel iskeleti. Üstte Gradient AppBar, altta modern NavigationBar
+/// ve sağdan açılan özel menü (CustomDrawer) bulunur.
 class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
 
@@ -24,13 +25,15 @@ class BudgetScreen extends ConsumerStatefulWidget {
 class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   int _selectedIndex = 0;
 
+  // Sayfalar Listesi
   static const List<Widget> _widgetOptions = <Widget>[
-    DashboardBody(),
-    TransactionsScreen(),
-    CalendarScreen(),
-    GoalsScreen(),
+    DashboardBody(), // 0: Gösterge Paneli
+    TransactionsScreen(), // 1: İşlemler
+    CalendarScreen(), // 2: Takvim
+    GoalsScreen(), // 3: Hedefler
   ];
 
+  // Sayfa Değiştirme
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -42,241 +45,147 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: budgetAppBar(_selectedIndex, l10n),
+      extendBodyBehindAppBar: false,
 
-      drawerScrimColor: Colors.transparent,
-      endDrawer: Align(
-        alignment: Alignment.topRight,
-        child: Padding(
-          padding: EdgeInsets.only(top: 60.0, right: 3.0),
-          child: SizedBox(
-            height: 200,
-            child: Drawer(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
-                side: BorderSide(color: Colors.white, width: 2),
-              ),
-              backgroundColor: AppColors.primaryDark,
-              width: 160,
-              child: customDrawer(context, l10n),
-            ),
+      // 1. Üst Bar (Gradient Efektli)
+      appBar: GradientAppBar(
+        title: Text(
+          _getTitleForPage(_selectedIndex, l10n),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
+        leading: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Image.asset(
+            'assets/icon/app_icon_white1.png',
+            fit: BoxFit.contain,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsScreen(),
+                ),
+              );
+            },
+            tooltip: l10n.pageTitleNotifications,
+          ),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                Scaffold.of(context).openEndDrawer();
+              },
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+            ),
+          ),
+        ],
       ),
 
+      // Menü açılırken arka planı karartma
+      drawerScrimColor: Colors.black54,
+
+      // 2. Sağ Menü (Drawer)
+      endDrawer: const CustomDrawer(),
+
+      // 3. Ana İçerik
       body: _widgetOptions.elementAt(_selectedIndex),
 
-      bottomNavigationBar: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-        child: SizedBox(
-          height: 75,
-          child: Theme(
-            data: Theme.of(context).copyWith(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-            ),
-            child: BottomNavigationBar(
-              backgroundColor: AppColors.primaryDark,
-              type: BottomNavigationBarType.fixed,
-              items: <BottomNavigationBarItem>[
-                _buildNavItem(Icons.home_outlined, Icons.home, l10n.navHome, 0),
-                _buildNavItem(
-                  Icons.swap_horiz_outlined,
-                  Icons.swap_horiz,
-                  l10n.navTransactions,
-                  1,
-                ),
-                _buildNavItem(
-                  Icons.calendar_today_outlined,
-                  Icons.calendar_today,
-                  l10n.navCalendar,
-                  2,
-                ),
-                _buildNavItem(
-                  Icons.track_changes_outlined,
-                  Icons.track_changes,
-                  l10n.navGoals,
-                  3,
-                ),
-              ],
-              currentIndex: _selectedIndex,
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.white.withOpacity(0.7),
-              onTap: _onItemTapped,
-              showSelectedLabels: true,
-              showUnselectedLabels: true,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // !NavBar
-  BottomNavigationBarItem _buildNavItem(
-    IconData icon,
-    IconData activeIcon,
-    String label,
-    int index,
-  ) {
-    return BottomNavigationBarItem(
-      icon: Icon(icon),
-      activeIcon: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white, width: 1.5),
-        ),
-        child: Icon(activeIcon),
-      ),
-      label: label,
-    );
-  }
-
-  // !AppBar
-  AppBar budgetAppBar(int page, AppLocalizations l10n) {
-    return AppBar(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
-      ),
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Image.asset('assets/icon/app_icon_white1.png'),
-      ),
-      title: Text(_getTitleForPage(page, l10n)),
-      centerTitle: false,
-      actions: [
-        // Bildirimler butonu
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationsScreen(),
-              ),
+      // 4. Alt Navigasyon (Modern Material 3)
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: AppColors.primaryDark,
+              );
+            }
+            return const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+              color: AppColors.textSecondary,
             );
-          },
-          tooltip: l10n.pageTitleNotifications,
+          }),
         ),
-        // Menü butonunu eklemesi.
-        Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () {
-              Scaffold.of(context).openEndDrawer();
-            },
-            tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // !Drawer
-  Column customDrawer(BuildContext context, AppLocalizations l10n) {
-    return Column(
-      children: [
-        // ! Ekleme yapmadan önce yüksekliği büyüt.
-        _buildDrawerItem(
-          context,
-          Icons.person_outline,
-          l10n.pageTitleProfile,
-          const ProfileScreen(),
-        ),
-        _buildDrawerItem(
-          context,
-          Icons.settings_outlined,
-          l10n.pageTitleSettings,
-          const SettingsScreen(),
-        ),
-        _buildDrawerItem(
-          context,
-          Icons.info_outline,
-          l10n.pageTitleAbout,
-          const AboutAppScreen(),
-        ),
-
-        const Spacer(),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 13.0),
-          child: Divider(color: Colors.white54, height: 10),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(11.0),
-          child: Material(
-            color: AppColors.primaryLight,
-            borderRadius: BorderRadius.circular(10),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(10),
-              onTap: () {
-                Navigator.pop(context);
-                ref.read(authServiceProvider).signOut();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 8,
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.logout, color: AppColors.blueRed),
-                    const SizedBox(width: 9),
-                    Text(
-                      l10n.logoutButton,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.blueRed,
-                        fontSize: 17,
-                      ),
-                    ),
-                  ],
-                ),
+        child: NavigationBar(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: _onItemTapped,
+          backgroundColor: AppColors.surface, // Beyaz/Temiz zemin
+          indicatorColor: AppColors.primaryLight.withOpacity(0.3), // Hap Rengi
+          elevation: 2,
+          shadowColor: Colors.black26,
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(
+                Icons.home_outlined,
+                color: AppColors.textSecondary,
               ),
+              selectedIcon: const Icon(
+                Icons.home,
+                color: AppColors.primaryDark,
+              ),
+              label: l10n.navHome,
             ),
-          ),
+            NavigationDestination(
+              icon: const Icon(
+                Icons.swap_horiz_outlined,
+                color: AppColors.textSecondary,
+              ),
+              selectedIcon: const Icon(
+                Icons.swap_horiz,
+                color: AppColors.primaryDark,
+              ),
+              label: l10n.navTransactions,
+            ),
+            NavigationDestination(
+              icon: const Icon(
+                Icons.calendar_today_outlined,
+                color: AppColors.textSecondary,
+              ),
+              selectedIcon: const Icon(
+                Icons.calendar_today,
+                color: AppColors.primaryDark,
+              ),
+              label: l10n.navCalendar,
+            ),
+            NavigationDestination(
+              icon: const Icon(
+                Icons.track_changes_outlined,
+                color: AppColors.textSecondary,
+              ),
+              selectedIcon: const Icon(
+                Icons.track_changes,
+                color: AppColors.primaryDark,
+              ),
+              label: l10n.navGoals,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
-}
 
-// !Drawer butonları
-Widget _buildDrawerItem(
-  BuildContext context,
-  IconData icon,
-  String title,
-  Widget page,
-) {
-  return ListTile(
-    dense: true,
-    visualDensity: VisualDensity.compact,
-    leading: Icon(icon, color: Colors.white),
-    title: Text(
-      title,
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-    ),
-    textColor: Colors.white,
-    onTap: () {
-      Navigator.pop(context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => page));
-    },
-  );
-}
-
-// !AppBar Başlıkları
-String _getTitleForPage(int page, AppLocalizations l10n) {
-  switch (page) {
-    case 0:
-      return l10n.appTitle;
-    case 1:
-      return l10n.navTransactions;
-    case 2:
-      return l10n.navCalendar;
-    case 3:
-      return l10n.navGoals;
-    default:
-      return l10n.appTitle;
+  // Sayfa Başlığını Getir
+  String _getTitleForPage(int page, AppLocalizations l10n) {
+    switch (page) {
+      case 0:
+        return l10n.appTitle;
+      case 1:
+        return l10n.navTransactions;
+      case 2:
+        return l10n.navCalendar;
+      case 3:
+        return l10n.navGoals;
+      default:
+        return l10n.appTitle;
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../../core/widgets/gradient_app_bar.dart';
 import '../../../core/providers/language_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -13,12 +14,7 @@ class SettingsScreen extends ConsumerWidget {
     final asyncLocale = ref.watch(languageProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
-        ),
-        title: Text(l10n.pageTitleSettings),
-      ),
+      appBar: GradientAppBar(title: Text(l10n.pageTitleSettings)),
       body: asyncLocale.when(
         data: (currentLocale) {
           final isEnglish = currentLocale.languageCode == 'en';
@@ -45,7 +41,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildLanguageSelector(WidgetRef ref, bool isEnglish) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -86,12 +82,12 @@ class SettingsScreen extends ConsumerWidget {
         margin: const EdgeInsets.all(2),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? AppColors.surface : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: AppColors.primaryDark.withOpacity(0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

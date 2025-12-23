@@ -16,16 +16,16 @@ class AuthWrapper extends ConsumerWidget {
     final authState = ref.watch(authStateChangesProvider);
 
     return authState.when(
-      // 1. Durum: Firebase henüz yanıt vermedi (Yükleniyor)
+      // 1. Durum: Yükleniyor
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
 
-      // 2. Durum: Bir hata oluştu
+      // 2. Durum: Hata
       error: (err, stack) => Scaffold(
         body: Center(child: Text(l10n.errorGeneric(err.toString()))),
       ),
 
-      // 3. Durum: Veri geldi (Kullanıcı var ya da yok)
+      // 3. Durum: Veri geldi
       data: (user) {
         if (user == null) {
           // Kullanıcı yok -> Giriş Ekranına git

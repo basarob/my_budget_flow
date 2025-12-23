@@ -71,7 +71,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noAccountQuestion => 'Hesabın yok mu?';
 
   @override
-  String get alreadyHaveAccountQuestion => 'Zaten hesabın var mı? Giriş Yap';
+  String get alreadyHaveAccountQuestion => 'Zaten hesabın var mı?';
 
   @override
   String get navHome => 'Ana Menü';
@@ -240,6 +240,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errorEnterAmount => 'Tutar giriniz';
 
   @override
+  String get amountLabel => 'Tutar';
+
+  @override
   String get errorInvalidAmount => 'Geçersiz tutar';
 
   @override
@@ -403,7 +406,55 @@ class AppLocalizationsTr extends AppLocalizations {
   String get updateButton => 'GÜNCELLE';
 
   @override
+  String get noInternetTitle => 'İnternet Bağlantısı Yok';
+
+  @override
+  String get noInternetMessage =>
+      'Lütfen internet bağlantınızı kontrol edip tekrar deneyin.';
+
+  @override
+  String get waitingConnection => 'Bağlantı bekleniyor...';
+
+  @override
+  String errorAppInit(Object error) {
+    return 'Uygulama başlatılamadı: $error';
+  }
+
+  @override
+  String get commonOk => 'Tamam';
+
+  @override
   String errorGeneric(Object error) {
     return 'Bir hata oluştu: $error';
   }
+
+  @override
+  String get dateRangeTitle => 'Tarih Aralığı';
+
+  @override
+  String get dateSelectPlaceholder => 'Seçiniz';
+
+  @override
+  String get applySelectionButton => 'Seçimi Uygula';
+
+  @override
+  String get shortDayMon => 'Pzt';
+
+  @override
+  String get shortDayTue => 'Sal';
+
+  @override
+  String get shortDayWed => 'Çar';
+
+  @override
+  String get shortDayThu => 'Per';
+
+  @override
+  String get shortDayFri => 'Cum';
+
+  @override
+  String get shortDaySat => 'Cmt';
+
+  @override
+  String get shortDaySun => 'Paz';
 }

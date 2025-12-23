@@ -44,5 +44,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Gemini
-gemini.md
+# Proje Dokümantasyonu
+proje.md

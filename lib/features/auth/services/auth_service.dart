@@ -16,9 +16,10 @@ class AuthService {
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
+  // Kullanıcı Oturum Akışı (Stream)
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  // Sign In
+  /// E-posta ve şifre ile giriş yapma fonksiyonu
   Future<User?> signIn({
     required String email,
     required String password,
@@ -36,7 +37,7 @@ class AuthService {
     }
   }
 
-  // Register
+  /// Yeni kullanıcı kaydı oluşturma fonksiyonu
   Future<User?> signUp({
     required String email,
     required String password,
@@ -54,7 +55,7 @@ class AuthService {
     }
   }
 
-  // Şifre Sıfırlama Maili Gönder
+  /// Şifre sıfırlama e-postası gönderme fonksiyonu
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
@@ -64,7 +65,7 @@ class AuthService {
     }
   }
 
-  // Sign Out
+  /// Kullanıcı oturumunu kapatma fonksiyonu
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
     _logger.i("Kullanıcı çıkış yaptı");

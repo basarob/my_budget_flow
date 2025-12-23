@@ -24,7 +24,7 @@
 
     "forgotPasswordQuestion": "Forgot Password?",
     "noAccountQuestion": "Don't have an account?",
-    "alreadyHaveAccountQuestion": "Already have an account? Login",
+    "alreadyHaveAccountQuestion": "Already have an account?",
 
     "navHome": "Home",
     "navTransactions": "Transactions",
@@ -86,7 +86,8 @@
     "addIncomeTitle": "Add Income",
     "editTransactionTitle": "Edit Transaction",
     "addFromRecurring": "Add from Recurring",
-    "errorEnterAmount": "Enter amount",
+    "errorEnterAmount": "Please enter an amount",
+    "amountLabel": "Amount",
     "errorInvalidAmount": "Invalid amount",
     "titleHint": "Title (e.g. Grocery Bill)",
     "errorEnterTitle": "Enter title",
@@ -140,8 +141,23 @@
     "recurringSwitchLabel": "Recurring Transaction",
     "descriptionLabel": "Description",
     "updateButton": "UPDATE",
+    "noInternetTitle": "No Internet Connection",
+    "noInternetMessage": "Please check your internet connection and try again.",
+    "waitingConnection": "Waiting for connection...",
+    "errorAppInit": "Application failed to initialize: {error}",
+    "commonOk": "OK",
 
     "errorGeneric": "An error occurred: {error}",
+    "dateRangeTitle": "Date Range",
+    "dateSelectPlaceholder": "Select",
+    "applySelectionButton": "Apply Selection",
+    "shortDayMon": "Mon",
+    "shortDayTue": "Tue",
+    "shortDayWed": "Wed",
+    "shortDayThu": "Thu",
+    "shortDayFri": "Fri",
+    "shortDaySat": "Sat",
+    "shortDaySun": "Sun",
     "@errorGeneric": {
         "description": "A generic error message that includes the error details.",
         "placeholders": {

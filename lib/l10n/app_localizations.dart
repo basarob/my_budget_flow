@@ -221,7 +221,7 @@ abstract class AppLocalizations {
   /// No description provided for @alreadyHaveAccountQuestion.
   ///
   /// In tr, this message translates to:
-  /// **'Zaten hesabın var mı? Giriş Yap'**
+  /// **'Zaten hesabın var mı?'**
   String get alreadyHaveAccountQuestion;
 
   /// No description provided for @navHome.
@@ -548,6 +548,12 @@ abstract class AppLocalizations {
   /// **'Tutar giriniz'**
   String get errorEnterAmount;
 
+  /// No description provided for @amountLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tutar'**
+  String get amountLabel;
+
   /// No description provided for @errorInvalidAmount.
   ///
   /// In tr, this message translates to:
@@ -860,11 +866,101 @@ abstract class AppLocalizations {
   /// **'GÜNCELLE'**
   String get updateButton;
 
+  /// No description provided for @noInternetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnternet Bağlantısı Yok'**
+  String get noInternetTitle;
+
+  /// No description provided for @noInternetMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen internet bağlantınızı kontrol edip tekrar deneyin.'**
+  String get noInternetMessage;
+
+  /// No description provided for @waitingConnection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı bekleniyor...'**
+  String get waitingConnection;
+
+  /// No description provided for @errorAppInit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulama başlatılamadı: {error}'**
+  String errorAppInit(Object error);
+
+  /// No description provided for @commonOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get commonOk;
+
   /// Hata detayını içeren genel bir hata mesajı.
   ///
   /// In tr, this message translates to:
   /// **'Bir hata oluştu: {error}'**
   String errorGeneric(Object error);
+
+  /// No description provided for @dateRangeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarih Aralığı'**
+  String get dateRangeTitle;
+
+  /// No description provided for @dateSelectPlaceholder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçiniz'**
+  String get dateSelectPlaceholder;
+
+  /// No description provided for @applySelectionButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçimi Uygula'**
+  String get applySelectionButton;
+
+  /// No description provided for @shortDayMon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pzt'**
+  String get shortDayMon;
+
+  /// No description provided for @shortDayTue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sal'**
+  String get shortDayTue;
+
+  /// No description provided for @shortDayWed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çar'**
+  String get shortDayWed;
+
+  /// No description provided for @shortDayThu.
+  ///
+  /// In tr, this message translates to:
+  /// **'Per'**
+  String get shortDayThu;
+
+  /// No description provided for @shortDayFri.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cum'**
+  String get shortDayFri;
+
+  /// No description provided for @shortDaySat.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cmt'**
+  String get shortDaySat;
+
+  /// No description provided for @shortDaySun.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paz'**
+  String get shortDaySun;
 }
 
 class _AppLocalizationsDelegate

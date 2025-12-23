@@ -71,7 +71,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noAccountQuestion => 'Don\'t have an account?';
 
   @override
-  String get alreadyHaveAccountQuestion => 'Already have an account? Login';
+  String get alreadyHaveAccountQuestion => 'Already have an account?';
 
   @override
   String get navHome => 'Home';
@@ -235,7 +235,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addFromRecurring => 'Add from Recurring';
 
   @override
-  String get errorEnterAmount => 'Enter amount';
+  String get errorEnterAmount => 'Please enter an amount';
+
+  @override
+  String get amountLabel => 'Amount';
 
   @override
   String get errorInvalidAmount => 'Invalid amount';
@@ -400,7 +403,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateButton => 'UPDATE';
 
   @override
+  String get noInternetTitle => 'No Internet Connection';
+
+  @override
+  String get noInternetMessage =>
+      'Please check your internet connection and try again.';
+
+  @override
+  String get waitingConnection => 'Waiting for connection...';
+
+  @override
+  String errorAppInit(Object error) {
+    return 'Application failed to initialize: $error';
+  }
+
+  @override
+  String get commonOk => 'OK';
+
+  @override
   String errorGeneric(Object error) {
     return 'An error occurred: $error';
   }
+
+  @override
+  String get dateRangeTitle => 'Date Range';
+
+  @override
+  String get dateSelectPlaceholder => 'Select';
+
+  @override
+  String get applySelectionButton => 'Apply Selection';
+
+  @override
+  String get shortDayMon => 'Mon';
+
+  @override
+  String get shortDayTue => 'Tue';
+
+  @override
+  String get shortDayWed => 'Wed';
+
+  @override
+  String get shortDayThu => 'Thu';
+
+  @override
+  String get shortDayFri => 'Fri';
+
+  @override
+  String get shortDaySat => 'Sat';
+
+  @override
+  String get shortDaySun => 'Sun';
 }

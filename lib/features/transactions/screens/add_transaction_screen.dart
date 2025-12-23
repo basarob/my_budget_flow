@@ -3,12 +3,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/gradient_app_bar.dart';
+import '../../../core/widgets/gradient_button.dart';
+import '../../../core/widgets/custom_text_field.dart';
 import '../models/transaction_model.dart';
 import '../models/recurring_transaction_model.dart';
 import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
+import '../widgets/transaction_type_segment.dart';
+import '../widgets/selection_card.dart';
+import '../widgets/category_selection_modal.dart';
+import '../widgets/recurring_selection_modal.dart';
 import '../../auth/services/auth_service.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -33,39 +41,33 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
   // Form Durumu
   late bool _isExpense;
   final TextEditingController _amountController = TextEditingController();
+  final FocusNode _amountFocusNode = FocusNode(); // Tutar odak takibi
   final TextEditingController _titleController = TextEditingController();
   String? _categoryName;
   late DateTime _selectedDate;
   String _description = '';
 
+  // UI Durumu
+  bool _isNoteVisible = false; // Not alanı görünürlüğü
+
   // Düzenli İşlem Durumu
   late bool _isRecurring;
   String _recurringFrequency = 'monthly';
+  int _dateAnimKey = 0; // Tarih değişimi animasyonu için
 
   final _formKey = GlobalKey<FormState>();
-
-  // Animasyon
-  late AnimationController _shakeController;
-  late Animation<double> _shakeAnimation;
 
   @override
   void initState() {
     super.initState();
-    // Animasyon Kurulumu (Tarih düzeltme uyarısı için)
-    _shakeController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-    _shakeAnimation =
-        Tween<double>(
-            begin: 0,
-            end: 10,
-          ).chain(CurveTween(curve: Curves.elasticIn)).animate(_shakeController)
-          ..addStatusListener((status) {
-            if (status == AnimationStatus.completed) {
-              _shakeController.reverse();
-            }
-          });
+
+    // Tutar alanı odak değişimi ve metin değişimi takibi
+    _amountFocusNode.addListener(() {
+      setState(() {}); // Odak değişince UI yenile (İkon görünürlüğü için)
+    });
+    _amountController.addListener(() {
+      setState(() {}); // Metin değişince UI yenile (Renk değişimi için)
+    });
 
     if (widget.transactionToEdit != null) {
       final t = widget.transactionToEdit!;
@@ -75,6 +77,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
       _categoryName = t.categoryName;
       _selectedDate = t.date;
       _description = t.description ?? '';
+      _isNoteVisible = _description.isNotEmpty; // Açıklama varsa alanı aç
       _isRecurring = false;
     } else {
       _isExpense = true;
@@ -87,8 +90,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
   @override
   void dispose() {
     _amountController.dispose();
+    _amountFocusNode.dispose();
     _titleController.dispose();
-    _shakeController.dispose();
     super.dispose();
   }
 
@@ -202,397 +205,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
 
   /// Kategori Seçim Modalı
   void _showCategorySelectionModal() {
-    final l10n = AppLocalizations.of(context)!;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent, // Arkaplanı şeffaf yap
       builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
-          expand: false,
-          builder: (_, scrollController) {
-            return Consumer(
-              builder: (context, ref, child) {
-                final categoryListAsync = ref.watch(categoryListProvider);
-
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      // Tutamaç
-                      Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            l10n.selectCategoryTitle,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _showAddCategoryDialog();
-                            },
-                            icon: const Icon(
-                              Icons.add_circle,
-                              color: Colors.blue,
-                              size: 28,
-                            ),
-                            tooltip: l10n.addNewCategoryTooltip,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      Expanded(
-                        child: categoryListAsync.when(
-                          data: (allCategories) {
-                            final defaultCategories = allCategories
-                                .where((c) => !c.isCustom)
-                                .toList();
-                            final customCategories = allCategories
-                                .where((c) => c.isCustom)
-                                .toList();
-
-                            return CustomScrollView(
-                              controller: scrollController,
-                              slivers: [
-                                // 1. Varsayılan Kategoriler
-                                SliverToBoxAdapter(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 8),
-                                    child: Text(
-                                      l10n.defaultCategoriesTitle,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SliverToBoxAdapter(
-                                  child: Center(
-                                    child: Wrap(
-                                      spacing: 8,
-                                      runSpacing: 12,
-                                      alignment: WrapAlignment.center,
-                                      children: defaultCategories.map((cat) {
-                                        return SizedBox(
-                                          width: 80,
-                                          child: _buildCategoryItem(cat),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                ),
-
-                                // 2. Özel Kategoriler
-                                if (customCategories.isNotEmpty) ...[
-                                  SliverToBoxAdapter(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        top: 24,
-                                        bottom: 12,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          const Divider(
-                                            thickness: 1,
-                                            indent: 40,
-                                            endIndent: 40,
-                                          ),
-                                          const SizedBox(height: 12),
-                                          Text(
-                                            l10n.userCategoriesTitle,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              const Icon(
-                                                Icons.touch_app,
-                                                size: 14,
-                                                color: Colors.grey,
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                l10n.deleteCategoryHint,
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SliverToBoxAdapter(
-                                    child: Center(
-                                      child: Wrap(
-                                        spacing: 8,
-                                        runSpacing: 12,
-                                        alignment: WrapAlignment.center,
-                                        children: customCategories.map((cat) {
-                                          return SizedBox(
-                                            width: 80,
-                                            child: _buildCategoryItem(cat),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-
-                                const SliverToBoxAdapter(
-                                  child: SizedBox(height: 32),
-                                ),
-                              ],
-                            );
-                          },
-                          loading: () =>
-                              const Center(child: CircularProgressIndicator()),
-                          error: (err, stack) =>
-                              Center(child: Text('${l10n.errorGeneric(err)}')),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildCategoryItem(CategoryModel cat) {
-    final isSelected = _categoryName == cat.name;
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _categoryName = cat.name;
-        });
-        HapticFeedback.selectionClick();
-        Navigator.pop(context);
-      },
-      onLongPress: cat.isCustom ? () => _showDeleteCategoryDialog(cat) : null,
-      borderRadius: BorderRadius.circular(12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? Color(cat.colorValue).withOpacity(0.2)
-                  : Colors.grey.shade100,
-              shape: BoxShape.circle,
-              border: isSelected
-                  ? Border.all(color: Color(cat.colorValue), width: 2)
-                  : null,
-            ),
-            child: Icon(
-              IconData(cat.iconCode, fontFamily: 'MaterialIcons'),
-              color: Color(cat.colorValue),
-              size: 28,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            cat.getLocalizedName(context),
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 11),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteCategoryDialog(CategoryModel category) {
-    final l10n = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.deleteCategoryTitle),
-          content: Text(l10n.deleteCategoryConfirmMessage(category.name)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancelButton),
-            ),
-            TextButton(
-              onPressed: () {
-                ref
-                    .read(categoryControllerProvider.notifier)
-                    .deleteCategory(category.id, category.name);
-                Navigator.pop(context);
-                HapticFeedback.mediumImpact();
-                if (_categoryName == category.name) {
-                  setState(() {
-                    _categoryName = l10n.categoryOther;
-                  });
-                }
-              },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: Text(l10n.deleteButton),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showAddCategoryDialog() {
-    final l10n = AppLocalizations.of(context)!;
-    final TextEditingController _nameController = TextEditingController();
-    Color _selectedColor = AppColors.userSelectionColors.first;
-    IconData _selectedIcon = Icons.shopping_cart;
-
-    final List<Color> colors = AppColors.userSelectionColors;
-    final List<IconData> icons = [
-      Icons.shopping_cart,
-      Icons.receipt_long,
-      Icons.restaurant,
-      Icons.directions_bus,
-      Icons.home,
-      Icons.movie,
-      Icons.fitness_center,
-      Icons.school,
-      Icons.pets,
-      Icons.flight,
-      Icons.redeem,
-      Icons.child_care,
-      Icons.gamepad,
-      Icons.more_horiz,
-    ];
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(l10n.addNewCategoryTitle),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: l10n.categoryNameLabel,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(l10n.selectColorLabel),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 12,
-                      alignment: WrapAlignment.center,
-                      children: colors.map((color) {
-                        return GestureDetector(
-                          onTap: () => setState(() => _selectedColor = color),
-                          child: CircleAvatar(
-                            backgroundColor: color,
-                            radius: 18,
-                            child: _selectedColor == color
-                                ? const Icon(
-                                    Icons.check,
-                                    size: 20,
-                                    color: Colors.white,
-                                  )
-                                : null,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(l10n.selectIconLabel),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 12,
-                      alignment: WrapAlignment.center,
-                      children: icons.map((icon) {
-                        return GestureDetector(
-                          onTap: () => setState(() => _selectedIcon = icon),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.grey.shade200,
-                            radius: 22,
-                            child: Icon(
-                              icon,
-                              size: 24,
-                              color: _selectedIcon == icon
-                                  ? _selectedColor
-                                  : Colors.grey,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.cancelButton),
-                ),
-                TextButton(
-                  onPressed: () {
-                    if (_nameController.text.isNotEmpty) {
-                      ref
-                          .read(categoryControllerProvider.notifier)
-                          .addCategory(
-                            _nameController.text,
-                            _selectedColor.value,
-                            _selectedIcon.codePoint,
-                          );
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text(l10n.addButton),
-                ),
-              ],
-            );
+        return CategorySelectionModal(
+          currentCategoryName: _categoryName,
+          onCategorySelected: (category) {
+            setState(() {
+              _categoryName = category.name;
+            });
+            Navigator.pop(context);
           },
         );
       },
@@ -600,27 +224,29 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
   }
 
   void _showRecurringSelectionModal() async {
-    showModalBottomSheet(
+    final selectedItem = await showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return const _RecurringSelectionList();
+        return const RecurringSelectionModal();
       },
-    ).then((selectedItem) {
-      if (selectedItem != null && selectedItem is RecurringTransactionModel) {
-        setState(() {
-          _amountController.text = selectedItem.amount.toString();
-          _categoryName = selectedItem.categoryName;
-          _isExpense = selectedItem.type == TransactionType.expense;
-          _titleController.text = selectedItem.title;
-          _description = selectedItem.description;
-          _selectedDate = DateTime.now();
-          _isRecurring = false;
-        });
-      }
-    });
+    );
+
+    if (!mounted) return;
+
+    if (selectedItem != null && selectedItem is RecurringTransactionModel) {
+      setState(() {
+        _amountController.text = selectedItem.amount.toString();
+        _categoryName = selectedItem.categoryName;
+        _isExpense = selectedItem.type == TransactionType.expense;
+        _titleController.text = selectedItem.title;
+        _description = selectedItem.description;
+        _selectedDate = DateTime.now();
+        _isRecurring = false;
+      });
+    }
   }
 
   @override
@@ -640,23 +266,24 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
           id: '',
           name: 'categoryOther',
           iconCode: Icons.category.codePoint,
-          colorValue: Colors.grey.value,
+          colorValue: AppColors.passive.value,
         ),
       ),
       orElse: () => CategoryModel(
         id: '',
         name: 'categoryOther',
         iconCode: Icons.category.codePoint,
-        colorValue: Colors.grey.value,
+        colorValue: AppColors.passive.value,
       ),
     );
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: GradientAppBar(
         title: Text(
           widget.transactionToEdit != null
               ? l10n.editTransactionTitle
               : (_isExpense ? l10n.addExpenseTitle : l10n.addIncomeTitle),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           // Düzenli İşlemden Kopya Oluşturma Butonu
@@ -678,93 +305,117 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           children: [
-            // Gelir / Gider Değiştirici
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ToggleButtons(
-                  borderRadius: BorderRadius.circular(12),
-                  isSelected: [!_isExpense, _isExpense],
-                  fillColor: primaryColor.withOpacity(0.1),
-                  selectedColor: primaryColor,
-                  color: Colors.grey.shade600,
-                  selectedBorderColor: Colors.transparent,
-                  borderColor: Colors.transparent,
-                  constraints: const BoxConstraints(
-                    minWidth: 100,
-                    minHeight: 40,
-                  ),
-                  onPressed: (index) {
-                    setState(() {
-                      _isExpense = index == 1;
-                    });
-                    HapticFeedback.lightImpact();
-                  },
-                  children: [
-                    Text(
-                      l10n.incomeType.toUpperCase(),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      l10n.expenseType.toUpperCase(),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Tutar
-            TextFormField(
-              controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              style: TextStyle(
-                fontSize: 32,
-                color: primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: '0.00',
-                prefixText: '₺',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: theme.cardColor,
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return l10n.errorEnterAmount;
-                }
-                if (double.tryParse(value) == null) {
-                  return l10n.errorInvalidAmount;
-                }
-                return null;
+            // 1. Gelir / Gider Segmenti
+            TransactionTypeSegment(
+              isExpense: _isExpense,
+              onTypeChanged: (isExpense) {
+                setState(() {
+                  _isExpense = isExpense;
+                });
+                HapticFeedback.lightImpact();
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
 
-            // Başlık
-            TextFormField(
+            // 2. Tutar Alanı (Genişletildi)
+            Column(
+              children: [
+                Text(
+                  l10n.amountLabel.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textSecondary,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _amountController,
+                  focusNode: _amountFocusNode,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  style: TextStyle(
+                    fontSize: 40,
+                    color: _amountController.text.isEmpty
+                        ? AppColors.textPrimary
+                        : primaryColor,
+                    fontWeight: FontWeight.bold,
+                    height: 1.1,
+                    letterSpacing: -0.5,
+                  ),
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: '0.00',
+                    // TL İkonu solda, diğer inputlar gibi
+                    prefixIcon: Container(
+                      padding: const EdgeInsets.only(left: 12, right: 8),
+                      child: Icon(
+                        Icons.currency_lira,
+                        color: _amountController.text.isEmpty
+                            ? AppColors.passive
+                            : primaryColor,
+                        size: 32,
+                      ),
+                    ),
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 40,
+                      minHeight: 40,
+                    ),
+                    // Metni tam ortalamak için görünmez suffix (Dengeleyici)
+                    suffixIcon: Container(
+                      padding: const EdgeInsets.only(left: 8, right: 12),
+                      child: const Icon(
+                        Icons.currency_lira,
+                        color: Colors.transparent,
+                        size: 32,
+                      ),
+                    ),
+                    suffixIconConstraints: const BoxConstraints(
+                      minWidth: 40,
+                      minHeight: 40,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surface,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: AppColors.passive.withOpacity(0.3),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: AppColors.passive.withOpacity(0.3),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: AppColors.passive.withOpacity(0.3),
+                      ), // Mavi çerçeve yok
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.errorEnterAmount;
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+
+            // 3. Başlık (CustomTextField)
+            CustomTextField(
               controller: _titleController,
-              maxLength: 30, // Karakter Sınırı
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: l10n.titleHint,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.title),
-                counterText: "",
-              ),
+              labelText: l10n.titleHint,
+              prefixIcon: Icons.edit_note_rounded,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return l10n.errorEnterTitle;
@@ -774,125 +425,117 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
             ),
             const SizedBox(height: 16),
 
-            // Kategori Seçimi
-            ListTile(
+            // 4. Kategori & Tarih (Alt Alta Geniş Kartlar)
+            SelectionCard(
+              title: l10n.categoryLabel,
+              selectedValue: _categoryName != null
+                  ? selectedCategory.getLocalizedName(context)
+                  : null,
+              icon: IconData(
+                selectedCategory.iconCode,
+                fontFamily: 'MaterialIcons',
+              ),
+              iconColor: _categoryName != null
+                  ? Color(selectedCategory.colorValue)
+                  : AppColors.passive,
               onTap: _showCategorySelectionModal,
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Color(selectedCategory.colorValue).withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  IconData(
-                    selectedCategory.iconCode,
-                    fontFamily: 'MaterialIcons',
-                  ),
-                  color: Color(selectedCategory.colorValue),
-                ),
-              ),
-              title: Text(l10n.categoryLabel),
-              subtitle: Text(
-                _categoryName == null
-                    ? l10n.selectCategoryHint
-                    : selectedCategory.getLocalizedName(context),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.grey.shade300),
-              ),
+              placeholder: l10n.selectCategoryHint,
             ),
             const SizedBox(height: 16),
-
-            // Tarih ve Düzenli İşlem Anahtarı
-            Row(
-              children: [
-                Expanded(
-                  child: AnimatedBuilder(
-                    animation: _shakeAnimation,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(_shakeAnimation.value, 0),
-                        child: child,
-                      );
-                    },
-                    child: ListTile(
+            _dateAnimKey > 0
+                ? ElasticIn(
+                    key: ValueKey('date-anim-$_dateAnimKey'),
+                    child: SelectionCard(
+                      title: l10n.dateLabel,
+                      selectedValue: DateFormat.yMMMMd(
+                        Localizations.localeOf(context).toString(),
+                      ).format(_selectedDate),
+                      icon: Icons.calendar_today_rounded,
+                      iconColor: AppColors.primary,
                       onTap: _showDatePicker,
-                      leading: const Icon(Icons.calendar_today),
-                      title: Text(l10n.dateLabel),
-                      subtitle: Text(
-                        DateFormat(
-                          'dd MMMM yyyy',
-                          'tr_TR',
-                        ).format(_selectedDate),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade300),
-                      ),
+                      placeholder: '',
                     ),
+                  )
+                : SelectionCard(
+                    title: l10n.dateLabel,
+                    selectedValue: DateFormat.yMMMMd(
+                      Localizations.localeOf(context).toString(),
+                    ).format(_selectedDate),
+                    icon: Icons.calendar_today_rounded,
+                    iconColor: AppColors.primary,
+                    onTap: _showDatePicker,
+                    placeholder: '',
+                  ),
+            const SizedBox(height: 16),
+
+            // 5. Düzenli İşlem Seçeneği (Sadece yeni eklemede)
+            if (widget.transactionToEdit == null) ...[
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.passive.withOpacity(0.3)),
+                ),
+                child: SwitchListTile.adaptive(
+                  value: _isRecurring,
+                  onChanged: (val) {
+                    setState(() {
+                      _isRecurring = val;
+                      if (_isRecurring) {
+                        final now = DateTime.now();
+                        final today = DateTime(now.year, now.month, now.day);
+                        if (_selectedDate.isBefore(today)) {
+                          _selectedDate = now;
+                          _dateAnimKey++; // Animasyonu tetikle
+                        }
+                      }
+                    });
+                  },
+                  title: Text(
+                    l10n.recurringSwitchLabel,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  secondary: Icon(
+                    Icons.repeat,
+                    color: _isRecurring
+                        ? theme.primaryColor
+                        : AppColors.passive,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  activeColor: theme.primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                // Düzenleme modunda değilsek 'Düzenli' switch'ini göster
-                if (widget.transactionToEdit == null) ...[
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          l10n.recurringSwitchLabel,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        Switch(
-                          value: _isRecurring,
-                          activeColor: theme.colorScheme.primary,
-                          onChanged: (val) {
-                            setState(() {
-                              _isRecurring = val;
-                              if (_isRecurring) {
-                                // Geçmiş tarih + Düzenli seçilemez -> Bugüne çek
-                                final now = DateTime.now();
-                                final today = DateTime(
-                                  now.year,
-                                  now.month,
-                                  now.day,
-                                );
-                                if (_selectedDate.isBefore(today)) {
-                                  _selectedDate = now;
-                                  _shakeController.forward(from: 0);
-                                  HapticFeedback.heavyImpact();
-                                }
-                              }
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
-
-            // Düzenli işlem sıklık seçimi
-            if (_isRecurring) ...[
+              ),
               const SizedBox(height: 16),
+            ],
+
+            // 6. Düzenli işlem sıklık seçimi
+            if (_isRecurring) ...[
               DropdownButtonFormField<String>(
                 value: _recurringFrequency,
                 decoration: InputDecoration(
                   labelText: l10n.frequencyLabel,
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.repeat),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: AppColors.passive.withOpacity(0.3),
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: AppColors.passive.withOpacity(0.3),
+                    ),
+                  ),
+                  prefixIcon: const Icon(Icons.update),
+                  filled: true,
+                  fillColor: AppColors.surface,
                 ),
                 items: [
                   DropdownMenuItem(
@@ -918,110 +561,91 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
                   }
                 },
               ),
+              const SizedBox(height: 16),
             ],
 
-            const SizedBox(height: 16),
-
-            // Açıklama
-            TextFormField(
-              initialValue: _description,
-              decoration: InputDecoration(
-                labelText: l10n.descriptionLabel,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.notes),
+            // 7. Not / Açıklama (Açılır Kapanır)
+            if (!_isNoteVisible) ...[
+              Center(
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _isNoteVisible = true;
+                    });
+                  },
+                  icon: const Icon(Icons.add_comment_outlined, size: 20),
+                  label: Text(l10n.addNoteLabel),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textSecondary,
+                  ),
+                ),
               ),
-              maxLines: 3,
-              onChanged: (val) => _description = val,
-            ),
+            ] else ...[
+              const SizedBox(height: 8),
+              Stack(
+                children: [
+                  TextFormField(
+                    initialValue: _description,
+                    onChanged: (val) => _description = val,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      labelText: l10n.descriptionLabel,
+                      prefixIcon: Icon(Icons.notes, color: AppColors.passive),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(
+                          color: AppColors.passive.withOpacity(0.3),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(
+                          color: AppColors.passive.withOpacity(0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(
+                          color: AppColors.primary,
+                          width: 2,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: AppColors.surface,
+                    ),
+                    maxLines: 2,
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, size: 18),
+                      color: AppColors.passive,
+                      onPressed: () {
+                        setState(() {
+                          _isNoteVisible = false;
+                          _description = ''; // İsteğe bağlı temizleme
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
             const SizedBox(height: 32),
 
-            // Kaydet Butonu
-            SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _saveTransaction,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                ),
-                child: Text(
-                  widget.transactionToEdit != null
-                      ? l10n.updateButton
-                      : l10n.saveButton,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+            // 6. Kaydet Butonu
+            GradientButton(
+              onPressed: _saveTransaction,
+              text: widget.transactionToEdit != null
+                  ? l10n.saveButton
+                  : l10n.addButton,
+              icon: Icons.check_circle_outline,
             ),
+            const SizedBox(height: 32),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Düzenli İşlemlerden Seçim Listesi (Modal İçeriği)
-class _RecurringSelectionList extends ConsumerWidget {
-  const _RecurringSelectionList();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final recurringListAsync = ref.watch(recurringListProvider);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-            child: Text(
-              l10n.selectRecurringTitle,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const Divider(),
-          Expanded(
-            child: recurringListAsync.when(
-              data: (items) {
-                if (items.isEmpty) {
-                  return Center(child: Text(l10n.noRecurringFound));
-                }
-                return ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return ListTile(
-                      leading: Icon(
-                        item.type == TransactionType.expense
-                            ? Icons.arrow_circle_down
-                            : Icons.arrow_circle_up,
-                        color: item.type == TransactionType.expense
-                            ? Colors.red
-                            : Colors.green,
-                      ),
-                      title: Text(
-                        item.title.isNotEmpty ? item.title : item.categoryName,
-                      ),
-                      subtitle: Text('${item.amount} ₺ - ${item.frequency}'),
-                      onTap: () {
-                        Navigator.pop(context, item);
-                      },
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, s) => Center(child: Text(l10n.errorGeneric(e))),
-            ),
-          ),
-        ],
       ),
     );
   }

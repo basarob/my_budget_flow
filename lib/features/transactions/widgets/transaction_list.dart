@@ -8,6 +8,7 @@ import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../screens/add_transaction_screen.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_theme.dart';
 
 /// Geçmiş İşlemler Listesi
 ///
@@ -50,20 +51,20 @@ class TransactionList extends ConsumerWidget {
                   Icon(
                     Icons.account_balance_wallet_outlined,
                     size: 64,
-                    color: Colors.grey.shade300,
+                    color: AppColors.passive.withOpacity(0.5),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     l10n.noTransactionsFound,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.addTransactionHint,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey.shade500,
+                      color: AppColors.textSecondary.withOpacity(0.7),
                     ),
                   ),
                 ],
@@ -92,14 +93,14 @@ class TransactionList extends ConsumerWidget {
                       id: '',
                       name: name,
                       iconCode: Icons.category.codePoint,
-                      colorValue: Colors.grey.value,
+                      colorValue: AppColors.passive.value,
                     ),
                   ),
                   orElse: () => CategoryModel(
                     id: '',
                     name: name,
                     iconCode: Icons.category.codePoint,
-                    colorValue: Colors.grey.value,
+                    colorValue: AppColors.passive.value,
                   ),
                 );
               }
@@ -108,22 +109,24 @@ class TransactionList extends ConsumerWidget {
               final localizedCategoryName = category.getLocalizedName(context);
 
               final isExpense = transaction.type == TransactionType.expense;
-              final amountColor = isExpense ? Colors.red : Colors.green;
+              final amountColor = isExpense
+                  ? AppColors.expenseRed
+                  : AppColors.incomeGreen;
 
               return Dismissible(
                 key: Key(transaction.id),
                 direction: DismissDirection.endToStart,
                 background: Container(
-                  color: Colors.red,
+                  color: AppColors.expenseRed,
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(right: 20),
-                  child: const Icon(Icons.delete, color: Colors.white),
+                  child: const Icon(Icons.delete, color: AppColors.surface),
                 ),
                 onDismissed: (_) {
                   HapticFeedback.lightImpact();
 
-                  // 1. Önceki SnackBar'ları temizle
-                  ScaffoldMessenger.of(context).clearSnackBars();
+                  final messenger = ScaffoldMessenger.of(context);
+                  messenger.clearSnackBars();
 
                   // 2. Optimistic Update (Listeden anında sil)
                   ref
@@ -136,7 +139,7 @@ class TransactionList extends ConsumerWidget {
                       .deleteTransaction(transaction.id);
 
                   // 4. Geri Alma Seçenekli SnackBar
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(l10n.transactionDeleted),
                       duration: const Duration(seconds: 3),
@@ -154,11 +157,9 @@ class TransactionList extends ConsumerWidget {
                     ),
                   );
 
-                  // 5. Kaybolmayan SnackBar sorununu çözmek için Timer
+                  // 5. Kesin kapanma garantisi için Timer
                   Future.delayed(const Duration(seconds: 3), () {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                    }
+                    messenger.hideCurrentSnackBar();
                   });
                 },
                 child: Card(
@@ -169,7 +170,7 @@ class TransactionList extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.grey.shade200),
+                    side: BorderSide(color: AppColors.passive.withOpacity(0.3)),
                   ),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
@@ -222,7 +223,7 @@ class TransactionList extends ConsumerWidget {
                             ).format(transaction.date),
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade600,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                           if (transaction.description != null &&
@@ -233,7 +234,7 @@ class TransactionList extends ConsumerWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade500,
+                                color: AppColors.textSecondary.withOpacity(0.7),
                               ),
                             ),
                         ],
@@ -260,7 +261,8 @@ class TransactionList extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Hata: $err')),
+        error: (err, stack) =>
+            Center(child: Text(l10n.errorGeneric(err.toString()))),
       ),
     );
   }

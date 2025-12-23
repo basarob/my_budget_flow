@@ -24,7 +24,7 @@
 
     "forgotPasswordQuestion": "Şifremi Unuttum?",
     "noAccountQuestion": "Hesabın yok mu?",
-    "alreadyHaveAccountQuestion": "Zaten hesabın var mı? Giriş Yap",
+    "alreadyHaveAccountQuestion": "Zaten hesabın var mı?",
 
     "navHome": "Ana Menü",
     "navTransactions": "İşlemler",
@@ -87,6 +87,7 @@
     "editTransactionTitle": "İşlemi Düzenle",
     "addFromRecurring": "Düzenliden Ekle",
     "errorEnterAmount": "Tutar giriniz",
+    "amountLabel": "Tutar",
     "errorInvalidAmount": "Geçersiz tutar",
     "titleHint": "Başlık (Örn: Market Fişi)",
     "errorEnterTitle": "Başlık giriniz",
@@ -140,8 +141,23 @@
     "recurringSwitchLabel": "Düzenli İşlem",
     "descriptionLabel": "Açıklama",
     "updateButton": "GÜNCELLE",
+    "noInternetTitle": "İnternet Bağlantısı Yok",
+    "noInternetMessage": "Lütfen internet bağlantınızı kontrol edip tekrar deneyin.",
+    "waitingConnection": "Bağlantı bekleniyor...",
+    "errorAppInit": "Uygulama başlatılamadı: {error}",
+    "commonOk": "Tamam",
 
     "errorGeneric": "Bir hata oluştu: {error}",
+    "dateRangeTitle": "Tarih Aralığı",
+    "dateSelectPlaceholder": "Seçiniz",
+    "applySelectionButton": "Seçimi Uygula",
+    "shortDayMon": "Pzt",
+    "shortDayTue": "Sal",
+    "shortDayWed": "Çar",
+    "shortDayThu": "Per",
+    "shortDayFri": "Cum",
+    "shortDaySat": "Cmt",
+    "shortDaySun": "Paz",
     "@errorGeneric": {
         "description": "Hata detayını içeren genel bir hata mesajı.",
         "placeholders": {

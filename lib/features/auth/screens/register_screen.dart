@@ -1,12 +1,16 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/widgets/gradient_button.dart';
 import 'package:intl/intl.dart';
-
+import 'package:flutter/cupertino.dart';
 import '../../../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../../../services/database_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/gradient_app_bar.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -30,7 +34,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   bool _isLoading = false;
   bool _isButtonEnabled = false;
-  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -89,35 +92,70 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         .join(' ');
   }
 
-  // .Tarih Seçiciyi Açan Fonksiyon
-  Future<void> _pickDate() async {
-    final DateTime? picked = await showDatePicker(
+  /// Tarih Seçicisi (Cupertino stili)
+  Future<void> _pickDate(BuildContext context) async {
+    // Klavye açıksa kapat
+    FocusScope.of(context).unfocus();
+
+    final l10n = AppLocalizations.of(context)!;
+
+    // Varsayılan tarih
+    final initialDate = _selectedDate ?? DateTime.now();
+
+    await showCupertinoModalPopup<void>(
       context: context,
-      initialDate: DateTime(2000),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      // .Temaya uygun renkler için builder
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              onSurface: AppColors.primaryDark,
-            ),
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          color: AppColors.surface, // Tema arka plan rengi
+          child: Column(
+            children: [
+              // Üstteki "Tamam" butonu çubuğu
+              Container(
+                color: AppColors.surface,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        l10n.commonOk,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Tarih Seçici Tekerleği
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.date,
+                  initialDateTime: initialDate,
+                  minimumDate: DateTime(1900),
+                  maximumDate: DateTime.now(),
+                  onDateTimeChanged: (DateTime newDate) {
+                    setState(() {
+                      _selectedDate = newDate;
+                      _birthDateController.text = DateFormat(
+                        'dd.MM.yyyy',
+                      ).format(newDate);
+                      _validateForm();
+                    });
+                  },
+                ),
+              ),
+            ],
           ),
-          child: child!,
         );
       },
     );
-
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-        _birthDateController.text = DateFormat('dd.MM.yyyy').format(picked);
-        _validateForm();
-      });
-    }
   }
 
   Future<void> _register() async {
@@ -184,215 +222,174 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      // AppBar: Ekranın en üstündeki başlık çubuğu
-      appBar: AppBar(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
-        ),
-        title: Text(l10n.createAccountTitle),
-      ),
+      appBar: GradientAppBar(title: Text(l10n.createAccountTitle)),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.joinUsTitle,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryDark,
+          child: Column(
+            children: [
+              Hero(
+                tag: 'app_icon',
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/icon/app_icon.png',
+                    height: 130,
+                    width: 130,
+                    fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.joinUsSubtitle,
-                  style: const TextStyle(color: AppColors.textSecondary),
-                ),
-                const SizedBox(height: 30),
+              ),
+              const SizedBox(height: 24),
 
-                // Ad ve Soyadı yan yana göstermek için Row (Satır) kullandık
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _nameController,
-                        textCapitalization: TextCapitalization.words,
-                        decoration: InputDecoration(
-                          labelText: l10n.nameLabel,
-                          prefixIcon: Icon(
-                            Icons.person_outline,
-                            color: AppColors.primaryLight,
+              FadeInUp(
+                duration: const Duration(milliseconds: 800),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField(
+                              controller: _nameController,
+                              labelText: l10n.nameLabel,
+                              prefixIcon: Icons.person_outline,
+                              validator: (v) {
+                                if (v == null || v.isEmpty)
+                                  return l10n.errorEmptyField;
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: CustomTextField(
+                              controller: _surnameController,
+                              labelText: l10n.surnameLabel,
+                              prefixIcon: Icons.person_outline,
+                              validator: (v) {
+                                if (v == null || v.isEmpty)
+                                  return l10n.errorEmptyField;
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      InkWell(
+                        onTap: () => _pickDate(context),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: _birthDateController.text.isEmpty
+                                  ? Colors.transparent
+                                  : Colors.grey.shade300,
+                            ),
+                          ),
+                          child: IgnorePointer(
+                            child: CustomTextField(
+                              controller: _birthDateController,
+                              labelText: l10n.birthDateLabel,
+                              prefixIcon: Icons.calendar_month,
+                              validator: (v) {
+                                if (v == null || v.isEmpty)
+                                  return l10n.errorEmptyField;
+                                return null;
+                              },
+                            ),
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      CustomTextField(
+                        controller: _emailController,
+                        labelText: l10n.emailLabel,
+                        prefixIcon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return null;
+                          final bool emailValid = RegExp(
+                            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+                          ).hasMatch(value);
+                          if (!emailValid) return l10n.errorInvalidEmail;
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      CustomTextField(
+                        controller: _passwordController,
+                        labelText: l10n.passwordLabel,
+                        prefixIcon: Icons.lock_outline,
+                        isPassword: true,
                         validator: (v) {
-                          if (v == null || v.isEmpty) return null;
-                          final nameRegExp = RegExp(
-                            r'^[a-zA-ZçÇğĞıİöÖşŞÜ\s]+$',
-                          );
-                          if (!nameRegExp.hasMatch(v)) {
-                            return l10n.errorOnlyLetters;
+                          if (v == null || v.length < 6)
+                            return l10n.errorPasswordShort;
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      CustomTextField(
+                        controller: _confirmPasswordController,
+                        labelText: l10n.passwordConfirmLabel,
+                        prefixIcon: Icons.lock_outline,
+                        isPassword: true,
+                        validator: (val) {
+                          if (val != _passwordController.text) {
+                            return l10n.errorPasswordMismatch;
                           }
                           return null;
                         },
                       ),
+                      const SizedBox(height: 24),
+
+                      GradientButton(
+                        onPressed: _isButtonEnabled && !_isLoading
+                            ? _register
+                            : null,
+                        text: l10n.registerButton,
+                        isLoading: _isLoading,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              FadeInUp(
+                delay: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 800),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.alreadyHaveAccountQuestion,
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
-                    const SizedBox(width: 16), // Araya boşluk
-                    Expanded(
-                      child: TextFormField(
-                        controller: _surnameController,
-                        textCapitalization: TextCapitalization.words,
-                        decoration: InputDecoration(
-                          labelText: l10n.surnameLabel,
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        l10n.loginButton,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
                         ),
-                        validator: (v) {
-                          if (v == null || v.isEmpty) return null;
-                          final nameRegExp = RegExp(
-                            r'^[a-zA-ZçÇğĞıİöÖşŞÜ\s]+$',
-                          );
-                          if (!nameRegExp.hasMatch(v)) {
-                            return l10n.errorOnlyLetters;
-                          }
-                          return null;
-                        },
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-
-                // Yaş Alanı
-                TextFormField(
-                  controller: _birthDateController,
-                  readOnly: true, // Elle yazmayı engelle, sadece tıklanabilsin
-                  onTap: _pickDate, // Tıklanınca takvimi aç
-                  decoration: InputDecoration(
-                    labelText: l10n.birthDateLabel,
-                    hintText: l10n.dateHint,
-                    prefixIcon: const Icon(
-                      Icons.calendar_month,
-                      color: AppColors.primaryLight,
-                    ),
-                  ),
-                  validator: (v) => null,
-                ),
-
-                const SizedBox(height: 16),
-
-                // Email Alanı
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: l10n.emailLabel,
-                    prefixIcon: const Icon(
-                      Icons.email_outlined,
-                      color: AppColors.primaryLight,
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return null; // Buton zaten pasif olacak
-                    }
-                    // Email formatına uygun mu? (Regex)
-                    final bool emailValid = RegExp(
-                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-                    ).hasMatch(value);
-
-                    if (!emailValid) {
-                      return l10n.errorInvalidEmail;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Şifre Alanı
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword, // Şifreyi yıldızlı göster
-                  decoration: InputDecoration(
-                    labelText: l10n.passwordLabel,
-                    prefixIcon: const Icon(
-                      Icons.lock_outline,
-                      color: AppColors.primaryLight,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                      onPressed: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                    ),
-                  ),
-                  validator: (v) => v != null && v.length < 6
-                      ? l10n.errorPasswordShort
-                      : null,
-                ),
-                const SizedBox(height: 16),
-
-                // Şifre Tekrar Alanı
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: l10n.passwordConfirmLabel,
-                    prefixIcon: const Icon(
-                      Icons.lock_clock_outlined,
-                      color: AppColors.primaryLight,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                      onPressed: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                    ),
-                  ),
-                  validator: (v) {
-                    if (v != _passwordController.text) {
-                      return l10n.errorPasswordMismatch;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 32),
-
-                // Kayıt Butonu
-                SizedBox(
-                  width: double.infinity, // Ekran genişliğini kapla
-                  child: ElevatedButton(
-                    onPressed: _isButtonEnabled && !_isLoading
-                        ? _register
-                        : null,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(l10n.registerButton),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Zaten hesabın var mı butonu
-                Center(
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      l10n.alreadyHaveAccountQuestion,
-                      style: const TextStyle(color: AppColors.primary),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
