@@ -58,7 +58,7 @@ class TransactionList extends ConsumerWidget {
                   Icon(
                     Icons.account_balance_wallet_outlined,
                     size: 64,
-                    color: AppColors.passive.withOpacity(0.5),
+                    color: AppColors.passive.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -71,7 +71,7 @@ class TransactionList extends ConsumerWidget {
                   Text(
                     l10n.addTransactionHint,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary.withOpacity(0.7),
+                      color: AppColors.textSecondary.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -100,14 +100,14 @@ class TransactionList extends ConsumerWidget {
                       id: '',
                       name: name,
                       iconCode: Icons.category.codePoint,
-                      colorValue: AppColors.passive.value,
+                      colorValue: AppColors.passive.toARGB32(),
                     ),
                   ),
                   orElse: () => CategoryModel(
                     id: '',
                     name: name,
                     iconCode: Icons.category.codePoint,
-                    colorValue: AppColors.passive.value,
+                    colorValue: AppColors.passive.toARGB32(),
                   ),
                 );
               }
@@ -175,7 +175,9 @@ class TransactionList extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: AppColors.passive.withOpacity(0.3)),
+                    side: BorderSide(
+                      color: AppColors.passive.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
@@ -199,7 +201,9 @@ class TransactionList extends ConsumerWidget {
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Color(category.colorValue).withOpacity(0.1),
+                          color: Color(
+                            category.colorValue,
+                          ).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -239,7 +243,9 @@ class TransactionList extends ConsumerWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.textSecondary.withOpacity(0.7),
+                                color: AppColors.textSecondary.withValues(
+                                  alpha: 0.7,
+                                ),
                               ),
                             ),
                         ],

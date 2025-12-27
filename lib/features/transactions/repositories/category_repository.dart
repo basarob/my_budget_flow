@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 
 class CategoryRepository {
@@ -25,7 +26,7 @@ class CategoryRepository {
       allCategories.addAll(customCategories);
     } catch (e) {
       // Hata durumunda en azından varsayılanları döndür
-      print("Kategori getirme hatası: $e");
+      debugPrint("Kategori getirme hatası: $e");
     }
 
     return allCategories;

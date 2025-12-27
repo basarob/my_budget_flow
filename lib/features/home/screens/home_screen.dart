@@ -148,8 +148,8 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         child: NavigationBar(
           selectedIndex: _selectedIndex,
           onDestinationSelected: _onItemTapped,
-          backgroundColor: AppColors.surface, // Beyaz/Temiz zemin
-          indicatorColor: AppColors.primaryLight.withOpacity(0.3), // Hap Rengi
+          backgroundColor: AppColors.surface,
+          indicatorColor: AppColors.primaryLight.withValues(alpha: 0.3),
           elevation: 2,
           shadowColor: Colors.black26,
           destinations: [

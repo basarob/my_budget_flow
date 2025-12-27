@@ -86,7 +86,7 @@ class RecurringTransactionList extends ConsumerWidget {
                 Icon(
                   Icons.event_repeat,
                   size: 64,
-                  color: AppColors.passive.withOpacity(0.5),
+                  color: AppColors.passive.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -99,7 +99,7 @@ class RecurringTransactionList extends ConsumerWidget {
                 Text(
                   l10n.addRecurringHint,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary.withOpacity(0.7),
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -126,14 +126,14 @@ class RecurringTransactionList extends ConsumerWidget {
                     id: '',
                     name: name,
                     iconCode: Icons.category.codePoint,
-                    colorValue: AppColors.passive.value,
+                    colorValue: AppColors.passive.toARGB32(),
                   ),
                 ),
                 orElse: () => CategoryModel(
                   id: '',
                   name: name,
                   iconCode: Icons.category.codePoint,
-                  colorValue: AppColors.passive.value,
+                  colorValue: AppColors.passive.toARGB32(),
                 ),
               );
             }
@@ -194,7 +194,9 @@ class RecurringTransactionList extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: AppColors.passive.withOpacity(0.3)),
+                    side: BorderSide(
+                      color: AppColors.passive.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: ListTile(
                     onTap: () async {
@@ -213,7 +215,9 @@ class RecurringTransactionList extends ConsumerWidget {
                     leading: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Color(category.colorValue).withOpacity(0.1),
+                        color: Color(
+                          category.colorValue,
+                        ).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -249,7 +253,9 @@ class RecurringTransactionList extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary.withOpacity(0.7),
+                              color: AppColors.textSecondary.withValues(
+                                alpha: 0.7,
+                              ),
                             ),
                           ),
                       ],
@@ -277,7 +283,9 @@ class RecurringTransactionList extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Switch(
                           value: isActive,
-                          activeColor: Theme.of(context).colorScheme.primary,
+                          activeTrackColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           onChanged: (val) {
                             HapticFeedback.selectionClick();
 

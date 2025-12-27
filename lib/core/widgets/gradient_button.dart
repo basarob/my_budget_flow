@@ -25,7 +25,7 @@ class GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         gradient: LinearGradient(
           colors: onPressed == null
-              ? [AppColors.passive.withOpacity(0.5), AppColors.passive]
+              ? [AppColors.passive.withValues(alpha: 0.5), AppColors.passive]
               : [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -34,7 +34,7 @@ class GradientButton extends StatelessWidget {
             ? []
             : [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),

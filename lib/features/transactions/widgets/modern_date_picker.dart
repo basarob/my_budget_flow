@@ -132,7 +132,7 @@ class _ModernDatePickerState extends State<ModernDatePicker> {
         textColor = Colors.white;
       } else if (inRange) {
         decoration = BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         );
         textColor = AppColors.primary;
@@ -143,17 +143,6 @@ class _ModernDatePickerState extends State<ModernDatePicker> {
         );
         textColor = AppColors.primary;
       }
-
-      // GestureDetector yerine InkWell veya özel bir tıklanabilir alan
-      // Grid içinde ScaleButton biraz ağır olabilir ama user rule'da "Tıklama animasyonları için ScaleButton" diyor.
-      // Ancak takvim gridinde çok fazla eleman var, ScaleButton her biri için controller oluşturursa performans düşebilir.
-      // Sadece basit bir InkWell + Haptic yeterli olur çoğu takvimde ama compliance için
-      // burada basit bir GestureDetector + Haptic Feedback (zaten _onDaySelected içinde var) kullanıyoruz.
-      // ScaleButton kullanımı burada UX açısından garip durabilir (günlerin zıplaması).
-      // Yine de "Tıklama animasyonları için ScaleButton" kuralına sadık kalarak, seçili günlerde efekt verebiliriz,
-      // ama tüm grid elemanlarında denemek riskli. Şimdilik GestureDetector ile devam edip
-      // dokümantasyonda performans gerekçesiyle bunu seçtiğimizi belirtebiliriz veya basit bir ScaleButton kullanabiliriz.
-      // Hadi basitliği koruyalım ve standart davranışı bozmayalım.
 
       dayWidgets.add(
         GestureDetector(

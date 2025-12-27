@@ -70,7 +70,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
           .read(categoryControllerProvider.notifier)
           .addCategory(
             _nameController.text.trim(),
-            _selectedColor.value,
+            _selectedColor.toARGB32(),
             _selectedIcon.codePoint,
           );
       Navigator.pop(context);
@@ -101,7 +101,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
                 height: 5,
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: AppColors.passive.withOpacity(0.3),
+                  color: AppColors.passive.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2.5),
                 ),
               ),
@@ -150,7 +150,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: _colors.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        separatorBuilder: (_, _) => const SizedBox(width: 12),
                         itemBuilder: (context, index) {
                           final color = _colors[index];
                           final isSelected = _selectedColor == color;
@@ -171,7 +171,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
                                     : null,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: color.withOpacity(0.4),
+                                    color: color.withValues(alpha: 0.4),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -215,7 +215,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
                           child: Container(
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? _selectedColor.withOpacity(0.1)
+                                  ? _selectedColor.withValues(alpha: 0.1)
                                   : AppColors.background,
                               shape: BoxShape.circle,
                               border: isSelected

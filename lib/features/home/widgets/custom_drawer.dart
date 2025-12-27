@@ -46,21 +46,23 @@ class CustomDrawer extends ConsumerWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     AppColors.surface,
-                    AppColors.surface.withOpacity(0.95), // Hafif saydamlık
+                    AppColors.surface.withValues(
+                      alpha: 0.95,
+                    ), // Hafif saydamlık
                   ],
                 ),
                 borderRadius: BorderRadius.circular(24),
                 // Derinlik hissi veren gölgelendirme
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryDark.withOpacity(0.15),
+                    color: AppColors.primaryDark.withValues(alpha: 0.15),
                     blurRadius: 30,
                     offset: const Offset(0, 10),
                   ),
                 ],
                 // İnce, zarif kenarlık
                 border: Border.all(
-                  color: AppColors.surface.withOpacity(0.5),
+                  color: AppColors.surface.withValues(alpha: 0.5),
                   width: 1.5,
                 ),
               ),
@@ -73,10 +75,12 @@ class CustomDrawer extends ConsumerWidget {
                       // 1. Profil ve Başlık Alanı
                       Container(
                         decoration: BoxDecoration(
-                          color: AppColors.primaryLight.withOpacity(0.08),
+                          color: AppColors.primaryLight.withValues(alpha: 0.08),
                           border: Border(
                             bottom: BorderSide(
-                              color: AppColors.primaryLight.withOpacity(0.2),
+                              color: AppColors.primaryLight.withValues(
+                                alpha: 0.2,
+                              ),
                               width: 1,
                             ),
                           ),
@@ -115,7 +119,9 @@ class CustomDrawer extends ConsumerWidget {
                         child: Divider(
                           height: 1,
                           thickness: 1,
-                          color: AppColors.textSecondary.withOpacity(0.15),
+                          color: AppColors.textSecondary.withValues(
+                            alpha: 0.15,
+                          ),
                         ),
                       ),
 
@@ -162,7 +168,7 @@ class CustomDrawer extends ConsumerWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.2),
+                    color: AppColors.primary.withValues(alpha: 0.2),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -208,7 +214,7 @@ class CustomDrawer extends ConsumerWidget {
                         user?.email ?? '',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textPrimary.withOpacity(0.6),
+                          color: AppColors.textPrimary.withValues(alpha: 0.6),
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
@@ -223,7 +229,7 @@ class CustomDrawer extends ConsumerWidget {
             // Tıklanabilir göstergesi
             Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textPrimary.withOpacity(0.4),
+              color: AppColors.textPrimary.withValues(alpha: 0.4),
               size: 20,
             ),
           ],
@@ -247,9 +253,11 @@ class CustomDrawer extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.expenseRed.withOpacity(0.08),
+          color: AppColors.expenseRed.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.expenseRed.withOpacity(0.1)),
+          border: Border.all(
+            color: AppColors.expenseRed.withValues(alpha: 0.1),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -286,7 +294,7 @@ class CustomDrawer extends ConsumerWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.05),
+          color: AppColors.primary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: AppColors.primary, size: 20),

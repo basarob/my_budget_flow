@@ -205,7 +205,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -246,7 +246,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.expenseRed.withOpacity(0.1),
+                          color: AppColors.expenseRed.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -292,7 +292,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppColors.passive.withOpacity(0.5),
+                      color: AppColors.passive.withValues(alpha: 0.5),
                     ),
                   ),
                   child: Row(
@@ -383,7 +383,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
               color: theme.scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   offset: const Offset(0, -4),
                   blurRadius: 16,
                 ),
@@ -437,7 +437,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -480,7 +480,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     offset: const Offset(0, 4),
                     blurRadius: 8,
                   ),
@@ -521,7 +521,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
           boxShadow: isCustom
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     offset: const Offset(0, 4),
                     blurRadius: 8,
                   ),
@@ -568,7 +568,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: categoryColor.withOpacity(0.35),
+                    color: categoryColor.withValues(alpha: 0.35),
                     offset: const Offset(0, 4),
                     blurRadius: 8,
                   ),

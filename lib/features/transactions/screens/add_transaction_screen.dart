@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import '../../../core/widgets/gradient_app_bar.dart';
@@ -15,12 +13,14 @@ import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../widgets/transaction_type_segment.dart';
-import '../widgets/selection_card.dart';
 import '../widgets/category_selection_modal.dart';
 import '../widgets/recurring_selection_modal.dart';
+import '../widgets/category_selector_card.dart';
+import '../widgets/transaction_date_picker.dart';
+import '../widgets/recurring_options_card.dart';
 import '../../auth/services/auth_service.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../calendar/providers/calendar_provider.dart'; // Import eklendi
+import '../../calendar/providers/calendar_provider.dart';
 
 /// Yeni İşlem Ekleme veya Mevcut İşlemi Düzenleme Ekranı
 ///
@@ -36,6 +36,7 @@ import '../../calendar/providers/calendar_provider.dart'; // Import eklendi
 /// Parametreler:
 /// - [transactionToEdit]: Eğer düzenleme modunda ise dolu gelir, yoksa null'dur.
 /// - [initialIsRecurring]: Ekranın doğrudan "Düzenli İşlem Ekle" modunda açılmasını sağlar.
+
 class AddTransactionScreen extends ConsumerStatefulWidget {
   final TransactionModel? transactionToEdit;
   final RecurringTransactionModel? recurringTransactionToEdit;
@@ -330,14 +331,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
           id: '',
           name: 'categoryOther',
           iconCode: Icons.category.codePoint,
-          colorValue: AppColors.passive.value,
+          colorValue: AppColors.passive.toARGB32(),
         ),
       ),
       orElse: () => CategoryModel(
         id: '',
         name: 'categoryOther',
         iconCode: Icons.category.codePoint,
-        colorValue: AppColors.passive.value,
+        colorValue: AppColors.passive.toARGB32(),
       ),
     );
 
@@ -448,19 +449,19 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppColors.passive.withOpacity(0.3),
+                        color: AppColors.passive.withValues(alpha: 0.3),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppColors.passive.withOpacity(0.3),
+                        color: AppColors.passive.withValues(alpha: 0.3),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppColors.passive.withOpacity(0.3),
+                        color: AppColors.passive.withValues(alpha: 0.3),
                       ), // Mavi çerçeve yok
                     ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 20),
@@ -493,139 +494,41 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
             const SizedBox(height: 16),
 
             // 4. Kategori & Tarih (Alt Alta Geniş Kartlar)
-            SelectionCard(
-              title: l10n.categoryLabel,
-              selectedValue: _categoryName != null
-                  ? selectedCategory.getLocalizedName(context)
-                  : null,
-              icon: IconData(
-                selectedCategory.iconCode,
-                fontFamily: 'MaterialIcons',
-              ),
-              iconColor: _categoryName != null
-                  ? Color(selectedCategory.colorValue)
-                  : AppColors.passive,
+            CategorySelectorCard(
+              selectedCategory: selectedCategory,
+              isSelected: _categoryName != null,
               onTap: _showCategorySelectionModal,
-              placeholder: l10n.selectCategoryHint,
             ),
             const SizedBox(height: 16),
-            _dateAnimKey > 0
-                ? ElasticIn(
-                    key: ValueKey('date-anim-$_dateAnimKey'),
-                    child: SelectionCard(
-                      title: l10n.dateLabel,
-                      selectedValue: DateFormat.yMMMMd(
-                        Localizations.localeOf(context).toString(),
-                      ).format(_selectedDate),
-                      icon: Icons.calendar_today_rounded,
-                      iconColor: AppColors.primary,
-                      onTap: _showDatePicker,
-                      placeholder: '',
-                    ),
-                  )
-                : SelectionCard(
-                    title: l10n.dateLabel,
-                    selectedValue: DateFormat.yMMMMd(
-                      Localizations.localeOf(context).toString(),
-                    ).format(_selectedDate),
-                    icon: Icons.calendar_today_rounded,
-                    iconColor: AppColors.primary,
-                    onTap: _showDatePicker,
-                    placeholder: '',
-                  ),
+            TransactionDatePicker(
+              selectedDate: _selectedDate,
+              onTap: _showDatePicker,
+              animKey: _dateAnimKey,
+            ),
             const SizedBox(height: 16),
 
             // 5. Düzenli İşlem Seçeneği (Sadece yeni eklemede)
             if (widget.transactionToEdit == null) ...[
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.passive.withOpacity(0.3)),
-                ),
-                child: SwitchListTile.adaptive(
-                  value: _isRecurring,
-                  onChanged: (val) {
-                    setState(() {
-                      _isRecurring = val;
-                      if (_isRecurring) {
-                        final now = DateTime.now();
-                        final today = DateTime(now.year, now.month, now.day);
-                        if (_selectedDate.isBefore(today)) {
-                          _selectedDate = now;
-                          _dateAnimKey++; // Animasyonu tetikle
-                        }
+              RecurringOptionsCard(
+                isRecurring: _isRecurring,
+                onRecurringChanged: (val) {
+                  setState(() {
+                    _isRecurring = val;
+                    if (_isRecurring) {
+                      final now = DateTime.now();
+                      final today = DateTime(now.year, now.month, now.day);
+                      if (_selectedDate.isBefore(today)) {
+                        _selectedDate = now;
+                        _dateAnimKey++; // Animasyonu tetikle
                       }
-                    });
-                  },
-                  title: Text(
-                    l10n.recurringSwitchLabel,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  secondary: Icon(
-                    Icons.repeat,
-                    color: _isRecurring
-                        ? theme.primaryColor
-                        : AppColors.passive,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  activeColor: theme.primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // 6. Düzenli işlem sıklık seçimi
-            if (_isRecurring) ...[
-              DropdownButtonFormField<String>(
-                value: _recurringFrequency,
-                decoration: InputDecoration(
-                  labelText: l10n.frequencyLabel,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: AppColors.passive.withOpacity(0.3),
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: AppColors.passive.withOpacity(0.3),
-                    ),
-                  ),
-                  prefixIcon: const Icon(Icons.update),
-                  filled: true,
-                  fillColor: AppColors.surface,
-                ),
-                items: [
-                  DropdownMenuItem(
-                    value: 'daily',
-                    child: Text(l10n.frequencyDaily),
-                  ),
-                  DropdownMenuItem(
-                    value: 'weekly',
-                    child: Text(l10n.frequencyWeekly),
-                  ),
-                  DropdownMenuItem(
-                    value: 'monthly',
-                    child: Text(l10n.frequencyMonthly),
-                  ),
-                  DropdownMenuItem(
-                    value: 'yearly',
-                    child: Text(l10n.frequencyYearly),
-                  ),
-                ],
-                onChanged: (val) {
-                  if (val != null) {
-                    setState(() => _recurringFrequency = val);
-                  }
+                    }
+                  });
+                },
+                frequency: _recurringFrequency,
+                onFrequencyChanged: (val) {
+                  setState(() {
+                    _recurringFrequency = val!;
+                  });
                 },
               ),
               const SizedBox(height: 16),
@@ -661,13 +564,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide(
-                          color: AppColors.passive.withOpacity(0.3),
+                          color: AppColors.passive.withValues(alpha: 0.3),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide(
-                          color: AppColors.passive.withOpacity(0.3),
+                          color: AppColors.passive.withValues(alpha: 0.3),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(

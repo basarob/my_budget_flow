@@ -28,55 +28,55 @@ class CategoryModel {
       id: 'cat_food',
       name: 'categoryFood',
       iconCode: Icons.restaurant.codePoint,
-      colorValue: AppColors.categoryColors[0].value,
+      colorValue: AppColors.categoryColors[0].toARGB32(),
     ),
     CategoryModel(
       id: 'cat_bills',
       name: 'categoryBills',
       iconCode: Icons.receipt_long.codePoint,
-      colorValue: AppColors.categoryColors[1].value,
+      colorValue: AppColors.categoryColors[1].toARGB32(),
     ),
     CategoryModel(
       id: 'cat_transport',
       name: 'categoryTransport',
       iconCode: Icons.directions_bus.codePoint,
-      colorValue: AppColors.categoryColors[2].value,
+      colorValue: AppColors.categoryColors[2].toARGB32(),
     ),
     CategoryModel(
       id: 'cat_rent',
       name: 'categoryRent',
       iconCode: Icons.home.codePoint,
-      colorValue: AppColors.categoryColors[3].value,
+      colorValue: AppColors.categoryColors[3].toARGB32(),
     ),
     CategoryModel(
       id: 'cat_entertainment',
       name: 'categoryEntertainment',
       iconCode: Icons.movie.codePoint,
-      colorValue: AppColors.categoryColors[4].value,
+      colorValue: AppColors.categoryColors[4].toARGB32(),
     ),
     CategoryModel(
       id: 'cat_shopping',
       name: 'categoryShopping',
       iconCode: Icons.shopping_bag.codePoint,
-      colorValue: AppColors.categoryColors[5].value,
+      colorValue: AppColors.categoryColors[5].toARGB32(),
     ),
     CategoryModel(
       id: 'cat_salary',
       name: 'categorySalary',
       iconCode: Icons.payments.codePoint,
-      colorValue: AppColors.categoryColors[9].value,
+      colorValue: AppColors.categoryColors[9].toARGB32(),
     ),
     CategoryModel(
       id: 'cat_investment',
       name: 'categoryInvestment',
       iconCode: Icons.trending_up.codePoint,
-      colorValue: AppColors.categoryColors[11].value,
+      colorValue: AppColors.categoryColors[11].toARGB32(),
     ),
     CategoryModel(
       id: 'cat_other',
       name: 'categoryOther',
       iconCode: Icons.more_horiz.codePoint,
-      colorValue: AppColors.categoryColors[8].value,
+      colorValue: AppColors.categoryColors[8].toARGB32(),
     ),
   ];
 
@@ -128,7 +128,7 @@ class CategoryModel {
       id: map['id'] ?? '',
       name: map['name'] ?? '',
       iconCode: map['iconCode'] ?? Icons.category.codePoint,
-      colorValue: map['colorValue'] ?? Colors.grey.value,
+      colorValue: map['colorValue'] ?? const Color(0xFF9E9E9E).toARGB32(),
       isCustom: map['isCustom'] ?? false,
     );
   }

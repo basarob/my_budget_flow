@@ -73,7 +73,7 @@ class TransactionTypeSegment extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: isSelected
               ? null
-              : Border.all(color: AppColors.passive.withOpacity(0.3)),
+              : Border.all(color: AppColors.passive.withValues(alpha: 0.3)),
         ),
         child: Text(
           title,

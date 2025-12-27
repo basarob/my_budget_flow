@@ -250,8 +250,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               keyboardType: TextInputType.name,
                               textCapitalization: TextCapitalization.words,
                               validator: (v) {
-                                if (v == null || v.isEmpty)
+                                if (v == null || v.isEmpty) {
                                   return l10n.errorEmptyField;
+                                }
                                 return null;
                               },
                             ),
@@ -265,8 +266,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               keyboardType: TextInputType.name,
                               textCapitalization: TextCapitalization.words,
                               validator: (v) {
-                                if (v == null || v.isEmpty)
+                                if (v == null || v.isEmpty) {
                                   return l10n.errorEmptyField;
+                                }
                                 return null;
                               },
                             ),
@@ -294,8 +296,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               labelText: l10n.birthDateLabel,
                               prefixIcon: Icons.calendar_month,
                               validator: (v) {
-                                if (v == null || v.isEmpty)
+                                if (v == null || v.isEmpty) {
                                   return l10n.errorEmptyField;
+                                }
                                 return null;
                               },
                             ),
@@ -326,8 +329,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         prefixIcon: Icons.lock_outline,
                         isPassword: true,
                         validator: (v) {
-                          if (v == null || v.length < 6)
+                          if (v == null || v.length < 6) {
                             return l10n.errorPasswordShort;
+                          }
                           return null;
                         },
                       ),

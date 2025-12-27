@@ -36,7 +36,7 @@ class RecurringSelectionModal extends ConsumerWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-              color: AppColors.passive.withOpacity(0.3),
+              color: AppColors.passive.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -62,7 +62,7 @@ class RecurringSelectionModal extends ConsumerWidget {
                         Icon(
                           Icons.history,
                           size: 48,
-                          color: AppColors.passive.withOpacity(0.5),
+                          color: AppColors.passive.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -77,7 +77,7 @@ class RecurringSelectionModal extends ConsumerWidget {
                 }
                 return ListView.separated(
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = items[index];
                     final isExpense = item.type == TransactionType.expense;
@@ -91,7 +91,7 @@ class RecurringSelectionModal extends ConsumerWidget {
                           id: '',
                           name: item.categoryName,
                           iconCode: Icons.category.codePoint,
-                          colorValue: AppColors.passive.value,
+                          colorValue: AppColors.passive.toARGB32(),
                         ),
                       );
                     });
@@ -100,7 +100,7 @@ class RecurringSelectionModal extends ConsumerWidget {
                       id: '',
                       name: item.categoryName,
                       iconCode: Icons.category.codePoint,
-                      colorValue: AppColors.passive.value,
+                      colorValue: AppColors.passive.toARGB32(),
                     );
 
                     final itemColor = Color(category!.colorValue);
@@ -116,11 +116,11 @@ class RecurringSelectionModal extends ConsumerWidget {
                           color: AppColors.surface,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.passive.withOpacity(0.3),
+                            color: AppColors.passive.withValues(alpha: 0.3),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: Colors.black.withValues(alpha: 0.03),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -131,7 +131,7 @@ class RecurringSelectionModal extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: itemColor.withOpacity(0.1),
+                                color: itemColor.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(

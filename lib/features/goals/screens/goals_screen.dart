@@ -1,6 +1,6 @@
-/// Sprint 3 kapsamında geliştirilecek olan Hedefler Ekranı.
-///
-/// Şu an sadece yer tutucu (placeholder) olarak bulunmaktadır.
+// Sprint 3 kapsamında geliştirilecek olan Hedefler Ekranı.
+//
+// Şu an sadece yer tutucu (placeholder) olarak bulunmaktadır.
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 

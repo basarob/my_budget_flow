@@ -51,7 +51,7 @@ class CategorySelectionModal extends ConsumerWidget {
                 width: 48,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: AppColors.passive.withOpacity(0.3),
+                  color: AppColors.passive.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2.5),
                 ),
               ),
@@ -73,7 +73,7 @@ class CategorySelectionModal extends ConsumerWidget {
                     ),
                     // Modern "Yeni Ekle" butonu
                     Material(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       child: InkWell(
                         onTap: () {
@@ -231,13 +231,13 @@ class CategorySelectionModal extends ConsumerWidget {
               border: Border.all(
                 color: isSelected
                     ? itemColor
-                    : AppColors.passive.withOpacity(0.1),
+                    : AppColors.passive.withValues(alpha: 0.1),
                 width: isSelected ? 3 : 1,
               ),
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: itemColor.withOpacity(0.25),
+                        color: itemColor.withValues(alpha: 0.25),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),

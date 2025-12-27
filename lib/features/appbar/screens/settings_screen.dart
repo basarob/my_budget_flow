@@ -87,7 +87,7 @@ class SettingsScreen extends ConsumerWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primaryDark.withOpacity(0.1),
+                    color: AppColors.primaryDark.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
