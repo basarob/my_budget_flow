@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -10,6 +11,7 @@ import '../../dashboard/screens/dashboard_screen.dart';
 import '../../goals/screens/goals_screen.dart';
 import '../../transactions/screens/transactions_screen.dart';
 import '../../transactions/providers/transaction_provider.dart';
+import '../../calendar/providers/calendar_provider.dart'; // Takvim Provider
 import '../widgets/custom_drawer.dart';
 
 /// Ana Ekran (Home Screen)
@@ -46,6 +48,9 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
 
   // Sayfa Değiştirme
   void _onItemTapped(int index) {
+    // Sayfa değiştiğinde açık olan SnackBar'ları temizle (Örn: İşlem silindikten sonra geri al bildirimi)
+    ScaffoldMessenger.of(context).clearSnackBars();
+
     setState(() {
       _selectedIndex = index;
     });
@@ -75,6 +80,20 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           ),
         ),
         actions: [
+          // Takvim Sayfası için "Bugün" Butonu
+          if (_selectedIndex == 2)
+            IconButton(
+              icon: const Icon(Icons.today, color: Colors.white),
+              tooltip: l10n.todayButtonTooltip,
+              onPressed: () {
+                // Takvimi bugüne getir
+                final now = DateTime.now();
+                ref.read(calendarProvider.notifier).selectDay(now);
+                ref.read(calendarProvider.notifier).onPageChanged(now);
+                HapticFeedback.mediumImpact();
+              },
+            ),
+
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.white),
             onPressed: () {

@@ -458,4 +458,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortDaySun => 'Sun';
+
+  @override
+  String get todayButtonTooltip => 'Today';
+
+  @override
+  String get netBalanceLabel => 'Total';
+
+  @override
+  String get plannedTransaction => 'Planned Transactions';
+
+  @override
+  String get thisMonthIncome => 'This Month\'s Income';
+
+  @override
+  String get thisMonthExpense => 'This Month\'s Expense';
+
+  @override
+  String get thisMonthNet => 'This Month\'s Net';
+
+  @override
+  String transactionCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Transactions',
+      one: '1 Transaction',
+      zero: 'No Transactions',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get upcomingPaymentLabel => 'Upcoming Payment';
+
+  @override
+  String get recurringPaymentLabel => 'Recurring Payment';
+
+  @override
+  String get categoryDeleted => 'Category deleted';
+
+  @override
+  String get addRecurringTransactionTitle => 'Add Recurring Transaction';
 }

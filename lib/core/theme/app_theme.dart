@@ -29,9 +29,8 @@ class AppColors {
     0xFFC62828,
   ); // Gider İşlemleri (Kırmızı)
   static const Color passive = Colors.grey; // Pasif / Devre Dışı Durum
-  static const Color warningYellow = Color(
-    0xFFEF6C00,
-  ); // Uyarı / Dikkat (Turuncu)
+  static const Color warning = Color(0xFFEF6C00); // Uyarı / Dikkat (Turuncu)
+  static const Color info = Color(0xFF00897B); // Bilgi / Detay (Teal)
 
   // --- KATEGORİ RENK PALETİ ---
   // İşlem kategorileri için kullanılan geniş renk yelpazesi

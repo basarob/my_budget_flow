@@ -967,6 +967,72 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Paz'**
   String get shortDaySun;
+
+  /// No description provided for @todayButtonTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün'**
+  String get todayButtonTooltip;
+
+  /// No description provided for @netBalanceLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Net'**
+  String get netBalanceLabel;
+
+  /// No description provided for @plannedTransaction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Planlanan İşlemler'**
+  String get plannedTransaction;
+
+  /// No description provided for @thisMonthIncome.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Ayın Geliri'**
+  String get thisMonthIncome;
+
+  /// No description provided for @thisMonthExpense.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Ayın Gideri'**
+  String get thisMonthExpense;
+
+  /// No description provided for @thisMonthNet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Ayın Neti'**
+  String get thisMonthNet;
+
+  /// No description provided for @transactionCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} İşlem'**
+  String transactionCount(num count);
+
+  /// No description provided for @upcomingPaymentLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yaklaşan Ödeme'**
+  String get upcomingPaymentLabel;
+
+  /// No description provided for @recurringPaymentLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenli Ödeme'**
+  String get recurringPaymentLabel;
+
+  /// No description provided for @categoryDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori silindi'**
+  String get categoryDeleted;
+
+  /// No description provided for @addRecurringTransactionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenli İşlem Ekle'**
+  String get addRecurringTransactionTitle;
 }
 
 class _AppLocalizationsDelegate

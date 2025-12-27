@@ -461,4 +461,39 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get shortDaySun => 'Paz';
+
+  @override
+  String get todayButtonTooltip => 'Bugün';
+
+  @override
+  String get netBalanceLabel => 'Net';
+
+  @override
+  String get plannedTransaction => 'Planlanan İşlemler';
+
+  @override
+  String get thisMonthIncome => 'Bu Ayın Geliri';
+
+  @override
+  String get thisMonthExpense => 'Bu Ayın Gideri';
+
+  @override
+  String get thisMonthNet => 'Bu Ayın Neti';
+
+  @override
+  String transactionCount(num count) {
+    return '$count İşlem';
+  }
+
+  @override
+  String get upcomingPaymentLabel => 'Yaklaşan Ödeme';
+
+  @override
+  String get recurringPaymentLabel => 'Düzenli Ödeme';
+
+  @override
+  String get categoryDeleted => 'Kategori silindi';
+
+  @override
+  String get addRecurringTransactionTitle => 'Düzenli İşlem Ekle';
 }

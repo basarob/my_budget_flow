@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Tüm uygulama genelinde standart SnackBar kullanımı için yardımcı sınıf.
 class SnackbarUtils {
@@ -9,7 +10,7 @@ class SnackbarUtils {
     BuildContext context, {
     required String message,
     VoidCallback? onUndo,
-    String undoLabel = 'Geri Al', // Varsayılan label
+    String? undoLabel,
   }) {
     _show(
       context,
@@ -39,6 +40,7 @@ class SnackbarUtils {
     String? undoLabel,
   }) {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     // Varsa önceki mesajları temizle
     messenger.clearSnackBars();
@@ -56,8 +58,8 @@ class SnackbarUtils {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         action: onUndo != null
             ? SnackBarAction(
-                label: undoLabel ?? 'Geri Al',
-                textColor: AppColors.surface, // Genelde beyaz iyi durur
+                label: undoLabel ?? l10n.undoAction,
+                textColor: AppColors.surface,
                 onPressed: onUndo,
               )
             : null,

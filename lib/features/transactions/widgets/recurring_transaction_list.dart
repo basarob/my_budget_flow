@@ -11,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import '../screens/add_transaction_screen.dart';
+import '../../calendar/providers/calendar_provider.dart'; // Takvim senkronizasyon
 
 /// Düzenli İşlemler Listesi
 ///
@@ -159,6 +160,8 @@ class RecurringTransactionList extends ConsumerWidget {
                     .read(transactionControllerProvider.notifier)
                     .deleteRecurringItem(item.id);
 
+                ref.invalidate(calendarProvider); // Takvimi güncelle
+
                 // 4. Geri Alma Seçenekli SnackBar
                 SnackbarUtils.showStandard(
                   context,
@@ -168,6 +171,9 @@ class RecurringTransactionList extends ConsumerWidget {
                     ref
                         .read(transactionControllerProvider.notifier)
                         .addRecurringItem(item);
+                    ref.invalidate(
+                      calendarProvider,
+                    ); // Geri alınınca da güncelle
                   },
                 );
 
@@ -298,6 +304,10 @@ class RecurringTransactionList extends ConsumerWidget {
                                   updatedItem,
                                   wasActivated: wasActivated,
                                 );
+
+                            ref.invalidate(
+                              calendarProvider,
+                            ); // Durum değişince takvimi güncelle
 
                             // Aktifleştirme bildirimi
                             if (wasActivated) {

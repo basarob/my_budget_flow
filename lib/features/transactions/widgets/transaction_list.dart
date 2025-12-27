@@ -7,6 +7,7 @@ import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../screens/add_transaction_screen.dart';
+import '../../calendar/providers/calendar_provider.dart'; // Takvim senkronizasyonu
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/snackbar_utils.dart';
@@ -141,7 +142,10 @@ class TransactionList extends ConsumerWidget {
                       .read(transactionControllerProvider.notifier)
                       .deleteTransaction(transaction.id);
 
-                  // 4. Geri Alma Seçenekli SnackBar
+                  // 4. Takvimi Güncelle (Silme sonrası)
+                  ref.invalidate(calendarProvider);
+
+                  // 5. Geri Alma Seçenekli SnackBar
                   SnackbarUtils.showStandard(
                     context,
                     message: l10n.transactionDeleted,
@@ -151,6 +155,8 @@ class TransactionList extends ConsumerWidget {
                           .read(transactionControllerProvider.notifier)
                           .addTransaction(transaction);
                       ref.invalidate(paginatedTransactionProvider);
+                      // Geri alındığında takvimi tekrar güncelle
+                      ref.invalidate(calendarProvider);
                     },
                   );
 

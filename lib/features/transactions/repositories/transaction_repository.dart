@@ -179,6 +179,28 @@ class TransactionRepository {
         });
   }
 
+  /// Belirli bir ay için işlemleri getirir (Takvim ekranı için)
+  Future<List<TransactionModel>> getTransactionsForMonth(
+    String userId,
+    DateTime month,
+  ) async {
+    final startOfMonth = DateTime(month.year, month.month, 1);
+    final endOfMonth = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
+
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('transactions')
+        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+        .orderBy('date', descending: true)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => TransactionModel.fromMap(doc.data(), doc.id))
+        .toList();
+  }
+
   // --- DÜZENLİ İŞLEMLER (RECURRING) ---
 
   /// Yeni düzenli işlem tanımı ekler
@@ -378,6 +400,22 @@ class TransactionRepository {
             return RecurringTransactionModel.fromMap(doc.data(), doc.id);
           }).toList();
         });
+  }
+
+  /// Aktif düzenli işlemleri getirir (Takvim tahminleri için)
+  Future<List<RecurringTransactionModel>> getActiveRecurringTransactions(
+    String userId,
+  ) async {
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('recurring_transactions')
+        .where('isActive', isEqualTo: true)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => RecurringTransactionModel.fromMap(doc.data(), doc.id))
+        .toList();
   }
 
   // --- OTOMATİK İŞLEM OLUŞTURMA MOTORU ---

@@ -20,6 +20,7 @@ import '../widgets/category_selection_modal.dart';
 import '../widgets/recurring_selection_modal.dart';
 import '../../auth/services/auth_service.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../calendar/providers/calendar_provider.dart'; // Import eklendi
 
 /// Yeni İşlem Ekleme veya Mevcut İşlemi Düzenleme Ekranı
 ///
@@ -215,6 +216,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
       }
 
       if (mounted) {
+        // Hangi ekranda olursak olalım, listelerin güncel kalmasını sağla
+        ref.invalidate(calendarProvider);
+        ref.invalidate(paginatedTransactionProvider);
+        ref.invalidate(recurringListProvider);
         Navigator.pop(context, true); // Yenileme sinyali
       }
     } catch (e) {

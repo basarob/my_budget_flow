@@ -159,6 +159,17 @@
     "shortDayFri": "Cum",
     "shortDaySat": "Cmt",
     "shortDaySun": "Paz",
+    "todayButtonTooltip": "Bugün",
+    "netBalanceLabel": "Net",
+    "plannedTransaction": "Planlanan İşlemler",
+    "thisMonthIncome": "Bu Ayın Geliri",
+    "thisMonthExpense": "Bu Ayın Gideri",
+    "thisMonthNet": "Bu Ayın Neti",
+    "transactionCount": "{count} İşlem",
+    "upcomingPaymentLabel": "Yaklaşan Ödeme",
+    "recurringPaymentLabel": "Düzenli Ödeme",
+    "categoryDeleted": "Kategori silindi",
+    "addRecurringTransactionTitle": "Düzenli İşlem Ekle",
     "@errorGeneric": {
         "description": "Hata detayını içeren genel bir hata mesajı.",
         "placeholders": {
