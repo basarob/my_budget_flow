@@ -101,8 +101,17 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
       _amountController.text = t.amount.toString();
       _titleController.text = t.title;
       _categoryName = t.categoryName;
-      // Düzenli işlemde başlangıç tarihi önemlidir
-      _selectedDate = t.startDate;
+      // Düzenli işlem düzenlenirken, bir sonraki vade tarihini göster.
+      // Eğer daha önce işlenmişse (lastProcessedDate var), sonraki tarihi hesapla.
+      // Yoksa başlangıç tarihini göster.
+      if (t.lastProcessedDate != null) {
+        _selectedDate = RecurringTransactionModel.calculateNextDueDate(
+          t.lastProcessedDate!,
+          t.frequency,
+        );
+      } else {
+        _selectedDate = t.startDate;
+      }
       _description = t.description;
       _isNoteVisible = _description.isNotEmpty;
       _isRecurring = true;

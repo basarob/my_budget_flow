@@ -896,6 +896,12 @@ abstract class AppLocalizations {
   /// **'Tamam'**
   String get commonOk;
 
+  /// No description provided for @recurringActivated.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem aktifleştirildi ve vadesi gelen kayıtlar oluşturuldu.'**
+  String get recurringActivated;
+
   /// Hata detayını içeren genel bir hata mesajı.
   ///
   /// In tr, this message translates to:

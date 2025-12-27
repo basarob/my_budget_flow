@@ -275,6 +275,9 @@ class RecurringTransactionList extends ConsumerWidget {
                           onChanged: (val) {
                             HapticFeedback.selectionClick();
 
+                            // Pasiften aktife mi çekildi?
+                            final wasActivated = val && !item.isActive;
+
                             final updatedItem = RecurringTransactionModel(
                               id: item.id,
                               title: item.title,
@@ -291,7 +294,18 @@ class RecurringTransactionList extends ConsumerWidget {
 
                             ref
                                 .read(transactionControllerProvider.notifier)
-                                .updateRecurringItem(updatedItem);
+                                .updateRecurringItem(
+                                  updatedItem,
+                                  wasActivated: wasActivated,
+                                );
+
+                            // Aktifleştirme bildirimi
+                            if (wasActivated) {
+                              SnackbarUtils.showSuccess(
+                                context,
+                                message: l10n.recurringActivated,
+                              );
+                            }
                           },
                         ),
                       ],

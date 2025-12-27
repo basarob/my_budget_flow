@@ -9,6 +9,7 @@ import '../../calendar/screens/calendar_screen.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
 import '../../goals/screens/goals_screen.dart';
 import '../../transactions/screens/transactions_screen.dart';
+import '../../transactions/providers/transaction_provider.dart';
 import '../widgets/custom_drawer.dart';
 
 /// Ana Ekran (Home Screen)
@@ -24,6 +25,16 @@ class BudgetScreen extends ConsumerStatefulWidget {
 
 class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Uygulama başladığında düzenli işlem kontrolünü tetikle
+    // Bu, vadesi gelen tekrarlayan işlemlerin otomatik olarak oluşturulmasını sağlar.
+    Future.microtask(() {
+      ref.read(transactionControllerProvider);
+    });
+  }
 
   // Sayfalar Listesi
   static const List<Widget> _widgetOptions = <Widget>[

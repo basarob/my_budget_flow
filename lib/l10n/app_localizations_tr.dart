@@ -424,6 +424,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonOk => 'Tamam';
 
   @override
+  String get recurringActivated =>
+      'İşlem aktifleştirildi ve vadesi gelen kayıtlar oluşturuldu.';
+
+  @override
   String errorGeneric(Object error) {
     return 'Bir hata oluştu: $error';
   }

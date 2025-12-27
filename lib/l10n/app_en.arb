@@ -146,6 +146,7 @@
     "waitingConnection": "Waiting for connection...",
     "errorAppInit": "Application failed to initialize: {error}",
     "commonOk": "OK",
+    "recurringActivated": "Transaction activated and pending entries have been created.",
 
     "errorGeneric": "An error occurred: {error}",
     "dateRangeTitle": "Date Range",

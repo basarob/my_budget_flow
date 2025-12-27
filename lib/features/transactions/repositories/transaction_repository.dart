@@ -222,7 +222,9 @@ class TransactionRepository {
           type: item.type,
           categoryName: item.categoryName,
           date: item.startDate,
-          description: '${item.description} (Otomatik: ${item.frequency})',
+          description: item.description.isNotEmpty
+              ? '${item.description} (Otomatik) '
+              : '(Otomatik)',
           isRecurring: true,
         );
 
@@ -250,13 +252,91 @@ class TransactionRepository {
     await batch.commit();
   }
 
-  Future<void> updateRecurringItem(RecurringTransactionModel item) async {
-    await _firestore
+  /// Düzenli işlemi günceller.
+  /// Eğer işlem aktife çekiliyorsa, vadesi gelen işlemleri de oluşturur.
+  Future<void> updateRecurringItem(
+    RecurringTransactionModel item, {
+    bool wasActivated = false,
+  }) async {
+    final batch = _firestore.batch();
+    bool batchHasChanges = false;
+
+    final docRef = _firestore
         .collection('users')
         .doc(item.userId)
         .collection('recurring_transactions')
-        .doc(item.id)
-        .update(item.toMap());
+        .doc(item.id);
+
+    batch.update(docRef, item.toMap());
+    batchHasChanges = true;
+
+    // Eğer pasiften aktife çekildiyse ve vadesi gelmişse işlem oluştur
+    if (wasActivated && item.isActive) {
+      final now = DateTime.now();
+
+      // Başlangıç tarihi gelmediyse atla
+      if (!item.startDate.isAfter(now)) {
+        DateTime lastRun = item.lastProcessedDate ?? item.startDate;
+
+        DateTime nextDue;
+        if (item.lastProcessedDate == null) {
+          nextDue = item.startDate;
+        } else {
+          nextDue = RecurringTransactionModel.calculateNextDueDate(
+            lastRun,
+            item.frequency,
+          );
+        }
+
+        int safetyCounter = 0;
+        DateTime? lastCreatedDate;
+
+        while (nextDue.isBefore(now) || isSameDay(nextDue, now)) {
+          if (safetyCounter++ > 12) break;
+
+          final newTxRef = _firestore
+              .collection('users')
+              .doc(item.userId)
+              .collection('transactions')
+              .doc();
+
+          final newTransaction = TransactionModel(
+            id: newTxRef.id,
+            userId: item.userId,
+            title: item.title.isNotEmpty ? item.title : item.categoryName,
+            amount: item.amount,
+            type: item.type,
+            categoryName: item.categoryName,
+            date: nextDue,
+            description: item.description.isNotEmpty
+                ? '${item.description} (Otomatik)'
+                : '(Otomatik)',
+            isRecurring: true,
+          );
+          batch.set(newTxRef, newTransaction.toMap());
+
+          lastCreatedDate = nextDue;
+          lastRun = nextDue;
+          nextDue = RecurringTransactionModel.calculateNextDueDate(
+            lastRun,
+            item.frequency,
+          );
+
+          if (nextDue.isAfter(now) && !isSameDay(nextDue, now)) break;
+        }
+
+        // lastProcessedDate'i güncelle
+        if (lastCreatedDate != null) {
+          batch.update(docRef, {
+            'lastProcessedDate': Timestamp.fromDate(lastCreatedDate),
+          });
+        }
+      }
+    }
+
+    if (batchHasChanges) {
+      await batch.commit();
+    }
   }
 
   Future<void> deleteRecurringItem(String userId, String itemId) async {
@@ -319,19 +399,24 @@ class TransactionRepository {
     for (var doc in snapshot.docs) {
       final item = RecurringTransactionModel.fromMap(doc.data(), doc.id);
 
-      // En son işlem tarihini al (Yoksa başlangıcın bir gün öncesini al)
-      DateTime lastRun =
-          item.lastProcessedDate ??
-          item.startDate.subtract(const Duration(days: 1));
+      // En son işlem tarihini al.
+      // Eğer daha önce işlenmemişse (null), startDate referans alınır.
+      DateTime lastRun = item.lastProcessedDate ?? item.startDate;
 
       // Henüz başlangıç tarihi gelmediyse atla
       if (item.startDate.isAfter(now)) continue;
 
-      // Sıklığa göre bir sonraki tarihi hesapla
-      DateTime nextDue = RecurringTransactionModel.calculateNextDueDate(
-        lastRun,
-        item.frequency,
-      );
+      DateTime nextDue;
+      if (item.lastProcessedDate == null) {
+        // İlk kez çalışacaksa, direkt başlangıç tarihi vadesidir.
+        nextDue = item.startDate;
+      } else {
+        // Daha önce çalışmışsa, son işlem tarihinden sonrasını hesapla.
+        nextDue = RecurringTransactionModel.calculateNextDueDate(
+          lastRun,
+          item.frequency,
+        );
+      }
 
       // Güvenlik Sayacı (Sonsuz döngüyü önlemek için)
       int safetyCounter = 0;
@@ -358,7 +443,9 @@ class TransactionRepository {
           type: item.type,
           categoryName: item.categoryName,
           date: nextDue,
-          description: '${item.description} (Otomatik: ${item.frequency})',
+          description: item.description.isNotEmpty
+              ? '${item.description} (Otomatik)'
+              : '(Otomatik)',
           isRecurring: true,
         );
         batch.set(newTxRef, newTransaction.toMap());

@@ -148,19 +148,20 @@ class TransactionController extends AsyncNotifier<void> {
     }
   }
 
-  Future<void> updateRecurringItem(RecurringTransactionModel item) async {
+  Future<void> updateRecurringItem(
+    RecurringTransactionModel item, {
+    bool wasActivated = false,
+  }) async {
     state = const AsyncValue.loading();
     try {
       final repository = ref.read(transactionRepositoryProvider);
-      await repository.updateRecurringItem(item);
+      await repository.updateRecurringItem(item, wasActivated: wasActivated);
 
-      // Pasiften aktife geçtiyse kontrol et
-      if (item.isActive) {
-        final user = ref.read(authStateChangesProvider).value;
-        if (user != null) {
-          await repository.checkAndProcessRecurringTransactions(user.uid);
-        }
+      // Aktifleştirme sonrası işlem listesini yenile
+      if (wasActivated) {
+        ref.invalidate(paginatedTransactionProvider);
       }
+
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);

@@ -421,6 +421,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonOk => 'OK';
 
   @override
+  String get recurringActivated =>
+      'Transaction activated and pending entries have been created.';
+
+  @override
   String errorGeneric(Object error) {
     return 'An error occurred: $error';
   }

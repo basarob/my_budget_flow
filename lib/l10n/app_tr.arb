@@ -146,6 +146,7 @@
     "waitingConnection": "Bağlantı bekleniyor...",
     "errorAppInit": "Uygulama başlatılamadı: {error}",
     "commonOk": "Tamam",
+    "recurringActivated": "İşlem aktifleştirildi ve vadesi gelen kayıtlar oluşturuldu.",
 
     "errorGeneric": "Bir hata oluştu: {error}",
     "dateRangeTitle": "Tarih Aralığı",

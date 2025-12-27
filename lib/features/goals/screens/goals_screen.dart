@@ -1,4 +1,4 @@
-/// Sprint 2 kapsamında geliştirilecek olan Hedefler Ekranı.
+/// Sprint 3 kapsamında geliştirilecek olan Hedefler Ekranı.
 ///
 /// Şu an sadece yer tutucu (placeholder) olarak bulunmaktadır.
 import 'package:flutter/material.dart';
