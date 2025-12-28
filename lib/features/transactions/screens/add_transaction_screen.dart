@@ -22,16 +22,17 @@ import '../../auth/services/auth_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../calendar/providers/calendar_provider.dart';
 
-/// Yeni İşlem Ekleme veya Mevcut İşlemi Düzenleme Ekranı
+/// Dosya: add_transaction_screen.dart
 ///
-/// Kullanıcının gelir veya gider kaydı oluşturduğu form ekranıdır.
-/// Hem yeni kayıt ekleme hem de var olan kaydı güncelleme amacıyla kullanılır.
+/// Amaç: Yeni gelir/gider ekleme veya mevcut işlemi düzenleme ekranıdır.
 ///
 /// Özellikler:
-/// - **Dinamik Form**: Tutar, Başlık, Kategori, Tarih ve Açıklama alanları.
-/// - **Düzenli İşlem Desteği**: İşlemi tekrar eden bir talimata dönüştürme seçeneği.
-/// - **Animasyonlar**: Tarih değişimi ve form geçişlerinde akıcı animasyonlar (animate_do).
-/// - **Hızlı Seçim**: Önceki düzenli işlemlerden kopyalayarak hızlı giriş yapabilme.
+/// - Gelir/Gider tipi seçimi (Segmented Control)
+/// - Tutar girişi (Özel klavye tipi ve formatlama)
+/// - Kategori seçimi ve özel kategori ekleme
+/// - Tarih seçimi (CupertinoDatePicker)
+/// - Düzenli işlem (Recurring) oluşturma seçenekleri
+/// - Mevcut işlemi veya düzenli işlemi düzenleme modu
 ///
 /// Parametreler:
 /// - [transactionToEdit]: Eğer düzenleme modunda ise dolu gelir, yoksa null'dur.

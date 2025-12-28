@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 
-/// Düzenli İşlem Seçenekleri Kartı
+/// Dosya: recurring_options_card.dart
 ///
-/// İşlemin tekrarlı olup olmadığını ve sıklığını belirleyen bileşen.
+/// Amaç: İşlem ekleme sırasında tekrarlama (recurring) seçeneklerini sunan kart.
+///
+/// Özellikler:
+/// - Tekrarlama durumu (Aktif/Pasif)
+/// - Tekrarlama sıklığı seçimi (Günlük, Haftalık, Aylık, Yıllık)
 class RecurringOptionsCard extends StatelessWidget {
   final bool isRecurring;
   final ValueChanged<bool> onRecurringChanged;

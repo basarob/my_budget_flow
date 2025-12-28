@@ -1,5 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Dosya: transaction_model.dart
+///
+/// Amaç: Tekil işlem (gelir/gider) veri modelini tanımlar.
+///
+/// Özellikler:
+/// - İşlem verilerini (tutar, tarih, kategori, tip vb.) tutar
+/// - Firestore için veri dönüşümlerini (toMap/fromMap) yapar
+/// - İşlem tipini (gelir/gider) enum olarak yönetir
+
 /// İşlem Tipi (Gelir / Gider)
 enum TransactionType { income, expense }
 

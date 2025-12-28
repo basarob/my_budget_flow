@@ -1,4 +1,3 @@
-import 'dart:ui' as ui; // BackdropFilter için
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // HapticFeedback için
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,22 +10,36 @@ import '../widgets/day_summary_card.dart';
 import '../widgets/daily_transaction_list.dart';
 import '../../transactions/providers/category_provider.dart';
 import '../../transactions/models/transaction_model.dart';
+import '../../../core/widgets/glass_container.dart';
 
 /// Takvim Ekranı
 ///
-/// Kullanıcının aylık finansal görünümünü sunar. Günlere tıklayarak detay
-/// görüntüler, işlem düzenler veya yaklaşan ödemeleri takip eder.
+/// Kullanıcının aylık finansal görünümünü sunar.
+///
+/// Özellikler:
+/// - **Aylık Özet:** Seçili ayın toplam gelir, gider ve net durumunu gösterir.
+/// - **Isı Haritası (Heatmap):** Takvim üzerinde günlerin yoğunluğunu renklerle belirtir.
+/// - **İşlem Listesi:** Seçilen güne ait işlemleri listeler.
+/// - **Yaklaşan Ödemeler:** Düzenli ödemelerin vadesi geldiğinde takvimde işaretler.
+///
+/// Performans Notu:
+/// - Aylık hesaplamalar `CalendarProvider` tarafında yapıldığı için `UI build` metodu hafiftir.
+/// - Gereksiz hesaplama ve döngülerden arındırılmıştır.
 class CalendarScreen extends ConsumerWidget {
   const CalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+
+    // Provider'dan durumu dinle (Hesaplanmış verilerle gelir)
     final calendarState = ref.watch(calendarProvider);
-    final categoriesAsync = ref.watch(categoryListProvider);
     final notifier = ref.read(calendarProvider.notifier);
 
-    // Hata Durumu
+    // Kategori listesi (İşlem listesinde ikon/renk göstermek için)
+    final categoriesAsync = ref.watch(categoryListProvider);
+
+    // 1. Hata Durumu Kontrolü
     if (calendarState.hasError) {
       return Center(
         child: Column(
@@ -46,49 +59,6 @@ class CalendarScreen extends ConsumerWidget {
       );
     }
 
-    // Isı haritası için o ayki maksimum mutlak net bakiyeyi bul (Normalizasyon için)
-    double maxAbsNetBalance = 0;
-    if (calendarState.monthlyEvents.isNotEmpty) {
-      for (var events in calendarState.monthlyEvents.values) {
-        double dailyIncome = 0;
-        double dailyExpense = 0;
-        for (var t in events) {
-          if (t.type == TransactionType.income) {
-            dailyIncome += t.amount;
-          } else {
-            dailyExpense += t.amount;
-          }
-        }
-        final absNet = (dailyIncome - dailyExpense).abs();
-        if (absNet > maxAbsNetBalance) maxAbsNetBalance = absNet;
-      }
-    }
-
-    // Aylık Toplamları Hesapla
-    double monthlyTotalIncome = 0;
-    double monthlyTotalExpense = 0;
-
-    // Görüntülenen ay için filtreleme yap
-    // Not: calendarState.monthlyEvents map'inde o aya ait olanlar var ama
-    // focusedDay'in ayına ait olanları garantiye almak için kontrol edebiliriz.
-    // Ancak provider zaten focusedDay'e göre yükleme yapıyor, bu yüzden mapteki tüm eventleri toplamak yeterli.
-    if (calendarState.monthlyEvents.isNotEmpty) {
-      for (var date in calendarState.monthlyEvents.keys) {
-        // Sadece seçili ayın verilerini topla (Emin olmak için)
-        if (date.year == calendarState.focusedDay.year &&
-            date.month == calendarState.focusedDay.month) {
-          final events = calendarState.monthlyEvents[date]!;
-          for (var t in events) {
-            if (t.type == TransactionType.expense) {
-              monthlyTotalExpense += t.amount;
-            } else {
-              monthlyTotalIncome += t.amount;
-            }
-          }
-        }
-      }
-    }
-
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -97,79 +67,45 @@ class CalendarScreen extends ConsumerWidget {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Column(
               children: [
-                // 1. Takvim ve Özet Kartı (Glassmorphism)
-                Container(
+                // 2. Takvim ve Üst Özet Kartı
+                GlassContainer(
                   margin: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    // Hafif gradient arka plan
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Theme.of(context).cardColor.withValues(alpha: 0.7),
-                        Theme.of(context).cardColor.withValues(alpha: 0.5),
-                      ],
-                    ),
-                    // Kenarlık (Sınır)
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      width: 1.5,
-                    ),
-                    // Gölge
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                  child: Column(
+                    children: [
+                      // A. Aylık Özet Başlığı (Provider'dan hazır veri)
+                      _buildMonthlySummaryHeader(
+                        context,
+                        l10n,
+                        calendarState.monthlyTotalIncome,
+                        calendarState.monthlyTotalExpense,
+                      ),
+
+                      // B. Takvim Bileşeni
+                      _buildCalendar(
+                        context,
+                        ref,
+                        calendarState,
+                        l10n,
+                        notifier,
+                        calendarState.maxAbsNetBalance,
                       ),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: BackdropFilter(
-                      filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Column(
-                          children: [
-                            // A. Aylık Özet Başlığı
-                            _buildMonthlySummaryHeader(
-                              context,
-                              l10n,
-                              monthlyTotalIncome,
-                              monthlyTotalExpense,
-                            ),
-
-                            // B. Takvim
-                            _buildCalendar(
-                              context,
-                              ref,
-                              calendarState,
-                              l10n,
-                              notifier,
-                              maxAbsNetBalance,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 ),
 
-                // 2. Yükleme göstergesi
+                // 3. Yükleme Çubuğu (Loading Indicator)
                 if (calendarState.isLoading)
                   const LinearProgressIndicator(minHeight: 2),
 
-                // 3. Seçili gün varsa özet ve liste
+                // 4. Gün Detay Alanı (Dolu veya Boş Durum)
                 if (calendarState.selectedDay != null) ...[
-                  // Özet Kartı
+                  // A. Günlük Özet Kartı
                   DaySummaryCard(
                     transactions: calendarState.selectedDayTransactions,
                     upcomingPayments: calendarState.selectedDayUpcoming,
                   ),
 
-                  // Seçili Gün Başlığı
+                  // B. Seçili Gün Başlığı ve Sayısı
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -198,7 +134,7 @@ class CalendarScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  // İşlem Listesi
+                  // C. İşlem Listesi
                   categoriesAsync.when(
                     data: (categories) => DailyTransactionList(
                       transactions: calendarState.selectedDayTransactions,
@@ -215,10 +151,10 @@ class CalendarScreen extends ConsumerWidget {
                         Center(child: Text(l10n.errorCategoriesLoad)),
                   ),
 
-                  // Alt boşluk (liste sonu)
+                  // Liste sonu boşluğu (Bottom bar altında kalmaması için)
                   const SizedBox(height: 80),
                 ] else
-                  // Gün seçilmemişse bilgi mesajı
+                  // Gün seçilmediyse kullanıcıyı yönlendiren placeholder
                   SizedBox(
                     height: 200,
                     child: Center(
@@ -249,13 +185,15 @@ class CalendarScreen extends ConsumerWidget {
     );
   }
 
+  /// Seçili gündeki toplam işlem sayısını (işlemler + ödemeler) döndürür.
   String _getEventCountText(CalendarState state, AppLocalizations l10n) {
     final count =
         state.selectedDayTransactions.length + state.selectedDayUpcoming.length;
     return l10n.transactionCount(count);
   }
 
-  /// Aylık Özet Başlığı
+  /// Aylık Finansal Özet Başlığı
+  /// (Gelir, Gider ve Net Durum)
   Widget _buildMonthlySummaryHeader(
     BuildContext context,
     AppLocalizations l10n,
@@ -277,7 +215,7 @@ class CalendarScreen extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // Gelir
+            // Gelir Kutusu
             _buildHeaderSummaryItem(
               context,
               l10n.thisMonthIncome,
@@ -286,14 +224,14 @@ class CalendarScreen extends ConsumerWidget {
               currencyFormat,
             ),
 
-            // Ayıraç
+            // Dikey Çizgi
             Container(
               width: 1,
               color: AppColors.textSecondary.withValues(alpha: 0.2),
               margin: const EdgeInsets.symmetric(vertical: 4),
             ),
 
-            // Net (Daha belirgin - Özel Tasarım)
+            // Net Durum (Vurgulu Ortalanmış)
             Column(
               children: [
                 Text(
@@ -301,7 +239,7 @@ class CalendarScreen extends ConsumerWidget {
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 11,
-                    fontWeight: FontWeight.bold, // Kalın
+                    fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                   ),
                   textAlign: TextAlign.center,
@@ -321,21 +259,21 @@ class CalendarScreen extends ConsumerWidget {
                     style: TextStyle(
                       color: netColor,
                       fontWeight: FontWeight.w900, // Extra Bold
-                      fontSize: 16, // Biraz daha büyük
+                      fontSize: 16,
                     ),
                   ),
                 ),
               ],
             ),
 
-            // Ayıraç
+            // Dikey Çizgi
             Container(
               width: 1,
               color: AppColors.textSecondary.withValues(alpha: 0.2),
               margin: const EdgeInsets.symmetric(vertical: 4),
             ),
 
-            // Gider
+            // Gider Kutusu
             _buildHeaderSummaryItem(
               context,
               l10n.thisMonthExpense,
@@ -349,6 +287,7 @@ class CalendarScreen extends ConsumerWidget {
     );
   }
 
+  /// Özet Başlık Öğesi Yardımcısı
   Widget _buildHeaderSummaryItem(
     BuildContext context,
     String title,
@@ -359,10 +298,10 @@ class CalendarScreen extends ConsumerWidget {
     return Column(
       children: [
         Text(
-          title, // "Bu Ayın Geliri" vb.
+          title,
           style: TextStyle(
             color: AppColors.textSecondary,
-            fontSize: 10, // Kompakt olması için küçülttüm
+            fontSize: 10,
             fontWeight: FontWeight.w500,
           ),
           textAlign: TextAlign.center,
@@ -373,14 +312,14 @@ class CalendarScreen extends ConsumerWidget {
           style: TextStyle(
             color: color,
             fontWeight: FontWeight.bold,
-            fontSize: 14, // Kompakt
+            fontSize: 14,
           ),
         ),
       ],
     );
   }
 
-  /// Takvim Widget'ı
+  /// Takvim Widget'ı (TableCalendar Entegrasyonu)
   Widget _buildCalendar(
     BuildContext context,
     WidgetRef ref,
@@ -389,39 +328,39 @@ class CalendarScreen extends ConsumerWidget {
     CalendarNotifier notifier,
     double maxAbsNetBalance,
   ) {
-    // Hafta başlangıcı (TR: Pazartesi, Diğer: Pazar)
+    // Türkiye için Pazartesi başlangıcı, diğerleri için Pazar
     final startingDayOfWeek = l10n.localeName.startsWith('tr')
         ? StartingDayOfWeek.monday
         : StartingDayOfWeek.sunday;
 
     return TableCalendar<TransactionModel>(
-      // Temel Ayarlar
       locale: l10n.localeName,
       firstDay: DateTime.utc(2020, 1, 1),
       lastDay: DateTime.utc(2030, 12, 31),
       focusedDay: state.focusedDay,
       startingDayOfWeek: startingDayOfWeek,
+
+      // Seçili gün kontrolü
       selectedDayPredicate: (day) {
-        // isSameDay null güvenliği kontrolü (Explicit bool check)
         return isSameDay(state.selectedDay, day) == true;
       },
 
-      // Olaylar
+      // Etkileşimler
       onDaySelected: (selectedDay, focusedDay) {
-        HapticFeedback.selectionClick(); // Titreşim eklendi
+        HapticFeedback.selectionClick(); // Titreşim efekti
         notifier.selectDay(selectedDay);
         notifier.onPageChanged(focusedDay);
       },
       onPageChanged: notifier.onPageChanged,
 
-      // Olay Yükleyici (Marker'lar için)
+      // Marker Yükleyici
       eventLoader: notifier.getEventsForDay,
 
-      // Takvim Formatı
+      // Görünüm Ayarları
       calendarFormat: CalendarFormat.month,
       availableCalendarFormats: const {CalendarFormat.month: 'Ay'},
 
-      // Başlık Stili
+      // Header Tasarımı
       headerStyle: HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
@@ -439,7 +378,7 @@ class CalendarScreen extends ConsumerWidget {
         ),
       ),
 
-      // Gün İsimleri Stili
+      // Gün İsimleri Tasarımı
       daysOfWeekStyle: DaysOfWeekStyle(
         weekdayStyle: TextStyle(
           color: AppColors.textSecondary,
@@ -453,9 +392,9 @@ class CalendarScreen extends ConsumerWidget {
         ),
       ),
 
-      // Gün Hücreleri Stili
+      // Takvim Hücre Stilleri
       calendarStyle: CalendarStyle(
-        // Bugün
+        // Bugün işaretçisi
         todayDecoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.3),
           shape: BoxShape.circle,
@@ -465,7 +404,7 @@ class CalendarScreen extends ConsumerWidget {
           color: Colors.white,
         ),
 
-        // Seçili Gün
+        // Seçili gün işaretçisi
         selectedDecoration: BoxDecoration(
           color: AppColors.primary,
           shape: BoxShape.circle,
@@ -475,18 +414,15 @@ class CalendarScreen extends ConsumerWidget {
           color: Colors.white,
         ),
 
-        // Ay Dışı Günler
         outsideDaysVisible: false,
-
-        // Marker Stilleri
         markersMaxCount: 3,
         markersAlignment: Alignment.bottomCenter,
         markerMargin: const EdgeInsets.symmetric(horizontal: 0.5),
       ),
 
-      // Özelleştirilmiş Builder'lar (Isı Haritası ve Marker)
+      // Özel Hücre Tasarımları (Builder)
       calendarBuilders: CalendarBuilders(
-        // Varsayılan gün görünümü (Isı haritası için override)
+        // Varsayılan hücre yerine Heatmap (Isı Haritası) hücresi kullan
         defaultBuilder: (context, day, focusedDay) {
           return _buildDayWithHeatmap(
             day,
@@ -494,8 +430,7 @@ class CalendarScreen extends ConsumerWidget {
             maxAbsNetBalance,
           );
         },
-
-        // Marker (Noktalar)
+        // Marker (Nokta) Tasarımı
         markerBuilder: (context, day, events) {
           return _buildMarkers(context, ref, day, events);
         },
@@ -503,16 +438,19 @@ class CalendarScreen extends ConsumerWidget {
     );
   }
 
-  /// Isı Haritası (Heatmap) Mantığı ile Gün Hücresi
+  /// Isı Haritası Mantığıyla Gün Hücresi Oluşturur
+  ///
+  /// Günün net bakiyesine göre (gelir - gider) hücre rengini ve opaklığını ayarlar.
   Widget _buildDayWithHeatmap(
     DateTime day,
     Map<DateTime, List<TransactionModel>> events,
     double maxAbsNetBalance,
   ) {
-    // Bu güne ait harcamayı bul
+    // Günü normalize et (Saat farkını sıfırla)
     final normalizedDate = DateTime(day.year, day.month, day.day);
     final dayEvents = events[normalizedDate] ?? [];
 
+    // O güne ait toplamları hesapla
     double totalIncome = 0;
     double totalExpense = 0;
 
@@ -527,14 +465,14 @@ class CalendarScreen extends ConsumerWidget {
     final net = totalIncome - totalExpense;
     final absNet = net.abs();
 
-    // Opaklık hesapla
-    // En az 0, en fazla 0.4 opacity olsun
+    // Renk ve Opaklık Hesapla
     double opacity = 0;
     Color baseColor = Colors.transparent;
 
     if (maxAbsNetBalance > 0 && absNet > 0) {
+      // Net bakiye oranına göre opaklık (Max 0.4)
       opacity = (absNet / maxAbsNetBalance) * 0.4;
-      if (opacity < 0.1) opacity = 0.1;
+      if (opacity < 0.1) opacity = 0.1; // Min görünürlük
 
       if (net >= 0) {
         baseColor = AppColors.incomeGreen;
@@ -560,7 +498,11 @@ class CalendarScreen extends ConsumerWidget {
     );
   }
 
-  /// Gün altındaki renkli noktaları oluşturur.
+  /// Günün altındaki durum işaretçilerini (Marker) oluşturur.
+  ///
+  /// Yeşil: Gelir var
+  /// Kırmızı: Gider var
+  /// Sarı: Yaklaşan bir ödeme var
   Widget? _buildMarkers(
     BuildContext context,
     WidgetRef ref,
@@ -580,38 +522,21 @@ class CalendarScreen extends ConsumerWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (hasIncome)
-            Container(
-              width: 6,
-              height: 6,
-              margin: const EdgeInsets.symmetric(horizontal: 1),
-              decoration: BoxDecoration(
-                color: AppColors.incomeGreen,
-                shape: BoxShape.circle,
-              ),
-            ),
-          if (hasExpense)
-            Container(
-              width: 6,
-              height: 6,
-              margin: const EdgeInsets.symmetric(horizontal: 1),
-              decoration: BoxDecoration(
-                color: AppColors.expenseRed,
-                shape: BoxShape.circle,
-              ),
-            ),
-          if (hasUpcoming)
-            Container(
-              width: 6,
-              height: 6,
-              margin: const EdgeInsets.symmetric(horizontal: 1),
-              decoration: BoxDecoration(
-                color: AppColors.warning,
-                shape: BoxShape.circle,
-              ),
-            ),
+          if (hasIncome) _buildDot(AppColors.incomeGreen),
+          if (hasExpense) _buildDot(AppColors.expenseRed),
+          if (hasUpcoming) _buildDot(AppColors.warning),
         ],
       ),
+    );
+  }
+
+  /// Marker Noktası Yardımcı Metodu
+  Widget _buildDot(Color color) {
+    return Container(
+      width: 6,
+      height: 6,
+      margin: const EdgeInsets.symmetric(horizontal: 1),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

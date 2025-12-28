@@ -2,6 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
+/// Dosya: database_service.dart
+///
+/// Amaç: Firestore veritabanı ile düşük seviyeli etkileşimleri yöneten servis.
+///
+/// Özellikler:
+/// - Kullanıcı verilerini kaydetme (Kayıt olurken)
+/// - Kullanıcı verilerini okuma
+/// - Logger entegrasyonu ile hata yönetimi
+
 // Servise erişim için Provider
 final databaseServiceProvider = Provider<DatabaseService>((ref) {
   return DatabaseService();

@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-/// Özelleştirilmiş Metin Giriş Alanı (Text Field)
+/// Dosya: custom_text_field.dart
 ///
-/// Şifre gizleme/gösterme özelliği, ikon desteği ve özel doğrulama (validation)
-/// mekanizmalarına sahip, yeniden kullanılabilir widget.
+/// Özelleştirilmiş Metin Giriş Alanı (Text Field).
+///
+/// [Özellikler]
+/// - Şifre alanları için gizle/göster butonu.
+/// - Otomatik odaklanma ve ikon desteği.
+/// - Standart tema ile uyumlu kenarlık ve renk tasarımları.
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String labelText;
   final IconData prefixIcon;
-  final bool isPassword; // Şifre alanı mı?
-  final TextInputType keyboardType; // Klavye tipi (örn: email, number)
-  final String? Function(String?)? validator; // Hata kontrol fonksiyonu
-  final bool autofocus; // Otomatik odaklanma
-  final TextCapitalization textCapitalization; // Büyük harf kuralı
+  final bool isPassword;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+  final bool autofocus;
+  final TextCapitalization textCapitalization;
 
   const CustomTextField({
     super.key,
@@ -61,11 +65,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 },
               )
             : null,
-        // Dolgu Rengi
+
         filled: true,
         fillColor: AppColors.surface,
 
-        // Kenarlıklar
+        // Kenarlık Stilleri
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.passive, width: 1),
@@ -87,7 +91,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
           borderSide: const BorderSide(color: AppColors.expenseRed, width: 1.5),
         ),
 
-        // İç Boşluklar
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,

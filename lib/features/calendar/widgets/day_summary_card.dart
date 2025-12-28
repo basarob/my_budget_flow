@@ -5,9 +5,14 @@ import '../../../l10n/app_localizations.dart';
 import '../../transactions/models/transaction_model.dart';
 import '../../transactions/models/recurring_transaction_model.dart';
 
-/// Günlük Özet Kartı
+/// Dosya: day_summary_card.dart
 ///
-/// Seçili günün toplam gelir, gider, net bakiye ve yaklaşan ödemelerini gösteren kart.
+/// Seçilen günün finansal özetini (Gelir, Gider, Net, Bekleyen) gösteren kart widget.
+///
+/// [Özellikler]
+/// - Net bakiyeyi anlık hesaplar.
+/// - Gelir ve giderleri karşılaştırmalı ikonlarla sunar.
+/// - Eğer o güne ait yaklaşan bir ödeme varsa, "Yaklaşan" uyarısı ekler.
 class DaySummaryCard extends StatelessWidget {
   final List<TransactionModel> transactions;
   final List<RecurringTransactionModel> upcomingPayments;
@@ -47,10 +52,7 @@ class DaySummaryCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.symmetric(
-        vertical: 12,
-        horizontal: 16,
-      ), // Reduced padding
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
@@ -65,11 +67,10 @@ class DaySummaryCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Üst Satır: Gelir - Gider - Yaklaşan
+          // Üst Satır: Gelir - Gider
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // Gelir
               _buildSummaryItem(
                 context,
                 icon: Icons.arrow_downward_rounded,
@@ -79,14 +80,12 @@ class DaySummaryCard extends StatelessWidget {
                 formatter: currencyFormat,
               ),
 
-              // Ayırıcı
               Container(
-                height: 24, // Smaller height
+                height: 24,
                 width: 1,
                 color: AppColors.textSecondary.withValues(alpha: 0.2),
               ),
 
-              // Gider
               _buildSummaryItem(
                 context,
                 icon: Icons.arrow_upward_rounded,
@@ -98,13 +97,13 @@ class DaySummaryCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8), // Reduced spacing
+          const SizedBox(height: 8),
           Divider(color: AppColors.textSecondary.withValues(alpha: 0.1)),
           const SizedBox(height: 8),
 
-          // Alt Satır: Net Bakiye (ve varsa Yaklaşan)
+          // Alt Satır: Net Bakiye ve Yaklaşan Ödemeler
           Row(
-            mainAxisAlignment: MainAxisAlignment.center, // Centered
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Net Bakiye
               Text(
@@ -112,7 +111,7 @@ class DaySummaryCard extends StatelessWidget {
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
-                  color: AppColors.textSecondary, // Gray color requested
+                  color: AppColors.textSecondary,
                 ),
               ),
               const SizedBox(width: 6),
@@ -127,7 +126,7 @@ class DaySummaryCard extends StatelessWidget {
                 ),
               ),
 
-              // Yaklaşan varsa sağda göster (Kompakt ayırıcı ile)
+              // Yaklaşan varsa sağda göster
               if (upcomingPayments.isNotEmpty) ...[
                 Container(
                   height: 14,
@@ -145,7 +144,7 @@ class DaySummaryCard extends StatelessWidget {
                   '~${currencyFormat.format(totalUpcoming)}',
                   style: TextStyle(
                     fontStyle: FontStyle.italic,
-                    fontSize: 13, // Smaller font
+                    fontSize: 13,
                     color: AppColors.warning,
                     fontWeight: FontWeight.w600,
                   ),
@@ -167,11 +166,9 @@ class DaySummaryCard extends StatelessWidget {
     required NumberFormat formatter,
   }) {
     return Row(
-      // Changed to Row for more compact look if preferred, or keep Column but smaller
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          // Small icon circle background
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.1),

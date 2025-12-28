@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 
+/// Dosya: no_internet_screen.dart
+///
+/// İnternet bağlantısı koptuğunda gösterilen tam sayfa uyarı ekranı.
+///
+/// [Özellikler]
+/// - Kullanıcıya internet bağlantısının olmadığını bildirir.
+/// - Bağlantı gelene kadar bekleme animasyonu gösterir.
 class NoInternetScreen extends StatelessWidget {
   const NoInternetScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Center(
@@ -22,6 +30,7 @@ class NoInternetScreen extends StatelessWidget {
                 color: AppColors.expenseRed,
               ),
               const SizedBox(height: 24),
+
               Text(
                 l10n.noInternetTitle,
                 style: const TextStyle(
@@ -32,6 +41,7 @@ class NoInternetScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
+
               Text(
                 l10n.noInternetMessage,
                 style: const TextStyle(
@@ -41,8 +51,10 @@ class NoInternetScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
+
               CircularProgressIndicator(color: AppColors.primary),
               const SizedBox(height: 16),
+
               Text(
                 l10n.waitingConnection,
                 style: const TextStyle(

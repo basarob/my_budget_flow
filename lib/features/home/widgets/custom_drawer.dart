@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/services/auth_service.dart';
+import '../../auth/providers/user_provider.dart'; // UserProvider eklendi
 import '../../appbar/screens/profile_screen.dart';
 import '../../appbar/screens/settings_screen.dart';
 import '../../appbar/screens/about_app_screen.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../services/database_service.dart';
 
 /// Özel Menü (Drawer) Bileşeni
 ///
 /// Kullanıcı profilini, ayarları ve çıkış işlemini barındıran
 /// modern, kompakt ve tema ile uyumlu sağ menü.
+///
+/// Performans Notu:
+/// - Kullanıcı bilgileri `userProvider` üzerinden önbellekten alınır.
+/// - Menü açıldığında tekrar veritabanı sorgusu yapılmaz.
 class CustomDrawer extends ConsumerWidget {
   const CustomDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Yerelleştirme ve Kullanıcı verisine erişim
+    // Yerelleştirme ve Kimlik Doğrulama verisine erişim
     final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(authStateChangesProvider).value;
 
@@ -142,12 +146,17 @@ class CustomDrawer extends ConsumerWidget {
   }
 
   /// Kullanıcı başlık alanını oluşturur (Profil fotosu, isim, email)
+  ///
+  /// `userProvider` kullanarak verileri önbellekten çeker.
   Widget _buildUserHeader(
     BuildContext context,
     WidgetRef ref,
     dynamic user,
     AppLocalizations l10n,
   ) {
+    // Kullanıcı detay verilerini (isim, vb.) dinle
+    final userAsync = ref.watch(userProvider);
+
     return InkWell(
       onTap: () {
         Navigator.pop(context); // Menüyü kapat
@@ -184,21 +193,22 @@ class CustomDrawer extends ConsumerWidget {
 
             // Kullanıcı Bilgileri (İsim & E-posta)
             Expanded(
-              child: FutureBuilder<Map<String, dynamic>?>(
-                future: user != null
-                    ? ref.read(databaseServiceProvider).getUserData(user.uid)
-                    : Future.value(null),
-                builder: (context, snapshot) {
-                  // Veri gelene kadar varsayılan başlık
-                  final name = (snapshot.hasData && snapshot.data != null)
-                      ? "${snapshot.data!['firstName']} ${snapshot.data!['lastName']}"
-                      : l10n.appTitle;
+              child: userAsync.when(
+                data: (userData) {
+                  // İsim bilgisini oluştur
+                  String displayName = l10n.appTitle;
+                  if (userData != null) {
+                    displayName =
+                        "${userData['firstName']} ${userData['lastName']}";
+                  } else if (user != null && user.email != null) {
+                    displayName = user.email!.split('@').first;
+                  }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        name,
+                        displayName,
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
@@ -206,8 +216,7 @@ class CustomDrawer extends ConsumerWidget {
                           letterSpacing: 0.3,
                         ),
                         maxLines: 1,
-                        overflow:
-                            TextOverflow.ellipsis, // Uzun isimler için kesme
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -218,14 +227,17 @@ class CustomDrawer extends ConsumerWidget {
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
-                        overflow:
-                            TextOverflow.ellipsis, // Uzun mailler için kesme
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   );
                 },
+                // Yüklenirken veya Hata durumunda minimal görünüm
+                loading: () => const Text('...'),
+                error: (_, __) => Text(user?.email ?? ''),
               ),
             ),
+
             // Tıklanabilir göstergesi
             Icon(
               Icons.chevron_right_rounded,

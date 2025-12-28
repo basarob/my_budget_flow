@@ -4,8 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/widgets/custom_text_field.dart';
 import '../../../core/widgets/gradient_button.dart';
-import '../../../main.dart'; // RouteObserver için
-
+import '../../../main.dart';
 import '../../../core/providers/language_provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
@@ -14,6 +13,16 @@ import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 import '../../../core/utils/snackbar_utils.dart';
 
+/// Dosya: login_screen.dart
+///
+/// Kullanıcı Giriş Ekranı.
+///
+/// [Özellikler]
+/// - E-posta ve şifre ile giriş imkanı.
+/// - Giriş animasyonları (Logo elasticity, FadeIn).
+/// - Hata yönetimi (Yanlış şifre vb. durumlar).
+/// - Dil değiştirme seçeneği (Popup Menu).
+/// - Kayıt ol ve şifremi unuttum ekranlarına yönlendirme.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -22,9 +31,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
-  final _formKey = GlobalKey<FormState>(); // Form anahtarı
-
-  // Controller'lar
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -41,7 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Subscribe to RouteObserver
+    // Route takibi için abone ol
     routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
 
@@ -55,10 +62,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
     super.dispose();
   }
 
-  /// Bu rota, üstündeki bir rota kapandığında (pop) tetiklenir.
+  /// Bu rota görünür hale geldiğinde klavyeyi kapat.
   @override
   void didPopNext() {
-    // Bu ekrana geri dönüldüğünde klavyeyi ve focus'u kapat
     FocusScope.of(context).unfocus();
   }
 
@@ -67,6 +73,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
     _passwordController.clear();
   }
 
+  /// Giriş butonunun aktiflik durumunu kontrol eder.
   void _updateButtonState() {
     final isEnabled =
         _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
@@ -77,13 +84,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
     }
   }
 
+  /// Giriş işlemini başlatır.
   Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return; // Boş alan varsa durdur
+    if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true); // Yükleme animasyonu ile ekranı kitle
+    setState(() => _isLoading = true);
 
     try {
-      // Riverpod ile AuthService'e ulaş ve signIn fonksiyonunu çağır.
+      // AuthService üzerinden giriş yap
       await ref
           .read(authServiceProvider)
           .signIn(
@@ -110,7 +118,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
         SnackbarUtils.showError(context, message: errorMessage);
       }
     } finally {
-      // 5. Adım: İşlem bitince (başarılı veya hatalı) yükleniyor animasyonunu durdur.
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -125,18 +132,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
         child: SafeArea(
           child: Stack(
             children: [
-              // Arkaplan Deseni (Opsiyonel: Hafif Gradient)
+              // Ana İçerik
               Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // --- BAŞLIK VE LOGO ---
+                      // --- LOGO ---
                       ElasticIn(
-                        duration: const Duration(
-                          milliseconds: 1000,
-                        ), // Elastik efekt için biraz daha uzun süre
+                        duration: const Duration(milliseconds: 1000),
                         child: Hero(
                           tag: 'app_icon',
                           child: ClipOval(
@@ -151,6 +156,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                       ),
                       const SizedBox(height: 24),
 
+                      // --- BAŞLIK ---
                       FadeInDown(
                         delay: const Duration(milliseconds: 200),
                         duration: const Duration(milliseconds: 800),
@@ -179,16 +185,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                       ),
                       const SizedBox(height: 48),
 
-                      // --- GİRİŞ FORMU ---
+                      // --- FORM ---
                       FadeInUp(
                         delay: const Duration(milliseconds: 400),
                         duration: const Duration(milliseconds: 800),
-                        child: loginForm(context),
+                        child: _buildLoginForm(context),
                       ),
 
                       const SizedBox(height: 32),
 
-                      // --- KAYIT OL YÖNLENDİRMESİ ---
+                      // --- KAYIT OL LINKI ---
                       FadeInUp(
                         delay: const Duration(milliseconds: 600),
                         duration: const Duration(milliseconds: 800),
@@ -233,7 +239,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                 ),
               ),
 
-              // Dil Seçimi
+              // --- DİL SEÇİMİ (Sağ Üst) ---
               Positioned(
                 top: 16,
                 right: 16,
@@ -268,7 +274,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                   },
                   itemBuilder: (context) => [
                     const PopupMenuItem(
-                      value: false, // isEnglish = false
+                      value: false, // Türkçe
                       child: Center(
                         child: Text(
                           '🇹🇷 Türkçe',
@@ -277,7 +283,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                       ),
                     ),
                     const PopupMenuItem(
-                      value: true, // isEnglish = true
+                      value: true, // English
                       child: Center(
                         child: Text(
                           '🇬🇧 English',
@@ -295,7 +301,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
     );
   }
 
-  Form loginForm(BuildContext context) {
+  /// Giriş Formu Widget'ı
+  Form _buildLoginForm(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,

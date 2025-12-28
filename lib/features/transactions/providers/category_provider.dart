@@ -4,6 +4,15 @@ import '../repositories/category_repository.dart';
 import '../providers/transaction_provider.dart';
 import '../../auth/services/auth_service.dart';
 
+/// Dosya: category_provider.dart
+///
+/// Amaç: Kategori verilerini ve işlemlerini yöneten Riverpod sağlayıcılarını tanımlar.
+///
+/// Özellikler:
+/// - Kategori listesini getirir (varsayılan + özel)
+/// - Kategori ekleme ve silme işlemlerini yönetir (CategoryController)
+/// - Kategori Repository erişimini sağlar
+
 /// Kategori Repository Sağlayıcısı
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
   return CategoryRepository();

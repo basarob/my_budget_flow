@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 
-/// İşlem Tipi Seçim Segmenti (Gelir / Gider)
+/// Dosya: transaction_type_segment.dart
 ///
-/// Kullanıcının işlem eklerken veya filtrelerken "Gelir" veya "Gider"
-/// seçenekleri arasında geçiş yapmasını sağlayan özel toggle butonu.
+/// Amaç: "Gelir" veya "Gider" tipini seçmek için kullanılan özel segment widget.
+///
+/// Özellikler:
+/// - Özel tasarım (Seçili taraf renkli, diğeri şeffaf)
+/// - Gelir için Yeşil, Gider için Kırmızı tema rengi kullanımı
+/// - Hızlı geçiş animasyonu
 ///
 /// Görünüm:
 /// - Seçili olmayan taraf şeffaf, seçili taraf kendi rengiyle (Yeşil/Kırmızı) dolgulu görünür.

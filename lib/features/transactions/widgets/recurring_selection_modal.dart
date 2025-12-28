@@ -7,13 +7,14 @@ import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 
-/// Düzenli İşlemlerden Seçim Listesi (Modal İçeriği)
+/// Dosya: recurring_selection_modal.dart
 ///
-/// Yeni bir işlem eklerken, kullanıcının daha önce tanımladığı
-/// düzenli işlemlerden (şablonlardan) hızlıca seçim yapmasını sağlar.
+/// Amaç: Kayıtlı düzenli işlem şablonlarından hızlı seçim yapmayı sağlayan modal.
 ///
-/// Seçilen şablonun bilgileri (Başlık, Tutar, Kategori vb.)
-/// işlem ekleme ekranına otomatik olarak doldurulur.
+/// Özellikler:
+/// - Mevcut düzenli işlemleri listeler
+/// - Seçilen şablonu geri döndürür (AddTransactionScreen'de kullanılır)
+/// - Kategori ikonları ve detayları ile zengin liste görünümü
 class RecurringSelectionModal extends ConsumerWidget {
   const RecurringSelectionModal({super.key});
 

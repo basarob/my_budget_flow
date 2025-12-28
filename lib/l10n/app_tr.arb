@@ -31,7 +31,7 @@
     "navCalendar": "Takvim",
     "navGoals": "Hedefler",
 
-    "pageTitleHome": "Ana Menü",
+    "pageTitleHome": "Bütçe Akışım",
     "pageTitleTransactions": "İşlemler",
     "pageTitleCalendar": "Takvim",
     "pageTitleGoals": "Hedefler",
@@ -93,7 +93,6 @@
     "errorEnterTitle": "Başlık giriniz",
     "categoryLabel": "Kategori",
     "selectLabel": "Seçiniz",
-    "categoryOther": "Diğer",
     "dateLabel": "Tarih",
     "addNoteLabel": "Not Ekle",
     "noteHint": "Notunuzu buraya yazın...",
@@ -105,6 +104,7 @@
     "categoryShopping": "Alışveriş",
     "categorySalary": "Maaş",
     "categoryInvestment": "Yatırım",
+    "categoryHealth": " Sağlık",
     "categoryOther": "Diğer",
     "saveButton": "KAYDET",
     "makeRecurringLabel": "Düzenli İşlem Yap",
@@ -170,6 +170,20 @@
     "recurringPaymentLabel": "Düzenli Ödeme",
     "categoryDeleted": "Kategori silindi",
     "addRecurringTransactionTitle": "Düzenli İşlem Ekle",
+    
+    "dashboardWelcomeMessage": "Hoş geldin, {name}",
+    "dashboardNetStatus": "Net Durum",
+    "dashboardTotalIncome": "Gelir",
+    "dashboardTotalExpense": "Gider",
+    "dashboardInvestment": "Yatırım",
+    "filterThisWeek": "Bu Hafta",
+    "filterThisMonth": "Bu Ay",
+    "filterLast30Days": "Son 30 Gün",
+    "filterThisYear": "Bu Yıl",
+    "chartSpendingDistribution": "Harcama Dağılımı",
+    "chartFinancialTrend": "Finansal Trend",
+    "goalsPlaceholder": "Hedefleriniz burada görünecek.",
+
     "@errorGeneric": {
         "description": "Hata detayını içeren genel bir hata mesajı.",
         "placeholders": {

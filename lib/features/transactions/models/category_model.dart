@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 
-/// Kategori Modeli
+/// Dosya: category_model.dart
 ///
-/// İşlemlerin ve düzenli işlemlerin sınıflandırılması için kullanılır.
-/// Hem varsayılan (sabit) kategorileri hem de kullanıcı tarafından eklenen (özel) kategorileri temsil eder.
+/// Amaç: Kategori veri modelini tanımlar.
+///
+/// Özellikler:
+/// - Kategori verilerini (id, isim, ikon, renk) tutar
+/// - Varsayılan sistem kategorilerini listeler
+/// - Yerelleştirilmiş kategori isimlerini döndürür
+/// - JSON serileştirme (toMap/fromMap) işlemlerini yapar
 class CategoryModel {
   final String id;
   final String name; // Yerelleştirme anahtarı veya özel kategori adı
@@ -73,6 +78,12 @@ class CategoryModel {
       colorValue: AppColors.categoryColors[11].toARGB32(),
     ),
     CategoryModel(
+      id: 'cat_health',
+      name: 'categoryHealth',
+      iconCode: Icons.medical_services_outlined.codePoint,
+      colorValue: AppColors.categoryColors[6].toARGB32(),
+    ),
+    CategoryModel(
       id: 'cat_other',
       name: 'categoryOther',
       iconCode: Icons.more_horiz.codePoint,
@@ -104,6 +115,8 @@ class CategoryModel {
         return l10n.categorySalary;
       case 'categoryInvestment':
         return l10n.categoryInvestment;
+      case 'categoryHealth':
+        return l10n.categoryHealth;
       case 'categoryOther':
         return l10n.categoryOther;
       default:

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-/// Tüm uygulama genelinde kullanılan Gradient (Geçişli) Arka Planlı AppBar.
+/// Dosya: gradient_app_bar.dart
 ///
-/// Material 3 tasarımına uygun, özel olarak tasarlanmış başlık çubuğu.
+/// Uygulama genelinde kullanılan, geçişli (gradient) arka plana sahip özel AppBar.
+///
+/// [Özellikler]
+/// - Material 3 uyumlu tasarım.
+/// - Altına gölge efekti (Shadow) eklenmiş modern görünüm.
+/// - SafeArea desteği ile çentikli cihazlarda düzgün görünüm.
 class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget title;
   final Widget? leading;
@@ -53,12 +58,12 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
-              fontSize: 20, // AppBar varsayılan yazı boyutu
+              fontSize: 20,
             ),
             child: title,
           ),
           bottom: bottom,
-          foregroundColor: Colors.white, // Geri butonu ve ikonlar beyaz renk
+          foregroundColor: Colors.white,
         ),
       ),
     );

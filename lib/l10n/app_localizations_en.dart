@@ -86,7 +86,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navGoals => 'Goals';
 
   @override
-  String get pageTitleHome => 'Dashboard';
+  String get pageTitleHome => 'My Budget Flow';
 
   @override
   String get pageTitleTransactions => 'Transactions';
@@ -256,9 +256,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectLabel => 'Select';
 
   @override
-  String get categoryOther => 'Other';
-
-  @override
   String get dateLabel => 'Date';
 
   @override
@@ -290,6 +287,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryInvestment => 'Investment';
+
+  @override
+  String get categoryHealth => 'Health';
+
+  @override
+  String get categoryOther => 'Other';
 
   @override
   String get saveButton => 'SAVE';
@@ -469,13 +472,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plannedTransaction => 'Planned Transactions';
 
   @override
-  String get thisMonthIncome => 'This Month\'s Income';
+  String get thisMonthIncome => 'Monthly Income';
 
   @override
-  String get thisMonthExpense => 'This Month\'s Expense';
+  String get thisMonthExpense => 'Monthly Expense';
 
   @override
-  String get thisMonthNet => 'This Month\'s Net';
+  String get thisMonthNet => 'Monthly Net';
 
   @override
   String transactionCount(num count) {
@@ -500,4 +503,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addRecurringTransactionTitle => 'Add Recurring Transaction';
+
+  @override
+  String dashboardWelcomeMessage(Object name) {
+    return 'Welcome, $name';
+  }
+
+  @override
+  String get dashboardNetStatus => 'Net Status';
+
+  @override
+  String get dashboardTotalIncome => 'Income';
+
+  @override
+  String get dashboardTotalExpense => 'Expense';
+
+  @override
+  String get dashboardInvestment => 'Investment';
+
+  @override
+  String get filterThisWeek => 'This Week';
+
+  @override
+  String get filterThisMonth => 'This Month';
+
+  @override
+  String get filterLast30Days => 'Last 30 Days';
+
+  @override
+  String get filterThisYear => 'This Year';
+
+  @override
+  String get chartSpendingDistribution => 'Spending Distribution';
+
+  @override
+  String get chartFinancialTrend => 'Financial Trend';
+
+  @override
+  String get goalsPlaceholder => 'Your goals will appear here.';
 }

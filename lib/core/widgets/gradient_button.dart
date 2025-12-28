@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-/// Gradient (Geçişli) Renkli Ana Buton
+/// Dosya: gradient_button.dart
 ///
-/// Yükleniyor durumu (loading state) desteği ve disable (pasif) modu bulunur.
+/// Gradient (Geçişli) renkli, modern ana buton bileşeni.
+///
+/// [Özellikler]
+/// - Yükleniyor (loading) durumunda Progress Indicator gösterir.
+/// - Pasif (disabled) durumunda gri renk alır ve tıklanmaz.
+/// - Opsiyonel ikon desteği bulunur.
 class GradientButton extends StatelessWidget {
   final VoidCallback? onPressed; // Tıklama aksiyonu
   final String text; // Buton metni

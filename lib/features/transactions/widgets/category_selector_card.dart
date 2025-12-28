@@ -4,10 +4,14 @@ import '../../../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import 'selection_card.dart';
 
-/// Kategori Seçim Kartı
+/// Dosya: category_selector_card.dart
 ///
-/// Kullanıcının işlem kategorisini seçmesi için kullanılan kart bileşeni.
-/// [SelectionCard] bileşenini sarmalar.
+/// Amaç: İşlem ekleme ekranında kategori seçimini başlatan kart bileşeni.
+///
+/// Özellikler:
+/// - Seçili kategoriyi (ikon ve isim) gösterir
+/// - Seçim yapılmamışsa placeholder gösterir
+/// - SelectionCard bileşenini kullanır
 class CategorySelectorCard extends StatelessWidget {
   final CategoryModel selectedCategory;
   final bool isSelected;

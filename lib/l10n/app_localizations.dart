@@ -251,7 +251,7 @@ abstract class AppLocalizations {
   /// No description provided for @pageTitleHome.
   ///
   /// In tr, this message translates to:
-  /// **'Ana Menü'**
+  /// **'Bütçe Akışım'**
   String get pageTitleHome;
 
   /// No description provided for @pageTitleTransactions.
@@ -584,12 +584,6 @@ abstract class AppLocalizations {
   /// **'Seçiniz'**
   String get selectLabel;
 
-  /// No description provided for @categoryOther.
-  ///
-  /// In tr, this message translates to:
-  /// **'Diğer'**
-  String get categoryOther;
-
   /// No description provided for @dateLabel.
   ///
   /// In tr, this message translates to:
@@ -655,6 +649,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Yatırım'**
   String get categoryInvestment;
+
+  /// No description provided for @categoryHealth.
+  ///
+  /// In tr, this message translates to:
+  /// **' Sağlık'**
+  String get categoryHealth;
+
+  /// No description provided for @categoryOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get categoryOther;
 
   /// No description provided for @saveButton.
   ///
@@ -1033,6 +1039,78 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Düzenli İşlem Ekle'**
   String get addRecurringTransactionTitle;
+
+  /// No description provided for @dashboardWelcomeMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hoş geldin, {name}'**
+  String dashboardWelcomeMessage(Object name);
+
+  /// No description provided for @dashboardNetStatus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Net Durum'**
+  String get dashboardNetStatus;
+
+  /// No description provided for @dashboardTotalIncome.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelir'**
+  String get dashboardTotalIncome;
+
+  /// No description provided for @dashboardTotalExpense.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gider'**
+  String get dashboardTotalExpense;
+
+  /// No description provided for @dashboardInvestment.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yatırım'**
+  String get dashboardInvestment;
+
+  /// No description provided for @filterThisWeek.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Hafta'**
+  String get filterThisWeek;
+
+  /// No description provided for @filterThisMonth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Ay'**
+  String get filterThisMonth;
+
+  /// No description provided for @filterLast30Days.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son 30 Gün'**
+  String get filterLast30Days;
+
+  /// No description provided for @filterThisYear.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Yıl'**
+  String get filterThisYear;
+
+  /// No description provided for @chartSpendingDistribution.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harcama Dağılımı'**
+  String get chartSpendingDistribution;
+
+  /// No description provided for @chartFinancialTrend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Finansal Trend'**
+  String get chartFinancialTrend;
+
+  /// No description provided for @goalsPlaceholder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefleriniz burada görünecek.'**
+  String get goalsPlaceholder;
 }
 
 class _AppLocalizationsDelegate

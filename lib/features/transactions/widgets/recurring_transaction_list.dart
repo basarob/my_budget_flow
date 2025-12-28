@@ -11,7 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import '../screens/add_transaction_screen.dart';
-import '../../calendar/providers/calendar_provider.dart'; // Takvim senkronizasyon
+import '../../calendar/providers/calendar_provider.dart';
 
 /// Düzenli İşlemler Listesi
 ///

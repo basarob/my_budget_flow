@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Tüm uygulama genelinde standart SnackBar kullanımı için yardımcı sınıf.
+/// Dosya: snackbar_utils.dart
+///
+/// Uygulama genelinde standart SnackBar (Bildirim Çubuğu) gösterimi için yardımcı sınıf.
+///
+/// [Özellikler]
+/// - Başarı, Hata ve Standart bilgi mesajları için hazır metodlar.
+/// - "Geri Al" (Undo) butonu desteği.
 class SnackbarUtils {
-  /// Standart bilgilendirme mesajı gösterir (Siyah/Gri).
-  /// [onUndo] verilirse "Geri Al" butonu eklenir.
+  /// Standart bilgilendirme mesajı gösterir.
+  ///
+  /// [onUndo] parametresi verilirse, mesajın yanında bir "Geri Al" butonu belirir.
   static void showStandard(
     BuildContext context, {
     required String message,
@@ -15,23 +22,23 @@ class SnackbarUtils {
     _show(
       context,
       message: message,
-      backgroundColor: null, // Tema varsayılanı veya koyu gri
+      backgroundColor: null, // null = Tema varsayılanı veya koyu gri
       onUndo: onUndo,
       undoLabel: undoLabel,
     );
   }
 
-  /// Başarılı işlem mesajı gösterir (Yeşil).
+  /// Başarılı işlem mesajı gösterir (Yeşil Arkaplan).
   static void showSuccess(BuildContext context, {required String message}) {
     _show(context, message: message, backgroundColor: AppColors.incomeGreen);
   }
 
-  /// Hata mesajı gösterir (Kırmızı).
+  /// Hata mesajı gösterir (Kırmızı Arkaplan).
   static void showError(BuildContext context, {required String message}) {
     _show(context, message: message, backgroundColor: AppColors.expenseRed);
   }
 
-  /// Temel SnackBar gösterim mantığı
+  /// Temel SnackBar gösterim mantığı (Private).
   static void _show(
     BuildContext context, {
     required String message,
@@ -42,7 +49,7 @@ class SnackbarUtils {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context)!;
 
-    // Varsa önceki mesajları temizle
+    // Varsa önceki mesajları temizle, yeni mesajın hemen görünmesini sağla
     messenger.clearSnackBars();
 
     messenger.showSnackBar(

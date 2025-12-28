@@ -9,6 +9,14 @@ import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/snackbar_utils.dart';
 
+/// Dosya: forgot_password_screen.dart
+///
+/// Şifremi Unuttum Ekranı.
+///
+/// [Özellikler]
+/// - Kullanıcıdan e-posta adresini alır.
+/// - Firebase üzerinden şifre sıfırlama bağlantısı gönderir.
+/// - Modern UI animasyonları (FadeInDown vb.) içerir.
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -36,6 +44,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     super.dispose();
   }
 
+  /// Butonun aktif/pasif durumunu, inputun doluluğuna göre günceller.
   void _updateButtonState() {
     final isEnabled = _emailController.text.isNotEmpty;
     if (isEnabled != _isButtonEnabled) {
@@ -43,27 +52,26 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
   }
 
+  /// Şifre sıfırlama isteğini başlatır.
   Future<void> _sendResetLink() async {
-    // Önce kontrol: Kullanıcı email yazmış mı?
+    // Form validasyonu
     if (!_formKey.currentState!.validate()) return;
+
     final l10n = AppLocalizations.of(context)!;
 
     setState(() => _isLoading = true);
     try {
-      // Servise git ve reset maili gönder
+      // Servis üzerinden e-posta gönder
       await ref
           .read(authServiceProvider)
           .sendPasswordResetEmail(_emailController.text.trim());
 
       if (mounted) {
-        // Klavye kapansın
         FocusScope.of(context).unfocus();
 
-        // Kullanıcıya başarı mesajı göster
+        // Başarı mesajı göster ve geri dön
         SnackbarUtils.showSuccess(context, message: l10n.successResetEmailSent);
-        Navigator.pop(
-          context,
-        ); // İşlem bitince kullanıcıyı Login ekranına geri at.
+        Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {

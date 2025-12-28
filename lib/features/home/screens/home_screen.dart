@@ -40,7 +40,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
 
   // Sayfalar Listesi
   static const List<Widget> _widgetOptions = <Widget>[
-    DashboardBody(), // 0: Gösterge Paneli
+    DashboardScreen(), // 0: Gösterge Paneli
     TransactionsScreen(), // 1: İşlemler
     CalendarScreen(), // 2: Takvim
     GoalsScreen(), // 3: Hedefler
@@ -207,7 +207,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   String _getTitleForPage(int page, AppLocalizations l10n) {
     switch (page) {
       case 0:
-        return l10n.appTitle;
+        return l10n.pageTitleHome; // Dashboard
       case 1:
         return l10n.navTransactions;
       case 2:

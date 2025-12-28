@@ -7,6 +7,16 @@ import '../models/recurring_transaction_model.dart';
 import '../repositories/transaction_repository.dart';
 import '../models/transaction_filter_state.dart';
 
+/// Dosya: transaction_provider.dart
+///
+/// Amaç: Finansal işlem verilerini yöneten Riverpod sağlayıcılarını tanımlar.
+///
+/// Özellikler:
+/// - İşlem CRUD (Ekle/Sil/Güncelle) operasyonlarını yönetir (TransactionController)
+/// - Filtreleme durumunu yönetir (TransactionFilterNotifier)
+/// - Sayfalı (Pagination) işlem listesini sunar
+/// - Düzenli işlem akışını ve son işlem akışını sağlar
+
 /// İşlem Repository Sağlayıcısı
 final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
   return TransactionRepository();

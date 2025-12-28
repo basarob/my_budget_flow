@@ -86,7 +86,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get navGoals => 'Hedefler';
 
   @override
-  String get pageTitleHome => 'Ana Menü';
+  String get pageTitleHome => 'Bütçe Akışım';
 
   @override
   String get pageTitleTransactions => 'İşlemler';
@@ -258,9 +258,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get selectLabel => 'Seçiniz';
 
   @override
-  String get categoryOther => 'Diğer';
-
-  @override
   String get dateLabel => 'Tarih';
 
   @override
@@ -292,6 +289,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get categoryInvestment => 'Yatırım';
+
+  @override
+  String get categoryHealth => ' Sağlık';
+
+  @override
+  String get categoryOther => 'Diğer';
 
   @override
   String get saveButton => 'KAYDET';
@@ -496,4 +499,42 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get addRecurringTransactionTitle => 'Düzenli İşlem Ekle';
+
+  @override
+  String dashboardWelcomeMessage(Object name) {
+    return 'Hoş geldin, $name';
+  }
+
+  @override
+  String get dashboardNetStatus => 'Net Durum';
+
+  @override
+  String get dashboardTotalIncome => 'Gelir';
+
+  @override
+  String get dashboardTotalExpense => 'Gider';
+
+  @override
+  String get dashboardInvestment => 'Yatırım';
+
+  @override
+  String get filterThisWeek => 'Bu Hafta';
+
+  @override
+  String get filterThisMonth => 'Bu Ay';
+
+  @override
+  String get filterLast30Days => 'Son 30 Gün';
+
+  @override
+  String get filterThisYear => 'Bu Yıl';
+
+  @override
+  String get chartSpendingDistribution => 'Harcama Dağılımı';
+
+  @override
+  String get chartFinancialTrend => 'Finansal Trend';
+
+  @override
+  String get goalsPlaceholder => 'Hedefleriniz burada görünecek.';
 }

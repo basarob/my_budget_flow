@@ -13,6 +13,15 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/gradient_app_bar.dart';
 import '../../../core/utils/snackbar_utils.dart';
 
+/// Dosya: register_screen.dart
+///
+/// Yeni Kullanıcı Kayıt Ekranı.
+///
+/// [Özellikler]
+/// - İsim, Soyisim, Doğum Tarihi, E-posta ve Şifre bilgileri alınır.
+/// - Doğum tarihi için iOS stili (Cupertino) tarih seçici kullanılır.
+/// - Firebase Auth ile kullanıcı oluşturulur.
+/// - Kullanıcı detayları Firestore veritabanına kaydedilir.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -23,7 +32,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Her girdi alanı için ayrı bir yönetici (Controller) tanımlıyoruz
+  // Input Controller'ları
   final _nameController = TextEditingController();
   final _surnameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -63,6 +72,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  /// Tüm alanların dolu olup olmadığını kontrol eder.
   void _validateForm() {
     final isEnabled =
         _nameController.text.isNotEmpty &&
@@ -77,7 +87,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  // Kelimelerin baş harflerini büyüten yardımcı fonksiyon
+  /// Kelimelerin ilk harflerini büyütür (Örn: "ahmet yilmaz" -> "Ahmet Yilmaz").
   String _capitalizeWords(String text) {
     if (text.trim().isEmpty) {
       return '';
@@ -93,14 +103,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         .join(' ');
   }
 
-  /// Tarih Seçicisi (Cupertino stili)
+  /// Doğum Tarihi Seçimi (Cupertino Modal).
   Future<void> _pickDate(BuildContext context) async {
-    // Klavye açıksa kapat
     FocusScope.of(context).unfocus();
-
     final l10n = AppLocalizations.of(context)!;
-
-    // Varsayılan tarih
     final initialDate = _selectedDate ?? DateTime.now();
 
     await showCupertinoModalPopup<void>(
@@ -108,10 +114,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       builder: (BuildContext context) {
         return Container(
           height: 250,
-          color: AppColors.surface, // Tema arka plan rengi
+          color: AppColors.surface,
           child: Column(
             children: [
-              // Üstteki "Tamam" butonu çubuğu
+              // Üst Bar (Tamam Butonu)
               Container(
                 color: AppColors.surface,
                 padding: const EdgeInsets.symmetric(
@@ -134,7 +140,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ],
                 ),
               ),
-              // Tarih Seçici Tekerleği
+              // Tarih Seçici
               Expanded(
                 child: CupertinoDatePicker(
                   mode: CupertinoDatePickerMode.date,
@@ -159,6 +165,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
+  /// Kayıt işlemini gerçekleştirir.
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -166,7 +173,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      // 1. ADIM: Firebase Authentication ile kullanıcıyı oluştur
+      // 1. Firebase Authentication ile kullanıcı hesabı oluştur
       final user = await ref
           .read(authServiceProvider)
           .signUp(
@@ -174,28 +181,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             password: _passwordController.text.trim(),
           );
 
-      // 2. ADIM: Eğer Auth başarılıysa, detayları Firestore'a kaydet
+      // 2. Başarılı ise detayları Firestore'a kaydet
       if (user != null) {
         await ref
             .read(databaseServiceProvider)
             .saveUserData(
-              uid: user.uid, // Auth'dan gelen benzersiz ID
+              uid: user.uid,
               firstName: _capitalizeWords(_nameController.text),
               lastName: _capitalizeWords(_surnameController.text),
               email: _emailController.text.trim(),
               birthDate: _selectedDate!,
             );
-        // 2.5 ADIM: Kullanıcıyı oturumdan çıkar
+
+        // 3. Otomatik giriş yerine kullanıcıyı login ekranına atmak için çıkış yap
         await ref.read(authServiceProvider).signOut();
       }
 
-      // 3. ADIM: Başarı mesajı göster ve bir önceki ekrana dön
+      // 4. Başarı mesajı göster ve geri dön
       if (mounted) {
         SnackbarUtils.showSuccess(context, message: l10n.successRegister);
         Navigator.of(context).pop();
       }
     } on FirebaseAuthException catch (e) {
-      // Hata mesajını yerelleştirme anahtarlarına göre ayarla
       if (mounted) {
         String errorMessage = l10n.errorRegisterGeneral;
         if (e.code == 'email-already-in-use') {
@@ -240,6 +247,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // İsim - Soyisim Yan Yana
                       Row(
                         children: [
                           Expanded(
@@ -277,6 +285,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      // Doğum Tarihi Alanı (Read-only, Tıklanabilir)
                       InkWell(
                         onTap: () => _pickDate(context),
                         borderRadius: BorderRadius.circular(12),
@@ -307,6 +316,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      // Email
                       CustomTextField(
                         controller: _emailController,
                         labelText: l10n.emailLabel,
@@ -323,6 +333,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      // Şifre
                       CustomTextField(
                         controller: _passwordController,
                         labelText: l10n.passwordLabel,
@@ -337,6 +348,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      // Şifre Tekrar
                       CustomTextField(
                         controller: _confirmPasswordController,
                         labelText: l10n.passwordConfirmLabel,
@@ -351,6 +363,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       const SizedBox(height: 24),
 
+                      // Kayıt Butonu
                       GradientButton(
                         onPressed: _isButtonEnabled && !_isLoading
                             ? _register
@@ -365,6 +378,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
               const SizedBox(height: 24),
 
+              // Giriş Yap Yönlendirmesi
               FadeInUp(
                 delay: const Duration(milliseconds: 200),
                 duration: const Duration(milliseconds: 800),

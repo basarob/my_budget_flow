@@ -7,7 +7,7 @@ import '../models/category_model.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../screens/add_transaction_screen.dart';
-import '../../calendar/providers/calendar_provider.dart'; // Takvim senkronizasyonu
+import '../../calendar/providers/calendar_provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/snackbar_utils.dart';

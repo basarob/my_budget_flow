@@ -3,10 +3,14 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'no_internet_screen.dart';
 
-/// İnternet bağlantı durumunu dinleyen ve kullanıcıya bildiren sarmalayıcı (wrapper) widget.
+/// Dosya: connection_wrapper.dart
 ///
-/// Uygulamanın en üst katmanında çalışarak tüm ekranlarda bağlantı kopukluğunu
-/// algılar ve [MaterialBanner] ile uyarı gösterir.
+/// İnternet bağlantı durumunu sürekli dinleyen sarmalayıcı (wrapper) widget.
+///
+/// [Özellikler]
+/// - Uygulamanın en üst katmanında çalışır.
+/// - Bağlantı koptuğunda otomatik olarak [NoInternetScreen] gösterir.
+/// - Bağlantı geri geldiğinde normal akışa devam eder.
 class ConnectionWrapper extends StatefulWidget {
   final Widget child;
 
@@ -33,13 +37,15 @@ class _ConnectionWrapperState extends State<ConnectionWrapper> {
     );
   }
 
+  /// Uygulama ilk açıldığında anlık bağlantı durumunu kontrol eder.
   Future<void> _checkInitialConnection() async {
     final result = await Connectivity().checkConnectivity();
     _updateConnectionStatus(result);
   }
 
+  /// Bağlantı durumu değiştiğinde state'i günceller.
   void _updateConnectionStatus(List<ConnectivityResult> results) {
-    // Liste içindeki herhangi bir sonuç 'none' değilse bağlantı var sayıyoruz
+    // 'none' içeriyorsa internet yok demektir.
     final hasConnection = !results.contains(ConnectivityResult.none);
 
     if (_hasConnection != hasConnection) {

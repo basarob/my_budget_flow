@@ -8,6 +8,17 @@ import 'features/auth/screens/wrapper.dart';
 import 'core/providers/language_provider.dart';
 import 'core/widgets/connection_wrapper.dart';
 
+/// Dosya: main.dart
+///
+/// Amaç: Uygulamanın giriş noktası (Entry Point).
+///
+/// Özellikler:
+/// - Firebase başlatma
+/// - Riverpod ProviderScope sarmalayıcısı
+/// - Localization (Dil) yapılandırması
+/// - Tema ve Rota yönetimi
+/// - Bağlantı kontrolü (ConnectionWrapper)
+
 /// Rota değişikliklerini algılamak için kullanılan global gözlemci (RouteAware widget'lar için).
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();

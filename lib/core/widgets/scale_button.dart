@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// Dosya: scale_button.dart
+///
 /// Tıklama anında küçülüp büyüyen (Bouncy) animasyonlu buton kapsayıcısı.
 ///
-/// Kullanıcı etkileşimini (Haptic Feedback) artırmak için herhangi bir widget'ı sarmalar.
+/// [Özellikler]
+/// - Herhangi bir widget'ı sararak animasyonlu butona dönüştürür.
+/// - Tıklama anında Haptic Feedback (Titreşim) verir.
+/// - Kullanıcı etkileşim hissiyatını (UX) artırır.
 class ScaleButton extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;

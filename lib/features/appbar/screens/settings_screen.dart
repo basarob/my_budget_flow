@@ -5,6 +5,14 @@ import '../../../l10n/app_localizations.dart';
 import '../../../../core/widgets/gradient_app_bar.dart';
 import '../../../core/providers/language_provider.dart';
 
+/// Dosya: settings_screen.dart
+///
+/// Amaç: Uygulama ayarlarının yapıldığı ekran.
+///
+/// Özellikler:
+/// - Dil Seçimi (Türkçe / İngilizce)
+/// - Gelecekte tema, bildirim tercihleri gibi ayarlar eklenebilir.
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 

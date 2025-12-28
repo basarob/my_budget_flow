@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'transaction_model.dart';
 
-/// Düzenli (Tekrarlayan) İşlem Modeli
+/// Dosya: recurring_transaction_model.dart
 ///
-/// Belirli aralıklarla (günlük, haftalık, aylık vb.) otomatik oluşturulacak
-/// işlemlerin şablonunu temsil eder.
+/// Amaç: Düzenli (tekrarlayan) işlem şablonunu tanımlar.
+///
+/// Özellikler:
+/// - Düzenli işlem detaylarını (sıklık, başlangıç tarihi vb.) tutar
+/// - Bir sonraki işlem tarihini hesaplar (calculateNextDueDate)
+/// - Otomatik oluşturma durumunu (aktif/pasif) yönetir
 class RecurringTransactionModel {
   final String id;
   final String title;

@@ -11,15 +11,24 @@ final authStateChangesProvider = StreamProvider<User?>((ref) {
   return authService.authStateChanges;
 });
 
+/// Dosya: auth_service.dart
+///
+/// Firebase Authentication işlemlerini yöneten servis sınıfı.
+///
+/// [Özellikler]
+/// - Giriş Yapma (SignIn)
+/// - Kayıt Olma (SignUp)
+/// - Çıkış Yapma (SignOut)
+/// - Şifre Sıfırlama (Password Reset)
+/// - Oturum durumunu dinleme (AuthStateChanges)
 class AuthService {
   final _logger = Logger();
-
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   // Kullanıcı Oturum Akışı (Stream)
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  /// E-posta ve şifre ile giriş yapma fonksiyonu
+  /// E-posta ve şifre ile giriş yapma işlemi.
   Future<User?> signIn({
     required String email,
     required String password,
@@ -37,7 +46,7 @@ class AuthService {
     }
   }
 
-  /// Yeni kullanıcı kaydı oluşturma fonksiyonu
+  /// Yeni kullanıcı oluşturma işlemi.
   Future<User?> signUp({
     required String email,
     required String password,
@@ -55,7 +64,7 @@ class AuthService {
     }
   }
 
-  /// Şifre sıfırlama e-postası gönderme fonksiyonu
+  /// Şifre sıfırlama bağlantısı gönderme isteği.
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
@@ -65,7 +74,7 @@ class AuthService {
     }
   }
 
-  /// Kullanıcı oturumunu kapatma fonksiyonu
+  /// Oturumu kapatma işlemi.
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
     _logger.i("Kullanıcı çıkış yaptı");

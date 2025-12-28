@@ -7,10 +7,15 @@ import '../../transactions/models/recurring_transaction_model.dart';
 import '../../transactions/screens/add_transaction_screen.dart';
 import '../../transactions/models/category_model.dart';
 
-/// Günlük İşlem Listesi
+/// Dosya: daily_transaction_list.dart
 ///
-/// Seçili güne ait gerçekleşmiş işlemleri ve yaklaşan ödemeleri listeler.
-/// İşlemlere tıklandığında düzenleme ekranına yönlendirir.
+/// Günlük İşlem Listesi Widget'ı.
+///
+/// [Özellikler]
+/// - Takvimde seçilen güne ait işlemleri listeler.
+/// - Yaklaşan düzenli ödemeleri ayrı bir bölüm olarak gösterir.
+/// - İşlemlere tıklandığında düzenleme ekranına (AddTransactionScreen) yönlendirir.
+/// - Kategori ikonlarını ve renklerini dinamik olarak gösterir.
 class DailyTransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;
   final List<RecurringTransactionModel> upcomingPayments;
@@ -31,10 +36,10 @@ class DailyTransactionList extends StatelessWidget {
       symbol: '₺',
     );
 
-    // Kategorileri haritaya çevir (Performans Optimizasyonu)
+    // Performans için kategorileri Map'e çevir
     final categoryMap = {for (var c in categories) c.name: c};
 
-    // Hiç işlem ve yaklaşan ödeme yoksa boş mesaj
+    // Veri Yoksa Boş Durum
     if (transactions.isEmpty && upcomingPayments.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(32.0),
@@ -63,7 +68,7 @@ class DailyTransactionList extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
-        // Gerçekleşmiş işlemler
+        // 1. Gerçekleşmiş İşlemler
         ...transactions.map(
           (tx) => _TransactionTile(
             transaction: tx,
@@ -74,7 +79,7 @@ class DailyTransactionList extends StatelessWidget {
           ),
         ),
 
-        // Yaklaşan ödemeler (farklı stil ile)
+        // 2. Yaklaşan Ödemeler (Opsiyonel)
         if (upcomingPayments.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -128,7 +133,7 @@ class DailyTransactionList extends StatelessWidget {
   }
 }
 
-/// Gerçekleşmiş İşlem Kartı
+/// Helper: Tekil İşlem Kartı
 class _TransactionTile extends StatelessWidget {
   final TransactionModel transaction;
   final CategoryModel? category;
@@ -151,7 +156,6 @@ class _TransactionTile extends StatelessWidget {
         ? AppColors.expenseRed
         : AppColors.incomeGreen;
 
-    // Kategori adı (Yerelleştirilmiş ise tr.arb'den al, yoksa direkt yaz)
     final displayCategory = _localizeCategory(transaction.categoryName, l10n);
 
     final icon = category != null
@@ -209,6 +213,7 @@ class _TransactionTile extends StatelessWidget {
   }
 }
 
+/// Yerelleştirilmiş kategori ismi
 String _localizeCategory(String name, AppLocalizations l10n) {
   switch (name) {
     case 'categoryFood':
@@ -234,7 +239,7 @@ String _localizeCategory(String name, AppLocalizations l10n) {
   }
 }
 
-/// Yaklaşan Ödeme Kartı (Farklı stil - kesikli çerçeve)
+/// Helper: Yaklaşan Ödeme Kartı
 class _UpcomingPaymentTile extends StatelessWidget {
   final RecurringTransactionModel recurring;
   final CategoryModel? category;

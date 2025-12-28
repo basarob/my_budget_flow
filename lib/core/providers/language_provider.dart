@@ -4,30 +4,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String _languageCodeKey = 'languageCode';
 
+/// Dosya: language_provider.dart
+///
 /// Uygulama dili yönetimini sağlayan Notifier sınıfı.
 ///
-/// Kullanıcının dil tercihini (Türkçe/İngilizce) yönetir, cihaz hafızasına kaydeder
-/// ve uygulama yeniden başlatıldığında tercihi hatırlar.
-/// Riverpod [AsyncNotifier] altyapısını kullanır.
+/// [Özellikler]
+/// - Kullanıcının dil tercihini (Türkçe/İngilizce) yönetir.
+/// - Tercihi cihaz hafızasına kaydeder ve açılışta hatırlar.
+/// - Riverpod [AsyncNotifier] altyapısını kullanır.
 class LanguageNotifier extends AsyncNotifier<Locale> {
   @override
   Future<Locale> build() async {
-    // 1. Adım: Cihaz hafızasından (SharedPreferences) kayıtlı dil tercihini oku.
+    // 1. Cihaz hafızasından kayıtlı dil tercihini oku.
     final prefs = await SharedPreferences.getInstance();
     final languageCode = prefs.getString(_languageCodeKey);
 
-    // 2. Adım: Eğer kayıtlı dil 'en' ise İngilizce locale döndür.
+    // 2. Eğer kayıtlı dil 'en' ise İngilizce locale döndür.
     if (languageCode == 'en') {
       return const Locale('en', 'US');
     }
 
-    // 3. Adım: Kayıtlı dil yoksa veya farklıysa varsayılan olarak Türkçe döndür.
+    // 3. Varsayılan olarak Türkçe döndür.
     return const Locale('tr', 'TR');
   }
 
   /// Dili değiştirir ve yeni tercihi kalıcı hafızaya kaydeder.
   ///
-  /// [isEnglish] true ise dili İngilizce yapar, false ise Türkçe yapar.
+  /// [isEnglish]: true ise İngilizce, false ise Türkçe yapar.
   Future<void> changeLanguage(bool isEnglish) async {
     final Locale newLocale;
     if (isEnglish) {
@@ -39,12 +42,10 @@ class LanguageNotifier extends AsyncNotifier<Locale> {
     // State'i güncelle (UI anında tepki verir)
     state = AsyncValue.data(newLocale);
 
-    // Tercihi diske kaydet (Asenkron işlem)
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_languageCodeKey, newLocale.languageCode);
     } catch (e) {
-      // Hata durumunda state'i hata ile güncelle
       state = AsyncValue.error(e, StackTrace.current);
     }
   }
@@ -52,7 +53,6 @@ class LanguageNotifier extends AsyncNotifier<Locale> {
 
 /// Dil Sağlayıcısı (Provider)
 ///
-/// [LanguageNotifier] sınıfını dinler ve [Locale] bilgisini widget ağacına sağlar.
 /// Uygulamanın herhangi bir yerinden `ref.watch(languageProvider)` ile erişilebilir.
 final languageProvider = AsyncNotifierProvider<LanguageNotifier, Locale>(() {
   return LanguageNotifier();

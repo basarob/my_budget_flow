@@ -3,6 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/transaction_model.dart';
 import '../models/recurring_transaction_model.dart';
 
+/// Dosya: transaction_repository.dart
+///
+/// Amaç: Firestore veritabanı ile finansal işlem iletişimini yönetir.
+///
+/// Özellikler:
+/// - İşlem ekleme, silme ve listeleme
+/// - Gelişmiş filtreleme ve sayfalama
+/// - Düzenli işlemlerin (recurring) yönetimi ve otomatik oluşturulması
+/// - Dashboard ve Takvim ekranları için özel veri akışları
+
 class PaginatedTransactionResult {
   final List<TransactionModel> items;
   final DocumentSnapshot? lastDocument;
@@ -164,6 +174,25 @@ class TransactionRepository {
   Stream<List<TransactionModel>> getRecentTransactionsStream(
     String userId, {
     int limit = 5,
+  }) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('transactions')
+        .orderBy('date', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            return TransactionModel.fromMap(doc.data(), doc.id);
+          }).toList();
+        });
+  }
+
+  /// Dashboard için geniş kapsamlı işlem akışı
+  Stream<List<TransactionModel>> getTransactionsStream({
+    required String userId,
+    int limit = 500,
   }) {
     return _firestore
         .collection('users')

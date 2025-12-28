@@ -5,9 +5,14 @@ import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import 'selection_card.dart';
 
-/// İşlem Tarihi Seçici
+/// Dosya: transaction_date_picker.dart
 ///
-/// Kullanıcının işlem tarihini seçmesi için kullanılan, animasyonlu kart bileşeni.
+/// Amaç: İşlem ekleme ekranında kullanılan tarih seçim kartı.
+///
+/// Özellikler:
+/// - Seçili tarihi formatlayarak gösterir
+/// - Tarih değiştiğinde (örn: otomatik olarak bugüne dönüldüğünde) animasyon oynatır
+/// - SelectionCard bileşenini sarmalar
 class TransactionDatePicker extends StatelessWidget {
   final DateTime selectedDate;
   final VoidCallback onTap;
