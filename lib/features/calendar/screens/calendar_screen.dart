@@ -406,12 +406,12 @@ class CalendarScreen extends ConsumerWidget {
 
         // Seçili gün işaretçisi
         selectedDecoration: BoxDecoration(
-          color: AppColors.primary,
+          color: AppColors.primary.withValues(alpha: 0.2), // Opaklık düşürüldü
           shape: BoxShape.circle,
         ),
-        selectedTextStyle: const TextStyle(
+        selectedTextStyle: TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: AppColors.primary, // Arka plan açıldığı için yazı koyu renk
         ),
 
         outsideDaysVisible: false,
@@ -518,7 +518,7 @@ class CalendarScreen extends ConsumerWidget {
     final hasExpense = events.any((e) => e.type == TransactionType.expense);
 
     return Positioned(
-      bottom: 1,
+      bottom: 5, // Biraz yukarı taşıdık
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -533,9 +533,9 @@ class CalendarScreen extends ConsumerWidget {
   /// Marker Noktası Yardımcı Metodu
   Widget _buildDot(Color color) {
     return Container(
-      width: 6,
-      height: 6,
-      margin: const EdgeInsets.symmetric(horizontal: 1),
+      width: 7, // Büyütüldü (6 -> 7)
+      height: 7,
+      margin: const EdgeInsets.symmetric(horizontal: 1.5), // Aralık artırıldı
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }

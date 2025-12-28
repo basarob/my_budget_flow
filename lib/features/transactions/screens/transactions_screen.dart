@@ -69,19 +69,31 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
       appBar: AppBar(
         title: Container(
           height: 40,
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.circular(20),
+            color: Colors.grey[200], // iOS Segmented Control arka planı
+            borderRadius: BorderRadius.circular(
+              12,
+            ), // Köşeleri biraz daha keskin ama yuvarlak
           ),
           child: TabBar(
             controller: _tabController,
             indicator: BoxDecoration(
-              color: theme.colorScheme.primary,
-              borderRadius: BorderRadius.circular(20),
+              color: theme.colorScheme.primary, // Tema ana rengi
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             indicatorSize: TabBarIndicatorSize.tab,
-            labelColor: Colors.white,
-            unselectedLabelColor: AppColors.textSecondary,
+            labelColor: Colors.white, // Seçili metin rengi
+            labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+            unselectedLabelColor:
+                Colors.grey[600], // Seçili olmayan metin rengi
             dividerColor: Colors.transparent,
             splashFactory: NoSplash.splashFactory,
             overlayColor: WidgetStateProperty.all(Colors.transparent),
@@ -111,24 +123,35 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      focusNode: _searchFocusNode,
-                      onChanged: (value) {
-                        ref
-                            .read(transactionFilterProvider.notifier)
-                            .setSearchQuery(value);
-                        ref.invalidate(paginatedTransactionProvider);
-                      },
-                      decoration: InputDecoration(
-                        hintText: l10n.searchHint,
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: TextField(
+                        focusNode: _searchFocusNode,
+                        onChanged: (value) {
+                          ref
+                              .read(transactionFilterProvider.notifier)
+                              .setSearchQuery(value);
+                          ref.invalidate(paginatedTransactionProvider);
+                        },
+                        decoration: InputDecoration(
+                          hintText: l10n.searchHint,
+                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.grey[600],
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
-                        filled: true,
-                        fillColor: AppColors.surface, // Renk paletine uygun
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
                       ),
                     ),
                   ),
@@ -144,15 +167,12 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(
-                            alpha: 0.1,
-                          ),
+                          color:
+                              Colors.transparent, // Filtre butonu da sadeleşti
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
                         ),
-                        child: Icon(
-                          Icons.filter_list,
-                          color: theme.colorScheme.primary,
-                        ),
+                        child: Icon(Icons.filter_list, color: Colors.grey[700]),
                       ),
                     ),
                   ],

@@ -114,7 +114,7 @@ class DashboardScreen extends ConsumerWidget {
           );
         },
         loading: () => const Text('...'), // Yükleniyor (Minimalist)
-        error: (_, __) => const SizedBox(), // Hata durumunda boş geç
+        error: (_, _) => const SizedBox(), // Hata durumunda boş geç
       ),
     );
   }
@@ -369,6 +369,13 @@ class DashboardScreen extends ConsumerWidget {
   ) {
     final categoryList = ref.watch(categoryListProvider).asData?.value ?? [];
 
+    // Toplam Tutar için Format
+    final currencyFormat = NumberFormat.currency(
+      locale: 'tr_TR',
+      symbol: '₺',
+      decimalDigits: 0,
+    );
+
     return FadeInUp(
       duration: const Duration(milliseconds: 800),
       child: GlassContainer(
@@ -389,32 +396,49 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
 
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Sol: Grafik
-                  Expanded(
-                    flex: 3,
-                    child: SizedBox(
-                      height: 160,
-                      child: PieChart(
-                        PieChartData(
-                          sectionsSpace: 2,
-                          centerSpaceRadius: 30,
-                          sections: _getPieSections(state, categoryList),
-                        ),
+              // 1. Grafik ve Ortadaki Toplam Tutar
+              SizedBox(
+                height: 200,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    PieChart(
+                      PieChartData(
+                        sectionsSpace: 4, // Biraz artırdık
+                        centerSpaceRadius: 60, // Boşluğu genişlettik
+                        sections: _getPieSections(state, categoryList),
+                        startDegreeOffset: 270,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-
-                  // Sağ: Kategori Listesi (Legend)
-                  Expanded(
-                    flex: 2,
-                    child: _buildPieLegend(state, categoryList, context),
-                  ),
-                ],
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.dashboardTotalExpense, // "Toplam Gider"
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          currencyFormat.format(state.totalExpense),
+                          style: GoogleFonts.outfit(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(height: 24),
+
+              // 2. Yatay Kaydırılabilir Legend (Chips)
+              _buildScrollableLegend(state, categoryList, context),
             ],
           ),
         ),
@@ -422,54 +446,99 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  /// Kategori Göstergesi (Legend)
-  Widget _buildPieLegend(
+  /// Yatay Kaydırılabilir Chip Listesi (Legend)
+  Widget _buildScrollableLegend(
     DashboardState state,
     List<CategoryModel> categoryList,
     BuildContext context,
   ) {
     final sortedEntries = state.expenseCategoryDistribution.entries.toList();
-    final top5 = sortedEntries.take(5).toList();
+    // En yüksek harcamadan düşüğe doğru
+    sortedEntries.sort((a, b) => b.value.compareTo(a.value));
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: top5.map((entry) {
-        final category = categoryList.firstWhere(
-          (c) => c.name == entry.key,
-          orElse: () => CategoryModel(
-            id: '',
-            name: entry.key,
-            iconCode: Icons.category.codePoint,
-            colorValue: Colors.grey.toARGB32(),
-          ),
-        );
+    // Limitsiz tüm kategorileri gösterelim veya ilk 10
+    final topList = sortedEntries.take(10).toList();
+    final totalExpense = state.totalExpense > 0 ? state.totalExpense : 1;
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Row(
-            children: [
-              Icon(
-                IconData(category.iconCode, fontFamily: 'MaterialIcons'),
-                size: 16,
-                color: Color(category.colorValue),
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: topList.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final entry = topList[index];
+          final category = categoryList.firstWhere(
+            (c) => c.name == entry.key,
+            orElse: () => CategoryModel(
+              id: '',
+              name: entry.key,
+              iconCode: Icons.category.codePoint,
+              colorValue: Colors.grey.toARGB32(),
+            ),
+          );
+
+          // Rengi biraz açalım ki yazı okunsun diye background olarak kullanalım
+          final catColor = Color(category.colorValue);
+
+          // Yüzde Hesapla
+          final percentage = (entry.value / totalExpense * 100);
+          final percentageText = percentage < 1
+              ? '<%1'
+              : '%${percentage.toStringAsFixed(0)}';
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: catColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: catColor.withValues(alpha: 0.2),
+                width: 1,
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  IconData(category.iconCode, fontFamily: 'MaterialIcons'),
+                  size: 16,
+                  color: catColor,
+                ),
+                const SizedBox(width: 6),
+                Text(
                   category.getLocalizedName(context),
                   style: GoogleFonts.inter(
                     fontSize: 12,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w500,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+                const SizedBox(width: 6),
+                // Yüzde Badge'i
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: catColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    percentageText,
+                    style: GoogleFonts.outfit(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: catColor, // Kendi renginde
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -480,12 +549,9 @@ class DashboardScreen extends ConsumerWidget {
   ) {
     final sortedEntries = state.expenseCategoryDistribution.entries.toList();
 
-    return sortedEntries.take(5).map((entry) {
+    return sortedEntries.take(8).map((entry) {
       final catName = entry.key;
       final amount = entry.value;
-      final total = state.totalExpense > 0 ? state.totalExpense : 1;
-      final percentage = (amount / total * 100);
-      final showTitle = percentage > 5;
 
       final category = categoryList.firstWhere(
         (c) => c.name == catName,
@@ -500,16 +566,9 @@ class DashboardScreen extends ConsumerWidget {
       return PieChartSectionData(
         color: Color(category.colorValue),
         value: amount,
-        title: showTitle
-            ? '%${percentage.toStringAsFixed(0)}'
-            : '', // Sadece %5'ten büyükse göster
-        radius: 45,
-        titleStyle: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          shadows: [const Shadow(color: Colors.black26, blurRadius: 2)],
-        ),
+        title: '', // Dilim üzerine yazı yazmıyoruz, sade olsun
+        radius: 16, // İnceltildi
+        showTitle: false,
       );
     }).toList();
   }

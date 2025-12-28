@@ -234,7 +234,7 @@ class CustomDrawer extends ConsumerWidget {
                 },
                 // Yüklenirken veya Hata durumunda minimal görünüm
                 loading: () => const Text('...'),
-                error: (_, __) => Text(user?.email ?? ''),
+                error: (_, _) => Text(user?.email ?? ''),
               ),
             ),
 
