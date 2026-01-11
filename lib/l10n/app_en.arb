@@ -37,7 +37,6 @@
     "pageTitleGoals": "Goals",
     "pageTitleProfile": "Profile",
     "pageTitleSettings": "Settings",
-    "pageTitleNotifications": "Notifications",
     "pageTitleAbout": "About",
 
     "errorInvalidEmail": "Please enter a valid email address.",
@@ -53,6 +52,7 @@
 
     "successRegister": "Registration successful. Please login.",
     "successResetEmailSent": "A reset link has been sent to your email address.\nDon't forget to check your spam folder!",
+    "profileUpdateSuccess": "Profile updated successfully.",
 
     "settingsLanguage": "App Language",
     "settingsLanguageTr": "Turkish",
@@ -183,12 +183,26 @@
     "chartSpendingDistribution": "Spending Distribution",
     "chartFinancialTrend": "Financial Trend",
     "goalsPlaceholder": "Your goals will appear here.",
+    "goalAddTitle": "Add New Goal",
+    "goalEditTitle": "Edit Goal",
+    "goalTargetAmount": "Target Amount",
+    "goalCurrentAmount": "Current Savings",
+    "goalDeadline": "Target Date",
+    "goalTitleLabel": "Goal Title",
+    "goalSavedAmount": "Saved: {amount}",
+    "addMoneyTitle": "Add Money",
+    "withdrawMoneyTitle": "Withdraw Money",
+    "goalDeleted": "Goal deleted",
+
+    "aboutAppDescriptionTitle": "About My Budget Flow",
+    "aboutAppDescription": "A modern budget tracking app designed to simplify your personal finance management. Track your income and expenses, set goals, and save money.",
+    "aboutPrivacyTitle": "Privacy and Security",
+    "aboutPrivacyContent": "Your data is encrypted and stored securely on your device and our cloud servers. Your personal data is never shared with third parties.",
 
     "@errorGeneric": {
         "description": "A generic error message that includes the error details.",
         "placeholders": {
-            "error": {
-            }
+            "error": {}
         }
     }
 }

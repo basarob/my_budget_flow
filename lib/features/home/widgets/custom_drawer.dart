@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/services/auth_service.dart';
 import '../../auth/providers/user_provider.dart'; // UserProvider eklendi
-import '../../appbar/screens/profile_screen.dart';
+import '../../profile/screens/profile_screen.dart';
 import '../../appbar/screens/settings_screen.dart';
 import '../../appbar/screens/about_app_screen.dart';
 import '../../../l10n/app_localizations.dart';

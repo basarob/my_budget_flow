@@ -29,7 +29,12 @@ class CustomTextField extends StatefulWidget {
     this.validator,
     this.autofocus = false,
     this.textCapitalization = TextCapitalization.none,
+    this.readOnly = false,
+    this.onTap,
   });
+
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -42,6 +47,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
+      readOnly: widget.readOnly,
+      onTap: widget.onTap,
       autofocus: widget.autofocus,
       obscureText: widget.isPassword ? _obscureText : false,
       keyboardType: widget.keyboardType,

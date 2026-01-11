@@ -1,112 +1,173 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../../core/widgets/gradient_app_bar.dart';
 import '../../../core/providers/language_provider.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/gradient_app_bar.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Dosya: settings_screen.dart
 ///
-/// Amaç: Uygulama ayarlarının yapıldığı ekran.
+/// Amaç: Uygulama ayarlarını yapılandırma ekranı.
 ///
 /// Özellikler:
-/// - Dil Seçimi (Türkçe / İngilizce)
-/// - Gelecekte tema, bildirim tercihleri gibi ayarlar eklenebilir.
+/// - Dil Seçimi (Türkçe / İngilizce) değişimini sağlar.
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _changeLanguage(Locale locale) {
+    final isEnglish = locale.languageCode == 'en';
+    ref.read(languageProvider.notifier).changeLanguage(isEnglish);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final asyncLocale = ref.watch(languageProvider);
+    final currentLocale = ref.watch(languageProvider);
 
     return Scaffold(
       appBar: GradientAppBar(title: Text(l10n.pageTitleSettings)),
-      body: asyncLocale.when(
-        data: (currentLocale) {
-          final isEnglish = currentLocale.languageCode == 'en';
-          return ListView(
-            padding: const EdgeInsets.symmetric(
-              vertical: 16.0,
-              horizontal: 8.0,
-            ),
-            children: [
-              ListTile(
-                title: Text(l10n.settingsLanguage),
-                trailing: _buildLanguageSelector(ref, isEnglish),
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text(l10n.errorLoadingLanguageSettings)),
-      ),
-    );
-  }
-
-  Widget _buildLanguageSelector(WidgetRef ref, bool isEnglish) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildLanguageToggle(
-            label: '🇹🇷 TR',
-            isSelected: !isEnglish,
-            onTap: () {
-              if (isEnglish) {
-                ref.read(languageProvider.notifier).changeLanguage(false);
-              }
-            },
-          ),
-          _buildLanguageToggle(
-            label: '🇬🇧 EN',
-            isSelected: isEnglish,
-            onTap: () {
-              if (!isEnglish) {
-                ref.read(languageProvider.notifier).changeLanguage(true);
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageToggle({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        margin: const EdgeInsets.all(2),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.surface : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: isSelected
-              ? [
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Dil Ayarı Kartı
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryDark.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    color: AppColors.textPrimary.withValues(alpha: 0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
                   ),
-                ]
-              : [],
+                ],
+                border: Border.all(
+                  color: AppColors.textPrimary.withValues(alpha: 0.05),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.language,
+                            color: AppColors.primary,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          l10n.settingsLanguage,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: AppColors.textPrimary.withValues(alpha: 0.05),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildLanguageOption(
+                    context,
+                    title: l10n.settingsLanguageTr,
+                    flag: "🇹🇷",
+                    value: const Locale('tr', 'TR'),
+                    groupValue: currentLocale.value,
+                    onChanged: (val) => _changeLanguage(val!),
+                  ),
+                  _buildLanguageOption(
+                    context,
+                    title: l10n.settingsLanguageEn,
+                    flag: "🇬🇧",
+                    value: const Locale('en', 'US'),
+                    groupValue: currentLocale.value,
+                    onChanged: (val) => _changeLanguage(val!),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ],
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? AppColors.primaryDark : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context, {
+    required String title,
+    required String flag,
+    required Locale value,
+    required Locale? groupValue,
+    required ValueChanged<Locale?> onChanged,
+  }) {
+    final isSelected =
+        groupValue != null && value.languageCode == groupValue.languageCode;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.05)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primary.withValues(alpha: 0.5)
+                : Colors.transparent,
+          ),
+        ),
+        // ignore: deprecated_member_use
+        child: RadioListTile<Locale>(
+          value: value,
+          // ignore: deprecated_member_use
+          groupValue: groupValue,
+          onChanged: onChanged,
+          activeColor: AppColors.primary,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 4,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Row(
+            children: [
+              Text(flag, style: const TextStyle(fontSize: 24)),
+              const SizedBox(width: 16),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -104,9 +104,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageTitleSettings => 'Settings';
 
   @override
-  String get pageTitleNotifications => 'Notifications';
-
-  @override
   String get pageTitleAbout => 'About';
 
   @override
@@ -146,6 +143,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get successResetEmailSent =>
       'A reset link has been sent to your email address.\nDon\'t forget to check your spam folder!';
+
+  @override
+  String get profileUpdateSuccess => 'Profile updated successfully.';
 
   @override
   String get settingsLanguage => 'App Language';
@@ -541,4 +541,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get goalsPlaceholder => 'Your goals will appear here.';
+
+  @override
+  String get goalAddTitle => 'Add New Goal';
+
+  @override
+  String get goalEditTitle => 'Edit Goal';
+
+  @override
+  String get goalTargetAmount => 'Target Amount';
+
+  @override
+  String get goalCurrentAmount => 'Current Savings';
+
+  @override
+  String get goalDeadline => 'Target Date';
+
+  @override
+  String get goalTitleLabel => 'Goal Title';
+
+  @override
+  String goalSavedAmount(Object amount) {
+    return 'Saved: $amount';
+  }
+
+  @override
+  String get addMoneyTitle => 'Add Money';
+
+  @override
+  String get withdrawMoneyTitle => 'Withdraw Money';
+
+  @override
+  String get goalDeleted => 'Goal deleted';
+
+  @override
+  String get aboutAppDescriptionTitle => 'About My Budget Flow';
+
+  @override
+  String get aboutAppDescription =>
+      'A modern budget tracking app designed to simplify your personal finance management. Track your income and expenses, set goals, and save money.';
+
+  @override
+  String get aboutPrivacyTitle => 'Privacy and Security';
+
+  @override
+  String get aboutPrivacyContent =>
+      'Your data is encrypted and stored securely on your device and our cloud servers. Your personal data is never shared with third parties.';
 }

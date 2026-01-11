@@ -37,7 +37,6 @@
     "pageTitleGoals": "Hedefler",
     "pageTitleProfile": "Profil",
     "pageTitleSettings": "Ayarlar",
-    "pageTitleNotifications": "Bildirimler",
     "pageTitleAbout": "Hakkında",
 
     "errorInvalidEmail": "Geçerli bir e-posta adresi giriniz.",
@@ -53,6 +52,7 @@
 
     "successRegister": "Kayıt başarıyla oluşturuldu. Lütfen giriş yapın.",
     "successResetEmailSent": "Sıfırlama bağlantısı e-posta adresine gönderildi.\nSpam klasörünü kontrol etmeyi unutma!",
+    "profileUpdateSuccess": "Profil başarıyla güncellendi.",
 
     "settingsLanguage": "Uygulama Dili",
     "settingsLanguageTr": "Türkçe",
@@ -183,6 +183,21 @@
     "chartSpendingDistribution": "Harcama Dağılımı",
     "chartFinancialTrend": "Finansal Trend",
     "goalsPlaceholder": "Hedefleriniz burada görünecek.",
+    "goalAddTitle": "Yeni Hedef Ekle",
+    "goalEditTitle": "Hedefi Düzenle",
+    "goalTargetAmount": "Hedef Tutar",
+    "goalCurrentAmount": "Mevcut Birikim",
+    "goalDeadline": "Hedef Tarihi",
+    "goalTitleLabel": "Hedef Başlığı",
+    "goalSavedAmount": "Biriken: {amount}",
+    "addMoneyTitle": "Para Ekle",
+    "withdrawMoneyTitle": "Para Çek",
+    "goalDeleted": "Hedef silindi",
+
+    "aboutAppDescriptionTitle": "My Budget Flow Hakkında",
+    "aboutAppDescription": "Kişisel finans yönetiminizi kolaylaştırmak için tasarlanmış modern bütçe takip uygulaması. Gelir ve giderlerinizi takip edin, hedefler belirleyin ve tasarruf edin.",
+    "aboutPrivacyTitle": "Gizlilik ve Güvenlik",
+    "aboutPrivacyContent": "Verileriniz cihazınızda ve güvenli bulut sunucularımızda şifrelenerek saklanmaktadır. Kişisel verileriniz üçüncü taraflarla asla paylaşılmaz.",
 
     "@errorGeneric": {
         "description": "Hata detayını içeren genel bir hata mesajı.",

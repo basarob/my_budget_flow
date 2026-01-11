@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/gradient_app_bar.dart';
-import '../../appbar/screens/notifications_screen.dart';
 import '../../calendar/screens/calendar_screen.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
 import '../../goals/screens/goals_screen.dart';
@@ -93,19 +92,6 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                 HapticFeedback.mediumImpact();
               },
             ),
-
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationsScreen(),
-                ),
-              );
-            },
-            tooltip: l10n.pageTitleNotifications,
-          ),
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),

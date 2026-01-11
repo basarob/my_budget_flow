@@ -284,12 +284,6 @@ abstract class AppLocalizations {
   /// **'Ayarlar'**
   String get pageTitleSettings;
 
-  /// No description provided for @pageTitleNotifications.
-  ///
-  /// In tr, this message translates to:
-  /// **'Bildirimler'**
-  String get pageTitleNotifications;
-
   /// No description provided for @pageTitleAbout.
   ///
   /// In tr, this message translates to:
@@ -367,6 +361,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Sıfırlama bağlantısı e-posta adresine gönderildi.\nSpam klasörünü kontrol etmeyi unutma!'**
   String get successResetEmailSent;
+
+  /// No description provided for @profileUpdateSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil başarıyla güncellendi.'**
+  String get profileUpdateSuccess;
 
   /// No description provided for @settingsLanguage.
   ///
@@ -1111,6 +1111,90 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Hedefleriniz burada görünecek.'**
   String get goalsPlaceholder;
+
+  /// No description provided for @goalAddTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Hedef Ekle'**
+  String get goalAddTitle;
+
+  /// No description provided for @goalEditTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefi Düzenle'**
+  String get goalEditTitle;
+
+  /// No description provided for @goalTargetAmount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef Tutar'**
+  String get goalTargetAmount;
+
+  /// No description provided for @goalCurrentAmount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut Birikim'**
+  String get goalCurrentAmount;
+
+  /// No description provided for @goalDeadline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef Tarihi'**
+  String get goalDeadline;
+
+  /// No description provided for @goalTitleLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef Başlığı'**
+  String get goalTitleLabel;
+
+  /// No description provided for @goalSavedAmount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Biriken: {amount}'**
+  String goalSavedAmount(Object amount);
+
+  /// No description provided for @addMoneyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Para Ekle'**
+  String get addMoneyTitle;
+
+  /// No description provided for @withdrawMoneyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Para Çek'**
+  String get withdrawMoneyTitle;
+
+  /// No description provided for @goalDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef silindi'**
+  String get goalDeleted;
+
+  /// No description provided for @aboutAppDescriptionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'My Budget Flow Hakkında'**
+  String get aboutAppDescriptionTitle;
+
+  /// No description provided for @aboutAppDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kişisel finans yönetiminizi kolaylaştırmak için tasarlanmış modern bütçe takip uygulaması. Gelir ve giderlerinizi takip edin, hedefler belirleyin ve tasarruf edin.'**
+  String get aboutAppDescription;
+
+  /// No description provided for @aboutPrivacyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik ve Güvenlik'**
+  String get aboutPrivacyTitle;
+
+  /// No description provided for @aboutPrivacyContent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verileriniz cihazınızda ve güvenli bulut sunucularımızda şifrelenerek saklanmaktadır. Kişisel verileriniz üçüncü taraflarla asla paylaşılmaz.'**
+  String get aboutPrivacyContent;
 }
 
 class _AppLocalizationsDelegate

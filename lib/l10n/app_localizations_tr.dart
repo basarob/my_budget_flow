@@ -104,9 +104,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get pageTitleSettings => 'Ayarlar';
 
   @override
-  String get pageTitleNotifications => 'Bildirimler';
-
-  @override
   String get pageTitleAbout => 'Hakkında';
 
   @override
@@ -148,6 +145,9 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get successResetEmailSent =>
       'Sıfırlama bağlantısı e-posta adresine gönderildi.\nSpam klasörünü kontrol etmeyi unutma!';
+
+  @override
+  String get profileUpdateSuccess => 'Profil başarıyla güncellendi.';
 
   @override
   String get settingsLanguage => 'Uygulama Dili';
@@ -537,4 +537,50 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get goalsPlaceholder => 'Hedefleriniz burada görünecek.';
+
+  @override
+  String get goalAddTitle => 'Yeni Hedef Ekle';
+
+  @override
+  String get goalEditTitle => 'Hedefi Düzenle';
+
+  @override
+  String get goalTargetAmount => 'Hedef Tutar';
+
+  @override
+  String get goalCurrentAmount => 'Mevcut Birikim';
+
+  @override
+  String get goalDeadline => 'Hedef Tarihi';
+
+  @override
+  String get goalTitleLabel => 'Hedef Başlığı';
+
+  @override
+  String goalSavedAmount(Object amount) {
+    return 'Biriken: $amount';
+  }
+
+  @override
+  String get addMoneyTitle => 'Para Ekle';
+
+  @override
+  String get withdrawMoneyTitle => 'Para Çek';
+
+  @override
+  String get goalDeleted => 'Hedef silindi';
+
+  @override
+  String get aboutAppDescriptionTitle => 'My Budget Flow Hakkında';
+
+  @override
+  String get aboutAppDescription =>
+      'Kişisel finans yönetiminizi kolaylaştırmak için tasarlanmış modern bütçe takip uygulaması. Gelir ve giderlerinizi takip edin, hedefler belirleyin ve tasarruf edin.';
+
+  @override
+  String get aboutPrivacyTitle => 'Gizlilik ve Güvenlik';
+
+  @override
+  String get aboutPrivacyContent =>
+      'Verileriniz cihazınızda ve güvenli bulut sunucularımızda şifrelenerek saklanmaktadır. Kişisel verileriniz üçüncü taraflarla asla paylaşılmaz.';
 }
