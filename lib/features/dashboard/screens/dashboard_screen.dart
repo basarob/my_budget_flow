@@ -100,21 +100,23 @@ class DashboardScreen extends ConsumerWidget {
             displayName = authUser.email!.split('@').first;
           }
 
-          final message = displayName.isNotEmpty
-              ? l10n.dashboardWelcomeMessage(displayName)
-              : l10n.dashboardWelcomeMessage('').replaceAll(',', '').trim();
+          // İsim boşsa "Kullanıcı" diyebiliriz veya boş bırakabiliriz
+          if (displayName.isEmpty) displayName = 'Kullanıcı';
 
-          return Text(
-            message,
-            style: GoogleFonts.outfit(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+          return Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 4),
+            child: Text(
+              l10n.dashboardWelcomeMessage(displayName),
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
           );
         },
-        loading: () => const Text('...'), // Yükleniyor (Minimalist)
-        error: (_, _) => const SizedBox(), // Hata durumunda boş geç
+        loading: () => const SizedBox(height: 50), // Yüklenirken yer tutucu
+        error: (_, _) => const SizedBox(),
       ),
     );
   }
@@ -396,49 +398,66 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
 
-              // 1. Grafik ve Ortadaki Toplam Tutar
-              SizedBox(
-                height: 200,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    PieChart(
-                      PieChartData(
-                        sectionsSpace: 4, // Biraz artırdık
-                        centerSpaceRadius: 60, // Boşluğu genişlettik
-                        sections: _getPieSections(state, categoryList),
-                        startDegreeOffset: 270,
+              // Yatay Düzen: Grafik (Sol) + Liste (Sağ)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 1. Grafik ve Ortadaki Toplam Tutar (Sol)
+                  Expanded(
+                    flex: 5,
+                    child: SizedBox(
+                      height: 180, // Biraz küçülttük
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          PieChart(
+                            PieChartData(
+                              sectionsSpace: 2,
+                              centerSpaceRadius: 50,
+                              sections: _getPieSections(state, categoryList),
+                              startDegreeOffset: 270,
+                            ),
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                l10n.dashboardTotalExpense,
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                currencyFormat.format(state.totalExpense),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          l10n.dashboardTotalExpense, // "Toplam Gider"
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          currencyFormat.format(state.totalExpense),
-                          style: GoogleFonts.outfit(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
+                  ),
 
-              // 2. Yatay Kaydırılabilir Legend (Chips)
-              _buildScrollableLegend(state, categoryList, context),
+                  const SizedBox(width: 16), // Araya boşluk
+                  // 2. Dikey Liste (Sağ)
+                  Expanded(
+                    flex: 4,
+                    child: _buildVerticalLegend(
+                      state,
+                      categoryList,
+                      context,
+                      state.totalExpense,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -446,99 +465,78 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  /// Yatay Kaydırılabilir Chip Listesi (Legend)
-  Widget _buildScrollableLegend(
+  /// Dikey Liste (Legend)
+  Widget _buildVerticalLegend(
     DashboardState state,
     List<CategoryModel> categoryList,
     BuildContext context,
+    double totalExpense,
   ) {
     final sortedEntries = state.expenseCategoryDistribution.entries.toList();
     // En yüksek harcamadan düşüğe doğru
     sortedEntries.sort((a, b) => b.value.compareTo(a.value));
 
-    // Limitsiz tüm kategorileri gösterelim veya ilk 10
-    final topList = sortedEntries.take(10).toList();
-    final totalExpense = state.totalExpense > 0 ? state.totalExpense : 1;
+    // İlk 5 kategori (veya 4 + "Diğer" yapılabilir ama şimdilik ilk 5)
+    final topList = sortedEntries.take(5).toList();
+    final realTotal = totalExpense > 0 ? totalExpense : 1;
 
-    return SizedBox(
-      height: 40,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: topList.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final entry = topList[index];
-          final category = categoryList.firstWhere(
-            (c) => c.name == entry.key,
-            orElse: () => CategoryModel(
-              id: '',
-              name: entry.key,
-              iconCode: Icons.category.codePoint,
-              colorValue: Colors.grey.toARGB32(),
-            ),
-          );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: topList.map((entry) {
+        final category = categoryList.firstWhere(
+          (c) => c.name == entry.key,
+          orElse: () => CategoryModel(
+            id: '',
+            name: entry.key,
+            iconCode: Icons.category.codePoint,
+            colorValue: Colors.grey.toARGB32(),
+          ),
+        );
+        final catColor = Color(category.colorValue);
+        final percentage = (entry.value / realTotal * 100);
 
-          // Rengi biraz açalım ki yazı okunsun diye background olarak kullanalım
-          final catColor = Color(category.colorValue);
-
-          // Yüzde Hesapla
-          final percentage = (entry.value / totalExpense * 100);
-          final percentageText = percentage < 1
-              ? '<%1'
-              : '%${percentage.toStringAsFixed(0)}';
-
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: catColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: catColor.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  IconData(category.iconCode, fontFamily: 'MaterialIcons'),
-                  size: 16,
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              // Renk Noktası
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
                   color: catColor,
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 6),
-                Text(
+              ),
+              const SizedBox(width: 8),
+
+              // Kategori Adı
+              Expanded(
+                child: Text(
                   category.getLocalizedName(context),
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 6),
-                // Yüzde Badge'i
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: catColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    percentageText,
-                    style: GoogleFonts.outfit(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: catColor, // Kendi renginde
-                    ),
-                  ),
+              ),
+
+              // Yüzde
+              Text(
+                percentage < 1 ? '<%1' : '%${percentage.toStringAsFixed(0)}',
+                style: GoogleFonts.outfit(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 

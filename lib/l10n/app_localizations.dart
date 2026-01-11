@@ -350,6 +350,24 @@ abstract class AppLocalizations {
   /// **'Dil ayarları yüklenirken bir hata oluştu.'**
   String get errorLoadingLanguageSettings;
 
+  /// No description provided for @errorUserDataNotFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcı verisi bulunamadı.'**
+  String get errorUserDataNotFound;
+
+  /// No description provided for @errorDataLoad.
+  ///
+  /// In tr, this message translates to:
+  /// **'Veri yüklenemedi.'**
+  String get errorDataLoad;
+
+  /// No description provided for @retryButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar Dene'**
+  String get retryButton;
+
   /// No description provided for @successRegister.
   ///
   /// In tr, this message translates to:
@@ -563,7 +581,7 @@ abstract class AppLocalizations {
   /// No description provided for @titleHint.
   ///
   /// In tr, this message translates to:
-  /// **'Başlık (Örn: Market Fişi)'**
+  /// **'Başlık (Örn: Market)'**
   String get titleHint;
 
   /// No description provided for @errorEnterTitle.
@@ -1043,7 +1061,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardWelcomeMessage.
   ///
   /// In tr, this message translates to:
-  /// **'Hoş geldin, {name}'**
+  /// **'Merhaba, {name} 👋'**
   String dashboardWelcomeMessage(Object name);
 
   /// No description provided for @dashboardNetStatus.
@@ -1195,6 +1213,114 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Verileriniz cihazınızda ve güvenli bulut sunucularımızda şifrelenerek saklanmaktadır. Kişisel verileriniz üçüncü taraflarla asla paylaşılmaz.'**
   String get aboutPrivacyContent;
+
+  /// No description provided for @goalTypeSavings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birikim Hedefi'**
+  String get goalTypeSavings;
+
+  /// No description provided for @goalTypeExpense.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harcama Hedefi'**
+  String get goalTypeExpense;
+
+  /// No description provided for @selectGoalType.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef Türünü Seçin'**
+  String get selectGoalType;
+
+  /// No description provided for @selectCategories.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategorileri Seçin ({count})'**
+  String selectCategories(Object count);
+
+  /// No description provided for @selectCategoriesError.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az 1 kategori seçmelisiniz!'**
+  String get selectCategoriesError;
+
+  /// No description provided for @startDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlangıç Tarihi'**
+  String get startDate;
+
+  /// No description provided for @resetGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefi Sıfırla'**
+  String get resetGoal;
+
+  /// No description provided for @resetGoalConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefi sıfırlamak istediğinize emin misiniz? Başlangıç tarihi bugüne çekilecek.'**
+  String get resetGoalConfirm;
+
+  /// No description provided for @goalReset.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef sıfırlandı.'**
+  String get goalReset;
+
+  /// No description provided for @collected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Biriken'**
+  String get collected;
+
+  /// No description provided for @spent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harcanan'**
+  String get spent;
+
+  /// No description provided for @remaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan'**
+  String get remaining;
+
+  /// No description provided for @goalDescriptionSavings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yatırım ve birikimlerinizi takip edin.'**
+  String get goalDescriptionSavings;
+
+  /// No description provided for @goalDescriptionExpense.
+  ///
+  /// In tr, this message translates to:
+  /// **'Belirli harcamalar için limit koyun.'**
+  String get goalDescriptionExpense;
+
+  /// No description provided for @goalsEmptyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz bir hedefiniz yok'**
+  String get goalsEmptyTitle;
+
+  /// No description provided for @goalsEmptyMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Finansal özgürlüğünüz için ilk adımı atın! + butonuna basarak yeni bir birikim veya bütçe hedefi oluşturun.'**
+  String get goalsEmptyMessage;
+
+  /// No description provided for @errorDefault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir hata oluştu'**
+  String get errorDefault;
+
+  /// No description provided for @categoriesLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategoriler yüklenemedi'**
+  String get categoriesLoadError;
 }
 
 class _AppLocalizationsDelegate

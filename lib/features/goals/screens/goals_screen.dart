@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/utils/snackbar_utils.dart';
 import '../../../l10n/app_localizations.dart';
 import '../models/goal_model.dart';
 import '../providers/goal_provider.dart';
-import '../widgets/add_goal_modal.dart';
+import 'add_goal_screen.dart';
 import '../widgets/goal_card.dart';
 
 /// Dosya: goals_screen.dart
@@ -13,9 +14,10 @@ import '../widgets/goal_card.dart';
 /// Amaç: Kullanıcının hedeflerini listelediği ve yönettiği ekran.
 ///
 /// Özellikler:
-/// - Hedef Listesi
-/// - Yeni Hedef Ekleme
-/// - Para Ekleme / Çıkarma Diyaloğu
+/// - Hedef Listesi (GoalsWithProgressProvider)
+/// - Sola kaydırarak silme (Undo özellikli)
+/// - Basılı tutarak sıfırlama (Tarihi bugüne çekme)
+/// - Tıklayarak düzenleme
 
 class GoalsScreen extends ConsumerStatefulWidget {
   const GoalsScreen({super.key});
@@ -25,73 +27,85 @@ class GoalsScreen extends ConsumerStatefulWidget {
 }
 
 class _GoalsScreenState extends ConsumerState<GoalsScreen> {
-  void _showAddGoalModal(BuildContext context, {Goal? goal}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => AddGoalModal(goalToEdit: goal),
+  void _showAddGoalScreen(BuildContext context, {Goal? goal}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AddGoalScreen(goalToEdit: goal)),
     );
   }
 
-  void _showAmountDialog(
-    BuildContext context,
-    WidgetRef ref,
-    Goal goal,
-    bool isAdding,
-  ) {
-    final controller = TextEditingController();
+  Future<void> _onResetGoal(BuildContext context, Goal goal) async {
     final l10n = AppLocalizations.of(context)!;
-
-    showDialog(
+    final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isAdding ? l10n.addMoneyTitle : l10n.withdrawMoneyTitle),
-        content: CustomTextField(
-          controller: controller,
-          labelText: l10n.amountLabel,
-          prefixIcon: isAdding ? Icons.add : Icons.remove,
-          keyboardType: TextInputType.number,
-        ),
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.resetGoal),
+        content: Text(l10n.resetGoalConfirm),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx, false),
             child: Text(l10n.cancelButton),
           ),
           TextButton(
-            onPressed: () async {
-              final amount =
-                  double.tryParse(controller.text.replaceAll(',', '.')) ?? 0.0;
-              if (amount > 0) {
-                final newAmount = isAdding
-                    ? goal.currentAmount + amount
-                    : goal.currentAmount - amount;
-
-                final updatedGoal = goal.copyWith(currentAmount: newAmount);
-                await ref
-                    .read(goalControllerProvider.notifier)
-                    .updateGoal(updatedGoal);
-
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              }
-            },
-            child: Text(isAdding ? l10n.addButton : l10n.saveButton),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.commonOk),
           ),
         ],
       ),
     );
+
+    if (confirm == true) {
+      await ref.read(goalControllerProvider.notifier).resetGoal(goal);
+      if (context.mounted) {
+        SnackbarUtils.showStandard(context, message: l10n.goalReset);
+      }
+    }
+  }
+
+  Future<void> _onDeleteGoal(BuildContext context, Goal goal) async {
+    HapticFeedback.lightImpact();
+    final l10n = AppLocalizations.of(context)!;
+
+    final notifier = ref.read(goalControllerProvider.notifier);
+
+    // 1. Silme işlemini başlat
+    await notifier.deleteGoal(goal.id);
+
+    // 4. Kesin kapanma garantisi (TransactionList ile uyum)
+    Future.delayed(const Duration(seconds: 3), () {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      }
+    });
+
+    // 2. Undo SnackBar göster (SnackbarUtils kullanarak)
+    if (context.mounted) {
+      SnackbarUtils.showStandard(
+        context,
+        message: l10n.goalDeleted,
+        onUndo: () {
+          notifier.addGoal(
+            title: goal.title,
+            targetAmount: goal.targetAmount,
+            startDate: goal.startDate,
+            type: goal.type,
+            categoryIds: goal.categoryIds,
+            colorValue: goal.colorValue,
+          );
+        },
+        undoLabel: l10n.undoAction,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final goalsAsync = ref.watch(goalsProvider);
+    final goalsAsync = ref.watch(goalsWithProgressProvider);
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddGoalModal(context),
+        onPressed: () => _showAddGoalScreen(context),
         backgroundColor: AppColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -99,30 +113,34 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
         data: (goals) {
           if (goals.isEmpty) {
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
                       Icons.flag_outlined,
                       size: 64,
-                      color: AppColors.primary,
+                      color: AppColors.passive.withValues(alpha: 0.5),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.goalsPlaceholder,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 16,
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.goalsEmptyTitle,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.goalsEmptyMessage,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary.withValues(alpha: 0.7),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             );
           }
@@ -132,12 +150,25 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
             itemCount: goals.length,
             itemBuilder: (context, index) {
               final goal = goals[index];
-              return GoalCard(
-                goal: goal,
-                onTap: () => _showAddGoalModal(context, goal: goal),
-                onAddMoney: () => _showAmountDialog(context, ref, goal, true),
-                onWithdrawMoney: () =>
-                    _showAmountDialog(context, ref, goal, false),
+              return Dismissible(
+                key: Key(goal.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.expenseRed,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (_) => _onDeleteGoal(context, goal),
+                child: GoalCard(
+                  goal: goal,
+                  onTap: () => _showAddGoalScreen(context, goal: goal),
+                  onLongPress: () => _onResetGoal(context, goal),
+                ),
               );
             },
           );

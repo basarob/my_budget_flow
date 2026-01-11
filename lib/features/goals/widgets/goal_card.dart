@@ -7,19 +7,22 @@ import '../models/goal_model.dart';
 /// Dosya: goal_card.dart
 ///
 /// Amaç: Tek bir hedefin özet bilgilerini ve ilerleme durumunu gösteren kart.
+///
+/// Özellikler:
+/// - Otomatik hesaplanan ilerleme durumu
+/// - Hedef Türüne göre sabit ikon
+/// - Düzenleme (Tap) ve Sıfırlama (Long Press) etkileşimleri
 
 class GoalCard extends StatelessWidget {
   final Goal goal;
   final VoidCallback onTap;
-  final VoidCallback onAddMoney;
-  final VoidCallback onWithdrawMoney;
+  final VoidCallback onLongPress;
 
   const GoalCard({
     super.key,
     required this.goal,
     required this.onTap,
-    required this.onAddMoney,
-    required this.onWithdrawMoney,
+    required this.onLongPress,
   });
 
   @override
@@ -27,15 +30,20 @@ class GoalCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final currencyFormat = NumberFormat.currency(locale: 'tr_TR', symbol: '₺');
 
+    // Renk ve İkon
     final progressColor = Color(goal.colorValue);
+    final iconData = goal.type == GoalType.investment
+        ? Icons.savings
+        : Icons.credit_card;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
-      shadowColor: Colors.black.withValues(alpha: 0.1),
+      shadowColor: Colors.black.withOpacity(0.1),
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -48,14 +56,10 @@ class GoalCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: progressColor.withValues(alpha: 0.1),
+                      color: progressColor.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      IconData(goal.iconCode, fontFamily: 'MaterialIcons'),
-                      color: progressColor,
-                      size: 24,
-                    ),
+                    child: Icon(iconData, color: progressColor, size: 24),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -70,14 +74,13 @@ class GoalCard extends StatelessWidget {
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        if (goal.deadline != null)
-                          Text(
-                            DateFormat('dd.MM.yyyy').format(goal.deadline!),
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 12,
-                            ),
+                        Text(
+                          '${l10n.startDate}: ${DateFormat('dd.MM.yyyy').format(goal.startDate)}',
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 12,
                           ),
+                        ),
                       ],
                     ),
                   ),
@@ -88,7 +91,7 @@ class GoalCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: progressColor.withValues(alpha: 0.1),
+                      color: progressColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -116,70 +119,47 @@ class GoalCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Tutarlar
+              // Tutarlar (Biriken / Hedef)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    currencyFormat.format(goal.currentAmount),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: progressColor,
-                    ),
-                  ),
-                  Text(
-                    currencyFormat.format(goal.targetAmount),
-                    style: const TextStyle(color: AppColors.textSecondary),
-                  ),
-                ],
-              ),
-
-              const Divider(height: 24),
-
-              // Alt Butonlar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: onWithdrawMoney,
-                    icon: const Icon(
-                      Icons.remove,
-                      size: 18,
-                      color: AppColors.expenseRed,
-                    ),
-                    label: Text(
-                      l10n.withdrawMoneyTitle,
-                      style: const TextStyle(
-                        color: AppColors.expenseRed,
-                        fontSize: 12,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.collected,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  TextButton.icon(
-                    onPressed: onAddMoney,
-                    icon: const Icon(
-                      Icons.add,
-                      size: 18,
-                      color: AppColors.incomeGreen,
-                    ),
-                    label: Text(
-                      l10n.addMoneyTitle,
-                      style: const TextStyle(
-                        color: AppColors.incomeGreen,
-                        fontSize: 12,
+                      Text(
+                        currencyFormat.format(goal.collectedAmount),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: progressColor,
+                        ),
                       ),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        l10n.goalTargetAmount,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      Text(
+                        currencyFormat.format(goal.targetAmount),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

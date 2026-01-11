@@ -139,6 +139,15 @@ class AppLocalizationsTr extends AppLocalizations {
       'Dil ayarları yüklenirken bir hata oluştu.';
 
   @override
+  String get errorUserDataNotFound => 'Kullanıcı verisi bulunamadı.';
+
+  @override
+  String get errorDataLoad => 'Veri yüklenemedi.';
+
+  @override
+  String get retryButton => 'Tekrar Dene';
+
+  @override
   String get successRegister =>
       'Kayıt başarıyla oluşturuldu. Lütfen giriş yapın.';
 
@@ -246,7 +255,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errorInvalidAmount => 'Geçersiz tutar';
 
   @override
-  String get titleHint => 'Başlık (Örn: Market Fişi)';
+  String get titleHint => 'Başlık (Örn: Market)';
 
   @override
   String get errorEnterTitle => 'Başlık giriniz';
@@ -502,7 +511,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String dashboardWelcomeMessage(Object name) {
-    return 'Hoş geldin, $name';
+    return 'Merhaba, $name 👋';
   }
 
   @override
@@ -583,4 +592,62 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get aboutPrivacyContent =>
       'Verileriniz cihazınızda ve güvenli bulut sunucularımızda şifrelenerek saklanmaktadır. Kişisel verileriniz üçüncü taraflarla asla paylaşılmaz.';
+
+  @override
+  String get goalTypeSavings => 'Birikim Hedefi';
+
+  @override
+  String get goalTypeExpense => 'Harcama Hedefi';
+
+  @override
+  String get selectGoalType => 'Hedef Türünü Seçin';
+
+  @override
+  String selectCategories(Object count) {
+    return 'Kategorileri Seçin ($count)';
+  }
+
+  @override
+  String get selectCategoriesError => 'En az 1 kategori seçmelisiniz!';
+
+  @override
+  String get startDate => 'Başlangıç Tarihi';
+
+  @override
+  String get resetGoal => 'Hedefi Sıfırla';
+
+  @override
+  String get resetGoalConfirm =>
+      'Hedefi sıfırlamak istediğinize emin misiniz? Başlangıç tarihi bugüne çekilecek.';
+
+  @override
+  String get goalReset => 'Hedef sıfırlandı.';
+
+  @override
+  String get collected => 'Biriken';
+
+  @override
+  String get spent => 'Harcanan';
+
+  @override
+  String get remaining => 'Kalan';
+
+  @override
+  String get goalDescriptionSavings => 'Yatırım ve birikimlerinizi takip edin.';
+
+  @override
+  String get goalDescriptionExpense => 'Belirli harcamalar için limit koyun.';
+
+  @override
+  String get goalsEmptyTitle => 'Henüz bir hedefiniz yok';
+
+  @override
+  String get goalsEmptyMessage =>
+      'Finansal özgürlüğünüz için ilk adımı atın! + butonuna basarak yeni bir birikim veya bütçe hedefi oluşturun.';
+
+  @override
+  String get errorDefault => 'Bir hata oluştu';
+
+  @override
+  String get categoriesLoadError => 'Kategoriler yüklenemedi';
 }

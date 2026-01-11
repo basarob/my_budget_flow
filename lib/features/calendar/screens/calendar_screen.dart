@@ -47,12 +47,12 @@ class CalendarScreen extends ConsumerWidget {
           children: [
             Icon(Icons.error_outline, size: 48, color: AppColors.expenseRed),
             const SizedBox(height: 16),
-            Text(l10n.errorGeneric('Veri yüklenemedi')),
+            Text(l10n.errorGeneric(l10n.errorDataLoad)),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: notifier.retryLoad,
               icon: const Icon(Icons.refresh),
-              label: const Text('Tekrar Dene'),
+              label: Text(l10n.retryButton),
             ),
           ],
         ),

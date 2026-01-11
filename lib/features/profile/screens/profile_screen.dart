@@ -73,7 +73,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       FocusScope.of(context).unfocus();
 
       final l10n = AppLocalizations.of(context)!;
-      // updateProfile returns void, so we await it.
+      // Profili güncelle (void döner, bu yüzden await kullanılır)
       await ref
           .read(profileControllerProvider.notifier)
           .updateProfile(
@@ -81,10 +81,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             lastName: _surnameController.text.trim(),
           );
 
-      // If we are here, strict mode assumes success or non-throwing.
-      // Riverpod async methods usually don't throw, but set state.
-      // We check state? Or just assume.
-      // For MVP UX, we show snackbar.
+      // Başarılı olduğunu varsayıyoruz (Riverpod async metotları genellikle hata fırlatmaz, state set eder)
+      // MVP UX için snackbar göster.
 
       if (mounted) {
         SnackbarUtils.showSuccess(context, message: l10n.profileUpdateSuccess);
@@ -106,7 +104,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: userAsync.when(
         data: (userData) {
           if (userData == null) {
-            return const Center(child: Text("Kullanıcı verisi bulunamadı."));
+            return Center(child: Text(l10n.errorUserDataNotFound));
           }
 
           _populateControllers(userData);

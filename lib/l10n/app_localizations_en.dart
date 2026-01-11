@@ -138,6 +138,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'An error occurred while loading the language settings.';
 
   @override
+  String get errorUserDataNotFound => 'User data not found.';
+
+  @override
+  String get errorDataLoad => 'Failed to load data.';
+
+  @override
+  String get retryButton => 'Retry';
+
+  @override
   String get successRegister => 'Registration successful. Please login.';
 
   @override
@@ -244,7 +253,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorInvalidAmount => 'Invalid amount';
 
   @override
-  String get titleHint => 'Title (e.g. Grocery Bill)';
+  String get titleHint => 'Title (e.g. Grocery)';
 
   @override
   String get errorEnterTitle => 'Enter title';
@@ -506,7 +515,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String dashboardWelcomeMessage(Object name) {
-    return 'Welcome, $name';
+    return 'Hello, $name 👋';
   }
 
   @override
@@ -587,4 +596,62 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aboutPrivacyContent =>
       'Your data is encrypted and stored securely on your device and our cloud servers. Your personal data is never shared with third parties.';
+
+  @override
+  String get goalTypeSavings => 'Savings Goal';
+
+  @override
+  String get goalTypeExpense => 'Expense Goal';
+
+  @override
+  String get selectGoalType => 'Select Goal Type';
+
+  @override
+  String selectCategories(Object count) {
+    return 'Select Categories ($count)';
+  }
+
+  @override
+  String get selectCategoriesError => 'You must select at least one category!';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get resetGoal => 'Reset Goal';
+
+  @override
+  String get resetGoalConfirm =>
+      'Are you sure you want to reset the goal? Start date will be set to today.';
+
+  @override
+  String get goalReset => 'Goal reset.';
+
+  @override
+  String get collected => 'Collected';
+
+  @override
+  String get spent => 'Spent';
+
+  @override
+  String get remaining => 'Remaining';
+
+  @override
+  String get goalDescriptionSavings => 'Track your savings and investments.';
+
+  @override
+  String get goalDescriptionExpense => 'Set limits for specific expenses.';
+
+  @override
+  String get goalsEmptyTitle => 'No goals yet';
+
+  @override
+  String get goalsEmptyMessage =>
+      'Take the first step towards financial freedom! Create a new savings or budget goal by pressing the + button.';
+
+  @override
+  String get errorDefault => 'An error occurred';
+
+  @override
+  String get categoriesLoadError => 'Failed to load categories';
 }
