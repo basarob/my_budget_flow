@@ -1286,6 +1286,24 @@ abstract class AppLocalizations {
   /// **'Kalan'**
   String get remaining;
 
+  /// No description provided for @goalRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan'**
+  String get goalRemaining;
+
+  /// No description provided for @savingsGoalCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tebrikler, hedefinize ulaştınız! 🎉'**
+  String get savingsGoalCompleted;
+
+  /// No description provided for @expenseGoalCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harcama hedefinize ulaştınız, dikkat edin! ⚠️'**
+  String get expenseGoalCompleted;
+
   /// No description provided for @goalDescriptionSavings.
   ///
   /// In tr, this message translates to:

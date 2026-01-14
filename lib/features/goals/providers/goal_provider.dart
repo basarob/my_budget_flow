@@ -51,10 +51,19 @@ final goalsWithProgressProvider = Provider<AsyncValue<List<Goal>>>((ref) {
                 // TransactionModel'de categoryName tutuluyor.
                 if (!goal.categoryIds.contains(tx.categoryName)) continue;
 
-                // 3. Tip Kontrolü: Sadece 'expense' (Harcama) tipli işlemler hesaba katılır.
-                // Birikim hedefi için: "Yatırım" kategorisindeki harcamalar (investment expense).
-                if (tx.type == TransactionType.expense) {
-                  collected += tx.amount;
+                // 3. Tip Kontrolü:
+                // - Harcama Hedefi: Sadece 'expense' (Gider) işlemleri.
+                // - Birikim Hedefi: Hem 'expense' (örn. Altın almak) hem de 'income' (örn. Maaş) işlemleri.
+                if (goal.type == GoalType.expense) {
+                  if (tx.type == TransactionType.expense) {
+                    collected += tx.amount;
+                  }
+                } else {
+                  // GoalType.investment
+                  if (tx.type == TransactionType.expense ||
+                      tx.type == TransactionType.income) {
+                    collected += tx.amount;
+                  }
                 }
               }
               return goal.copyWith(collectedAmount: collected);

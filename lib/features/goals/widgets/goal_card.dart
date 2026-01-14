@@ -127,7 +127,9 @@ class GoalCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.collected,
+                        goal.type == GoalType.investment
+                            ? l10n.collected
+                            : l10n.spent,
                         style: const TextStyle(
                           fontSize: 10,
                           color: AppColors.textSecondary,
@@ -138,6 +140,30 @@ class GoalCard extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: progressColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Kalan Miktar
+                  Column(
+                    children: [
+                      Text(
+                        l10n.goalRemaining,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      Text(
+                        currencyFormat.format(
+                          (goal.targetAmount - goal.collectedAmount).clamp(
+                            0,
+                            goal.targetAmount,
+                          ),
+                        ),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ],
@@ -163,6 +189,59 @@ class GoalCard extends StatelessWidget {
                   ),
                 ],
               ),
+
+              // Tamamlanma Mesajı
+              if (goal.progress >= 1.0) ...[
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: goal.type == GoalType.investment
+                        ? AppColors.incomeGreen.withValues(alpha: 0.1)
+                        : AppColors.expenseRed.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: goal.type == GoalType.investment
+                          ? AppColors.incomeGreen.withValues(alpha: 0.3)
+                          : AppColors.expenseRed.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        goal.type == GoalType.investment
+                            ? Icons.celebration
+                            : Icons.warning_amber_rounded,
+                        size: 16,
+                        color: goal.type == GoalType.investment
+                            ? AppColors.incomeGreen
+                            : AppColors.expenseRed,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          goal.type == GoalType.investment
+                              ? l10n.savingsGoalCompleted
+                              : l10n.expenseGoalCompleted,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: goal.type == GoalType.investment
+                                ? AppColors.incomeGreen
+                                : AppColors.expenseRed,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),

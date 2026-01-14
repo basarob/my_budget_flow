@@ -61,6 +61,7 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
       _selectedColor = goal.colorValue;
     } else {
       _titleController = TextEditingController();
+      _selectedColor = AppColors.userSelectionColors[4].toARGB32();
     }
 
     _amountFocusNode.addListener(() {
@@ -87,9 +88,9 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
       // Tür değişince varsayılan renk de değişsin (Eğer kullanıcı henüz elle seçmediyse...
       // ama basitlik için direkt atıyoruz)
       if (type == GoalType.investment) {
-        _selectedColor = AppColors.incomeGreen.toARGB32();
+        _selectedColor = AppColors.userSelectionColors[4].toARGB32();
       } else {
-        _selectedColor = AppColors.expenseRed.toARGB32();
+        _selectedColor = AppColors.userSelectionColors[6].toARGB32();
       }
     });
     HapticFeedback.lightImpact();

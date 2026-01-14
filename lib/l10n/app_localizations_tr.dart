@@ -633,6 +633,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get remaining => 'Kalan';
 
   @override
+  String get goalRemaining => 'Kalan';
+
+  @override
+  String get savingsGoalCompleted => 'Tebrikler, hedefinize ulaştınız! 🎉';
+
+  @override
+  String get expenseGoalCompleted =>
+      'Harcama hedefinize ulaştınız, dikkat edin! ⚠️';
+
+  @override
   String get goalDescriptionSavings => 'Yatırım ve birikimlerinizi takip edin.';
 
   @override

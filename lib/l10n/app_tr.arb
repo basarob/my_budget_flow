@@ -214,6 +214,9 @@
     "collected": "Biriken",
     "spent": "Harcanan",
     "remaining": "Kalan",
+    "goalRemaining": "Kalan",
+    "savingsGoalCompleted": "Tebrikler, hedefinize ulaştınız! 🎉",
+    "expenseGoalCompleted": "Harcama hedefinize ulaştınız, dikkat edin! ⚠️",
 
     "goalDescriptionSavings": "Yatırım ve birikimlerinizi takip edin.",
     "goalDescriptionExpense": "Belirli harcamalar için limit koyun.",

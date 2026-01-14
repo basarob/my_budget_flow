@@ -214,6 +214,9 @@
     "collected": "Collected",
     "spent": "Spent",
     "remaining": "Remaining",
+    "goalRemaining": "Remaining",
+    "savingsGoalCompleted": "Congratulations, you reached your goal! 🎉",
+    "expenseGoalCompleted": "You reached your expense limit, be careful! ⚠️",
 
     "goalDescriptionSavings": "Track your savings and investments.",
     "goalDescriptionExpense": "Set limits for specific expenses.",

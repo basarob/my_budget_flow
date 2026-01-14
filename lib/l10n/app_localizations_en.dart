@@ -637,6 +637,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remaining => 'Remaining';
 
   @override
+  String get goalRemaining => 'Remaining';
+
+  @override
+  String get savingsGoalCompleted =>
+      'Congratulations, you reached your goal! 🎉';
+
+  @override
+  String get expenseGoalCompleted =>
+      'You reached your expense limit, be careful! ⚠️';
+
+  @override
   String get goalDescriptionSavings => 'Track your savings and investments.';
 
   @override
