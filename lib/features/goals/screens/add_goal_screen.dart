@@ -43,7 +43,7 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
   GoalType _selectedType = GoalType.investment;
   late DateTime _startDate;
   List<String> _selectedCategoryIds = [];
-  int _selectedColor = AppColors.userSelectionColors[0].value;
+  int _selectedColor = AppColors.userSelectionColors[0].toARGB32();
 
   @override
   void initState() {
@@ -87,9 +87,9 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
       // Tür değişince varsayılan renk de değişsin (Eğer kullanıcı henüz elle seçmediyse...
       // ama basitlik için direkt atıyoruz)
       if (type == GoalType.investment) {
-        _selectedColor = AppColors.incomeGreen.value;
+        _selectedColor = AppColors.incomeGreen.toARGB32();
       } else {
-        _selectedColor = AppColors.expenseRed.value;
+        _selectedColor = AppColors.expenseRed.toARGB32();
       }
     });
     HapticFeedback.lightImpact();
@@ -352,12 +352,13 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: AppColors.userSelectionColors.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                separatorBuilder: (_, _) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final color = AppColors.userSelectionColors[index];
-                  final isSelected = _selectedColor == color.value;
+                  final isSelected = _selectedColor == color.toARGB32();
                   return GestureDetector(
-                    onTap: () => setState(() => _selectedColor = color.value),
+                    onTap: () =>
+                        setState(() => _selectedColor = color.toARGB32()),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: isSelected ? 40 : 32,

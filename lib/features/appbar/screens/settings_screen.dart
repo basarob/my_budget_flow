@@ -147,6 +147,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           value: value,
           // ignore: deprecated_member_use
           groupValue: groupValue,
+          // ignore: deprecated_member_use
           onChanged: onChanged,
           activeColor: AppColors.primary,
           contentPadding: const EdgeInsets.symmetric(

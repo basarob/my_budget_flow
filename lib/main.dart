@@ -7,8 +7,6 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/screens/wrapper.dart';
 import 'core/providers/language_provider.dart';
 import 'core/widgets/connection_wrapper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'core/services/shared_prefs_service.dart';
 
 /// Dosya: main.dart
 ///
@@ -31,18 +29,7 @@ void main() async {
   // Firebase başlat
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Shared Preferences ve Bildirimler
-  final prefs = await SharedPreferences.getInstance();
-  final sharedPrefsService = SharedPrefsService(prefs);
-
-  runApp(
-    ProviderScope(
-      overrides: [
-        sharedPrefsServiceProvider.overrideWithValue(sharedPrefsService),
-      ],
-      child: const MyBudgetFlow(),
-    ),
-  );
+  runApp(ProviderScope(child: const MyBudgetFlow()));
 }
 
 class MyBudgetFlow extends ConsumerWidget {
