@@ -1,5 +1,7 @@
 # 💰 My Budget Flow
 
+<img src="assets/docs/banner.jpg" width="100%">
+
 <p align="center">
   <a href="#türkçe">Türkçe</a> •
   <a href="#english">English</a>
@@ -82,17 +84,17 @@ my_budget_flow/
     flutter run
     ```
 
-### 📸 Ekran Görüntüleri / Screenshots
+### 📸 Ekran Görüntüleri
 
 |                          Giriş                           |                        Ana Sayfa                         |                          İşlemler                          |
 | :------------------------------------------------------: | :------------------------------------------------------: | :--------------------------------------------------------: |
 | <img src="assets/images/login_sc_image.png" width="200"> | <img src="assets/images/dashb_sc_image.png" width="200"> | <img src="assets/images/tralist_sc_image.png" width="200"> |
-|                       **Hedefler**                       |                        **Takvim**                        |                                                            |
-| <img src="assets/images/goals_sc_image.png" width="200"> |  <img src="assets/images/cal_sc_image.png" width="200">  |                                                            |
+|                     **İşlem Ekleme**                     |                       **Hedefler**                       |                         **Takvim**                         |
+| <img src="assets/images/addtr_sc_image.png" width="200"> | <img src="assets/images/goals_sc_image.png" width="200"> |   <img src="assets/images/cal_sc_image.png" width="200">   |
 
 ---
 
-<h2 id="english">🇺🇸 English</h2>
+<h2 id="english">🇬🇧 English</h2>
 
 ### 🚀 About The Project
 
@@ -172,8 +174,8 @@ my_budget_flow/
 |                          Login                           |                        Dashboard                         |                        Transactions                        |
 | :------------------------------------------------------: | :------------------------------------------------------: | :--------------------------------------------------------: |
 | <img src="assets/images/login_sc_image.png" width="200"> | <img src="assets/images/dashb_sc_image.png" width="200"> | <img src="assets/images/tralist_sc_image.png" width="200"> |
-|                        **Goals**                         |                       **Calendar**                       |                                                            |
-| <img src="assets/images/goals_sc_image.png" width="200"> |  <img src="assets/images/cal_sc_image.png" width="200">  |                                                            |
+|                   **Add Transaction**                    |                        **Goals**                         |                        **Calendar**                        |
+| <img src="assets/images/addtr_sc_image.png" width="200"> | <img src="assets/images/goals_sc_image.png" width="200"> |   <img src="assets/images/cal_sc_image.png" width="200">   |
 
 ### 🤝 Contributing
 
