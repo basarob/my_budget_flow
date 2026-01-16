@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'dart:async';
 import '../../auth/services/auth_service.dart';
 import '../../transactions/models/transaction_model.dart';
 import '../../transactions/providers/transaction_provider.dart';
@@ -73,26 +74,42 @@ class DashboardNotifier extends Notifier<DashboardState> {
   // Stream aboneliğini takip etmek için
   // Not: Repository Stream'ini dinleyerek state'i günceller.
 
+  StreamSubscription<List<TransactionModel>>? _subscription;
+
   @override
   DashboardState build() {
-    _subscribeToStream();
+    // Auth state'i dinle. Kullanıcı değiştiğinde build tekrar çalışır ve
+    // yeni bir Notifier örneği oluşturulur (eskisi dispose olur).
+    final authState = ref.watch(authStateChangesProvider);
+    final user = authState.value;
+
+    // Bu notifier dispose edildiğinde (yeni kullanıcı geldiğinde veya provider kapandığında)
+    // stream aboneliğini iptal et.
+    ref.onDispose(() {
+      _subscription?.cancel();
+    });
+
+    if (user != null) {
+      _subscribeToStream(user.uid);
+    }
+
     return const DashboardState();
   }
 
-  void _subscribeToStream() {
-    final user = ref.read(authStateChangesProvider).value;
-    if (user == null) return;
+  void _subscribeToStream(String userId) {
+    // Güvenlik: Eski abonelik varsa iptal et
+    _subscription?.cancel();
 
     final repository = ref.read(transactionRepositoryProvider);
 
     // Tüm işlemleri (veya geniş bir aralığı) dinle
     // Performans: Dashboard için son 1000 işlem yeterli olacaktır.
     final stream = repository.getTransactionsStream(
-      userId: user.uid,
+      userId: userId,
       limit: 1000,
     );
 
-    stream.listen((items) {
+    _subscription = stream.listen((items) {
       _processData(items);
     });
   }
@@ -106,7 +123,11 @@ class DashboardNotifier extends Notifier<DashboardState> {
     if (_lastAllTransactions.isNotEmpty) {
       _processData(_lastAllTransactions);
     } else {
-      _subscribeToStream(); // Tekrar abone ol (Gerekirse)
+      // Eğer memory'de veri yoksa tekrar stream başlat
+      final user = ref.read(authStateChangesProvider).value;
+      if (user != null) {
+        _subscribeToStream(user.uid);
+      }
     }
   }
 
